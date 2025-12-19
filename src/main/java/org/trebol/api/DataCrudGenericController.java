@@ -26,6 +26,7 @@ import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.services.CrudService;
 import org.trebol.jpa.services.PredicateService;
 import org.trebol.jpa.services.SortSpecParserService;
+import jakarta.validation.Valid;
 
 import jakarta.persistence.EntityNotFoundException;
 import java.util.Map;
@@ -51,7 +52,7 @@ public abstract class DataCrudGenericController<M, E>
     }
 
     @Override
-    public void update(M input, Map<String, String> requestParams) throws BadInputException, EntityNotFoundException {
+    public void update(@Valid M input, Map<String, String> requestParams) throws BadInputException, EntityNotFoundException {
         if (requestParams.isEmpty()) {
             throw new BadInputException("Missing request params");
         }
