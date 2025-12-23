@@ -20,16 +20,18 @@
 
 package org.trebol.api;
 
-import com.querydsl.core.types.Predicate;
+import java.util.Map;
+
 import org.trebol.api.services.PaginationService;
 import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.services.CrudService;
 import org.trebol.jpa.services.PredicateService;
 import org.trebol.jpa.services.SortSpecParserService;
-import jakarta.validation.Valid;
+
+import com.querydsl.core.types.Predicate;
 
 import jakarta.persistence.EntityNotFoundException;
-import java.util.Map;
+import jakarta.validation.Valid;
 
 /**
  * Base class that implements {@link DataCrudController}.<br/>
