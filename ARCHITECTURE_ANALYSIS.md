@@ -4,7 +4,7 @@
 
 ### 1.1 Current Architecture Diagram
 
-```
+
 ┌─────────────────────────────────────────────────────────────────────┐
 │                      PRESENTATION LAYER                             │
 │                   (REST API Controllers)                            │

@@ -90,3 +90,72 @@
 - OrderDetail entities hold line-item data for each order.
 - OrderStatus codes: 0=Pending, 1=Started, 2=Paid, 3=Confirmed, 4=Rejected, 5=Aborted, 6=Failed, 7=Completed.
 - buyOrder filter in readMany is a special case; returns exact match as single-page result.
+
+---
+
+## Three-Layer Architecture (Current – Order Management)
+- Presentation: REST controller orchestrating workflows and CRUD
+  - Controller: org.trebol.api.controllers.DataOrdersController
+  - Endpoints: list/create/update/patch/delete + workflow (`/confirmation`, `/rejection`, `/completion`)
+  - Collaborators: PaginationService, SortSpecParserService, OrdersCrudService, OrdersPredicateService, OrdersProcessService, optional MailingService
+- Application: services implementing business use cases and CRUD
+  - CRUD service: org.trebol.jpa.services.crud.impl.OrdersCrudServiceImpl
+    - Responsibilities: `readOne(predicate)` assembling `OrderPojo` with addresses and details; `flushPartialChanges` blocking edits when processed unless `apiProperties.isAbleToEditOrdersAfterBeingProcessed()` is true; `getExisting(OrderPojo)` by `buyOrder`
+    - Dependencies: OrdersRepository, OrdersConverterService, AddressesConverterService, ApiProperties
+  - Workflow service: org.trebol.api.services.impl.OrdersProcessServiceImpl
+    - Use cases: `markAsStarted`, `markAsAborted`, `markAsFailed`, `markAsPaid`, `markAsConfirmed`, `markAsRejected`, `markAsCompleted`
+    - Logic: validates current status, looks up next `OrderStatus` by name, updates status/token via repository, returns converted `OrderPojo` enriched with details/products
+    - Dependencies: OrdersCrudService, OrdersRepository, OrderDetailsRepository, OrderStatusesRepository, OrdersConverterService, ProductsConverterService
+  - Cross-cutting: Predicates and sorting (QueryDSL) via OrdersPredicateService and OrdersSortSpec
+- Persistence: JPA repositories and entities
+  - Repositories: org.trebol.jpa.repositories.OrdersRepository, OrderDetailsRepository, OrderStatusesRepository
+    - Custom queries: `findByTransactionToken`, `findByIdWithDetails`, `setStatus`, `setTransactionToken`
+  - Entities: org.trebol.jpa.entities.Order, OrderDetail, OrderStatus, Address
+  - Converters: OrdersConverterService, AddressesConverterService, ProductsConverterService
+
+## Relations Overview (Current)
+- DataOrdersController → OrdersCrudService / OrdersPredicateService / SortSpecParserService for data operations
+- DataOrdersController → OrdersProcessService for status transitions (+ MailingService notifications)
+- OrdersCrudServiceImpl → OrdersRepository (read/save), Converters (entity↔pojo), AddressesConverterService
+- OrdersProcessServiceImpl → OrdersRepository (status/token updates) + OrderDetailsRepository (line items) + OrderStatusesRepository (status lookups)
+- Repositories → Entities (Order aggregate references status, details, addresses)
+
+## Clean/Hexagonal Architecture (Target – Order Management)
+- Domain (core): business rules, invariants, aggregates
+  - Aggregate: `Order` (id, date, totals, `OrderStatus`, addresses, `List<OrderDetail>`)
+  - Value objects: `OrderDetail` (productId, units, unitValue), `OrderStatus` (code, name)
+  - Domain services: `OrderWorkflow` encapsulating transitions (start, paid, confirm, reject, complete) using status enum/codes, not strings
+  - Domain events: `OrderConfirmed`, `OrderRejected`, `OrderCompleted` (optional for integration/outbox)
+  - Ports (interfaces): `OrderRepository`, `OrderStatusRepository`, `OrderDetailRepository`, `NotificationPort`
+- Application (use cases): orchestrate domain operations and map DTOs
+  - Use cases: `StartPayment`, `AbortPayment`, `FailPayment`, `MarkPaid`, `ConfirmOrder`, `RejectOrder`, `CompleteOrder`
+  - Responsibilities: load aggregate via ports, invoke domain transitions, persist, publish events/notifications, return response models
+  - DTO mappers: map between `OrderPojo`/`OrderDetailPojo` and domain models
+- Adapters (in/out): implement ports and expose APIs
+  - Inbound (web): REST controller mapping endpoints to use cases; no direct repository/QueryDSL access
+    - Package: `org.trebol.order.adapters.in.web`
+  - Outbound (persistence): Spring Data JPA repositories implementing domain ports; entity mappers kept at adapter boundary
+    - Package: `org.trebol.order.adapters.out.persistence`
+  - Outbound (notifications): email/SMS adapters implementing `NotificationPort` (MailingService)
+    - Package: `org.trebol.order.adapters.out.notifications`
+
+## Package Refactoring Proposal
+- `org.trebol.order.domain` → Order, OrderDetail, OrderStatus, OrderRepository (port), OrderWorkflow (service)
+- `org.trebol.order.application` → use-case classes, DTO mappers
+- `org.trebol.order.adapters.in.web` → DataOrdersController (thin, delegates to use cases)
+- `org.trebol.order.adapters.out.persistence` → JPA repositories, QueryDSL specs, entity↔domain mappers
+- `org.trebol.order.adapters.out.notifications` → Mailing adapter
+
+## Key Improvements
+- Status model: replace string comparisons with enum/code-based transitions enforced in domain
+- Controller thickness: move all status logic to application use cases; controller becomes input adapter
+- Repository access: controller does not access repositories/predicates; only through use cases/ports
+- Converters/mappers: centralize mapping at adapter boundaries; domain works with pure models
+- Testability: unit-test domain transitions; integration-test adapters
+
+## Migration Steps (Incremental)
+- Introduce domain-layer models and status enum; adapt existing converters
+- Create ports for repositories/notifications; implement adapters around existing Spring Data repositories/MailingService
+- Extract use-case classes from OrdersProcessServiceImpl; wire controller to use cases
+- Gradually move predicate/sort concerns to persistence adapter (keep API-compatible responses)
+- Add domain tests for transitions and invariants; keep existing API tests passing
