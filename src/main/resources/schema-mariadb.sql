@@ -298,7 +298,7 @@ CREATE TABLE `order_details` (
   `order_id` bigint(20) NOT NULL,
   PRIMARY KEY (`order_detail_id`),
   CONSTRAINT `FK_ORDER_DETAIL_PROD_ID` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE SET NULL,
-  CONSTRAINT `FK_ORDER_DETAIL_PARENT_ID` FOREIGN KEY (`order_id`) REFERENCES `sales` (`order_id`)
+  CONSTRAINT `FK_ORDER_DETAIL_PARENT_ID` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
