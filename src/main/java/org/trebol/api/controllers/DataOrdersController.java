@@ -186,6 +186,18 @@ public class DataOrdersController
         }
     }
 
+    @PostMapping("/payment")
+    @Operation(summary = "Mark an order as paid (bypasses payment gateway for testing).")
+    @ResponseStatus(NO_CONTENT)
+    @PreAuthorize("hasAuthority('orders:update')")
+    public void markOrderAsPaid(@RequestBody OrderPojo sell)
+        throws BadInputException, MailingServiceException {
+        OrderPojo updatedSell = processService.markAsPaid(sell);
+        if (this.mailingService!=null) {
+            mailingService.notifyOrderStatusToClient(updatedSell);
+        }
+    }
+
     @Override
     protected Map<String, OrderSpecifier<?>> getOrderSpecMap() {
         return OrdersSortSpec.ORDER_SPEC_MAP;

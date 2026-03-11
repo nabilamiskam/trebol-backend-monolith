@@ -47,41 +47,92 @@ Example transition sequences:
 - Started → Aborted/Failed
 
 ## Clean/Hexagonal Architecture (Target)
+
+**Design Note:** Uses **anemic domain entities** (data containers without business methods) with business logic in domain services. This is a valid architectural choice where entities focus on data structure and relationships, while domain services encapsulate business rules.
+
 - Domain (Core)
-  - Aggregate: `Order` (id, date, totals, `OrderStatus`, `Address`es, `List<OrderDetail>`)
-  - Value objects: `OrderDetail` (productId, units, unitValue), `OrderStatus` (code, name)
-  - Domain service: `OrderWorkflow` enforcing transitions via enum/code, not string comparisons
-  - Domain events: `OrderConfirmed`, `OrderRejected`, `OrderCompleted` (optional/outbox)
-  - Ports: `OrderRepository`, `OrderStatusRepository`, `OrderDetailRepository`, `NotificationPort`
+  - **Entities (Anemic):** `Order`, `OrderDetail`, `OrderStatus` (data-only, no business methods)
+    - `Order`: id, date, totals, status, addresses, details (relationships preserved)
+    - `OrderDetail`: productId, units, unitValue
+    - `OrderStatus`: code, name (consider converting to enum for type safety)
+  - **Domain Services:** Business logic extracted from entities
+    - `OrderWorkflow`: enforces status transitions via enum/code (not string comparisons)
+    - `OrderTotalsCalculator`: computes net value, taxes (19%), transport, total
+    - `OrderValidator`: checks if order can be modified based on status
+  - **Domain Events:** `OrderConfirmed`, `OrderRejected`, `OrderCompleted` (optional/outbox pattern)
+  - **Ports (Interfaces):** `OrderRepository`, `OrderStatusRepository`, `OrderDetailRepository`, `NotificationPort`
 - Application (Use Cases)
-  - `StartPayment`, `AbortPayment`, `FailPayment`, `MarkPaid`, `ConfirmOrder`, `RejectOrder`, `CompleteOrder`
-  - Responsibilities: load aggregate via ports, invoke domain transitions, persist, publish events/notifications, return DTOs
-  - DTO mappers: map between `OrderPojo`/`OrderDetailPojo` and domain models
+  - **Use Cases:** `StartPayment`, `AbortPayment`, `FailPayment`, `MarkPaid`, `ConfirmOrder`, `RejectOrder`, `CompleteOrder`
+  - **Responsibilities:** 
+    - Load entities via repository ports
+    - Invoke domain services (OrderWorkflow, OrderTotalsCalculator)
+    - Persist changes through ports
+    - Publish domain events / trigger notifications
+    - Return DTOs to presentation layer
+  - **DTO Mappers:** Map between `OrderPojo`/`OrderDetailPojo` and domain entities (boundary translation)
 - Adapters (Inbound/Outbound)
-  - Inbound (web): REST controller mapping endpoints to use cases; no direct repository/QueryDSL access
-  - Outbound (persistence): Spring Data JPA implementing domain ports; entity↔domain mappers at adapter boundary
-  - Outbound (notifications): email/SMS adapter implementing `NotificationPort` (MailingService)
+  - **Inbound (Web):** REST controllers delegate to use cases; no direct repository/QueryDSL access
+  - **Outbound (Persistence):** Spring Data JPA repositories implement domain ports; keep JPA annotations at adapter boundary
+  - **Outbound (Notifications):** Email/SMS adapter implementing `NotificationPort` (MailingService)
+  - **Outbound (Payment):** Payment gateway adapter implementing `PaymentPort` (WebPay Plus decoupled)
 
 ## Package Refactoring Proposal
-- `org.trebol.order.domain` → `Order`, `OrderDetail`, `OrderStatus`, `OrderRepository` (port), `OrderWorkflow`
-- `org.trebol.order.application` → use-case classes, DTO mappers
-- `org.trebol.order.adapters.in.web` → `DataOrdersController` (thin, delegates to use cases)
-- `org.trebol.order.adapters.out.persistence` → JPA repositories, QueryDSL specs, entity↔domain mappers
-- `org.trebol.order.adapters.out.notifications` → mailing adapter
+- `org.trebol.order.domain`
+  - `entities`: `Order`, `OrderDetail`, `OrderStatus` (anemic entities - data only)
+  - `services`: `OrderWorkflow`, `OrderTotalsCalculator`, `OrderValidator` (business logic)
+  - `ports`: `OrderRepository`, `OrderStatusRepository`, `NotificationPort` (interfaces)
+- `org.trebol.order.application`
+  - `usecases`: `ConfirmOrder`, `RejectOrder`, `CompleteOrder`, etc.
+  - `mappers`: DTO ↔ Entity translation at boundary
+- `org.trebol.order.adapters.in.web` 
+  - `DataOrdersController` (thin, delegates to use cases)
+- `org.trebol.order.adapters.out.persistence` 
+  - JPA repositories implementing domain ports
+  - QueryDSL specifications
+- `org.trebol.order.adapters.out.notifications` 
+  - Mailing adapter implementing `NotificationPort`
+- `org.trebol.order.adapters.out.payment`
+  - Payment gateway adapter implementing `PaymentPort`
 
 ## Key Improvements
-- Replace string-based status checks with enum/code-based transitions in domain
-- Move status logic from controller to application use cases (controller becomes input adapter)
-- Access repositories only through ports in use cases; remove direct predicate/sort from controller
-- Centralize converters/mappers at adapter boundaries; domain remains pure
-- Improve testability: unit-test domain transitions; integration-test adapters and use cases
+- **Anemic entities accepted**: Business logic in domain services (OrderWorkflow, OrderTotalsCalculator), not entity methods
+- **Replace string-based status checks**: Use enum/code-based transitions in `OrderWorkflow` domain service
+- **Extract business logic from converter**: Move tax calculation (19%) to `OrderTotalsCalculator` domain service
+- **Reduce converter dependencies**: OrdersConverterService has 10+ repositories - split into mappers (simple conversion) + domain services (business logic)
+- **Controller as thin adapter**: Move all status transition logic to application use cases
+- **Repository access through ports**: Use cases depend on port interfaces, not concrete JPA repositories
+- **Decouple payment provider**: Abstract PaymentService behind `PaymentPort` to easily swap WebPay Plus
+- **Improve testability**: 
+  - Unit-test domain services (no DB, no frameworks)
+  - Integration-test adapters with real infrastructure
+  - Test use cases with port mocks
 
 ## Migration Steps
-- Introduce domain models and status enum; adapt converters accordingly
-- Define repository/notification ports; implement adapters around existing Spring Data/MailingService
-- Extract use-case classes from `OrdersProcessServiceImpl`; wire controller to use cases
-- Move predicate/sort concerns to persistence adapter; preserve API compatibility
-- Add domain tests for transitions; keep existing API tests passing during refactor
+- **Phase 1: Extract domain services from converter**
+  - Create `OrderTotalsCalculator` domain service (extract 19% tax calculation from OrdersConverterService)
+  - Create `OrderValidator` domain service (extract status-based validation rules)
+  - Reduce OrdersConverterService dependencies from 10+ to simple entity↔DTO mapping
+- **Phase 2: Introduce status enum and OrderWorkflow**
+  - Create `OrderStatusCode` enum (PENDING=0, STARTED=1, PAID=2, etc.)
+  - Build `OrderWorkflow` domain service with code-based transitions (replace string comparisons)
+  - Keep OrderStatus entity for backwards compatibility, add enum mapping
+- **Phase 3: Define repository ports**
+  - Create port interfaces: `OrderRepository`, `OrderStatusRepository`, `NotificationPort`, `PaymentPort`
+  - Implement adapters using existing Spring Data repositories and MailingService
+  - Abstract WebPay Plus behind PaymentPort for decoupling
+- **Phase 4: Extract use-case classes**
+  - Split OrdersProcessServiceImpl into individual use cases (`ConfirmOrder`, `RejectOrder`, etc.)
+  - Wire controller to use cases instead of direct service calls
+  - Move DTO mapping to application layer boundaries
+- **Phase 5: Reorganize packages**
+  - Move entities to `domain.entities` (keep anemic)
+  - Move domain services to `domain.services`
+  - Move use cases to `application.usecases`
+  - Separate adapters by type (web, persistence, notifications, payment)
+- **Phase 6: Testing strategy**
+  - Add unit tests for domain services (no DB/framework dependencies)
+  - Add integration tests for adapters (with real Spring Data, email service mocks)
+  - Keep existing API tests passing throughout refactor
 
 ## ASCII Diagrams
 
@@ -159,12 +210,17 @@ Target Clean/Hexagonal Architecture
          +------------------------------|----------------------------+
                                         v
          +------------------------ Domain Layer ---------------------+
-         |  Aggregate: Order                                         |
-         |  Value Objects: OrderDetail, OrderStatus (enum/code)      |
-         |  Domain Service: OrderWorkflow (enforces transitions)     |
-         |  Ports:                                                   |
+         |  Entities (Anemic): Order, OrderDetail, OrderStatus       |
+         |    - Data containers only (no business methods)           |
+         |                                                           |
+         |  Domain Services (Business Logic):                        |
+         |    - OrderWorkflow (status transitions via enum/code)     |
+         |    - OrderTotalsCalculator (net, tax 19%, total)          |
+         |    - OrderValidator (can modify? based on status)         |
+         |                                                           |
+         |  Ports (Interfaces):                                      |
          |    OrderRepository, OrderStatusRepository,                |
-         |    OrderDetailRepository, NotificationPort                |
+         |    NotificationPort, PaymentPort                          |
          +-------------------|-------------------|-------------------+
                              |                   |
                              v                   v

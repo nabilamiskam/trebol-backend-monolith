@@ -223,3 +223,13 @@ VALUES
 (03, 'salesperson', '$2a$10$j3fyIRTlgzANU8b2uDAsL.k2djo9Ywj3IJHeKse7TyeMT1dfcs8q2', 03),
 (04, 'customer',  '$2a$10$jQDzZpBh8JE0Yi4tOrx2XuJP3vPgepZFNH0UNlrIQJJFtrzd/XO8q', 04);
 -- passwords equal usernames, bcrypt logarithm cost factor of 10
+
+INSERT INTO `products`
+(`product_id`, `product_name`, `product_code`, `product_description`, `product_price`, `product_stock_current`, `product_stock_critical`)
+VALUES
+(01, 'Laptop', 'LAP001', 'High performance laptop', 50000, 10, 2),
+(02, 'Mouse', 'MOU001', 'Wireless mouse', 2000, 50, 5),
+(03, 'Keyboard', 'KEY001', 'Mechanical keyboard', 8000, 20, 3),
+(04, 'Monitor', 'MON001', '27 inch LED monitor', 35000, 15, 2),
+(05, 'Headphones', 'HEA001', 'Noise cancelling headphones', 12000, 30, 5);
+
