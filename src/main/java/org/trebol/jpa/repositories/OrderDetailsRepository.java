@@ -20,6 +20,7 @@
 
 package org.trebol.jpa.repositories;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.trebol.jpa.Repository;
@@ -33,4 +34,8 @@ public interface OrderDetailsRepository
 
     @Query(value = "SELECT d FROM OrderDetail d WHERE d.order.id = :orderId")
     List<OrderDetail> findBySellId(@Param("orderId") Long orderId);
+
+    @Modifying
+    @Query("DELETE FROM OrderDetail d WHERE d.order.id = :orderId")
+    int deleteByOrderId(@Param("orderId") Long orderId);
 }

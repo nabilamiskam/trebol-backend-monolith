@@ -112,7 +112,7 @@ public class Order
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private Salesperson salesperson;
     @JoinColumn(name = "order_id", nullable = false)
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY)
     private Collection<OrderDetail> details;
 
     /**

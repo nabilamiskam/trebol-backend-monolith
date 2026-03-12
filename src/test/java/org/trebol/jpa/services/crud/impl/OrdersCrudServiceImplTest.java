@@ -32,6 +32,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.trebol.api.models.OrderPojo;
 import org.trebol.config.ApiProperties;
 import org.trebol.jpa.entities.Order;
+import org.trebol.jpa.repositories.OrderDetailsRepository;
 import org.trebol.jpa.repositories.OrdersRepository;
 import org.trebol.jpa.services.conversion.AddressesConverterService;
 import org.trebol.jpa.services.conversion.OrdersConverterService;
@@ -47,12 +48,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OrdersCrudServiceImplTest {
     @InjectMocks OrdersCrudServiceImpl instance;
+    @Mock OrderDetailsRepository orderDetailsRepositoryMock;
     @Mock OrdersRepository ordersRepositoryMock;
     @Mock OrdersConverterService ordersConverterMock;
     @Mock AddressesConverterService addressesConverterServiceMock; // TODO verify usage of this mock when reading one
@@ -97,5 +100,28 @@ class OrdersCrudServiceImplTest {
         BooleanBuilder anyPredicate = new BooleanBuilder();
         when(ordersRepositoryMock.findOne(any(Predicate.class))).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> instance.readOne(anyPredicate));
+    }
+
+    @Test
+    void deletes_order_details_before_deleting_orders() {
+        BooleanBuilder anyPredicate = new BooleanBuilder();
+        Order existingOrder = ordersHelper.orderEntityAfterCreation();
+        when(ordersRepositoryMock.findAll(any(Predicate.class))).thenReturn(List.of(existingOrder));
+        when(orderDetailsRepositoryMock.findBySellId(existingOrder.getId())).thenReturn(List.of());
+
+        instance.delete(anyPredicate);
+
+        verify(orderDetailsRepositoryMock).findBySellId(existingOrder.getId());
+        verify(orderDetailsRepositoryMock).deleteAll(List.of());
+        verify(ordersRepositoryMock).deleteAll(List.of(existingOrder));
+    }
+
+    @Test
+    void throws_not_found_when_deleting_missing_orders() {
+        BooleanBuilder anyPredicate = new BooleanBuilder();
+        when(ordersRepositoryMock.findAll(any(Predicate.class))).thenReturn(List.of());
+
+        assertThrows(EntityNotFoundException.class, () -> instance.delete(anyPredicate));
+        verify(orderDetailsRepositoryMock, never()).deleteAll(any());
     }
 }
