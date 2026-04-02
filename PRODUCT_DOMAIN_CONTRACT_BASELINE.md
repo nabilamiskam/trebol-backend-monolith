@@ -1,253 +1,217 @@
-# Product Domain Contract Baseline
+# Product Domain Clean Architecture Baseline And Migration Playbook
 
-This document locks the current HTTP contract for Product domain endpoints during the safe migration to clean architecture. All changes to these contracts must be explicitly planned and reviewed.
+This document consolidates the agreed target architecture, migration strategy, contract-freeze rules, and baseline tests for product-domain reengineering.
 
-## Endpoints & Contracts
+Date: 2026-04-02
 
-### GET /data/products
-**Purpose**: List all products with pagination and filtering
+## 1. Target Structure
 
-**Request Parameters**
-- `pageIndex` (query): Page number (0-indexed)
-- `pageSize` (query): Items per page
-- `sortBy` (query, optional): Sort column
-- `direction` (query, optional): ASC or DESC
+### Product module root
+- `src/main/java/org/trebol/product`
 
-**Response (200)**
-```json
-{
-  "items": [
-    {
-      "id": 1,
-      "code": "PROD001",
-      "name": "Product Name",
-      "price": 29.99,
-      "type": {
-        "id": 1,
-        "code": "TYPE_CODE",
-        "name": "Type Name"
-      },
-      "category": {
-        "id": 1,
-        "code": "CAT_CODE",
-        "name": "Category Name"
-      },
-      "description": "Product description",
-      "isActive": true,
-      "imageURLList": [
-        {
-          "id": 1,
-          "url": "http://example.com/image.jpg"
-        }
-      ]
-    }
-  ],
-  "totalCount": 100
-}
-```
+### Domain layer
+- Folder: `src/main/java/org/trebol/product/domain/model`
+  - `ProductAggregate.java`
+  - `ProductId.java`
+  - `ProductName.java`
+  - `ProductPrice.java`
+  - `ProductStatus.java`
+- Folder: `src/main/java/org/trebol/product/domain/service`
+  - `ProductDomainService.java`
+- Folder: `src/main/java/org/trebol/product/domain/port`
+  - `ProductRepository.java`
+- Folder: `src/main/java/org/trebol/product/domain/exception`
+  - `ProductValidationException.java`
+  - `ProductNotFoundException.java`
+- Folder: `src/main/java/org/trebol/product/domain/event`
+  - `ProductCreatedEvent.java`
+  - `ProductUpdatedEvent.java`
 
----
+### Application layer
+- Folder: `src/main/java/org/trebol/product/application/usecase/create`
+  - `CreateProductUseCase.java`
+  - `CreateProductCommand.java`
+  - `CreateProductResult.java`
+- Folder: `src/main/java/org/trebol/product/application/usecase/update`
+  - `UpdateProductUseCase.java`
+  - `UpdateProductCommand.java`
+  - `UpdateProductResult.java`
+- Folder: `src/main/java/org/trebol/product/application/usecase/get`
+  - `GetProductUseCase.java`
+  - `GetProductQuery.java`
+  - `GetProductResult.java`
+- Folder: `src/main/java/org/trebol/product/application/usecase/list`
+  - `ListProductsUseCase.java`
+  - `ListProductsQuery.java`
+  - `ListProductsResult.java`
+- Folder: `src/main/java/org/trebol/product/application/usecase/delete`
+  - `DeleteProductUseCase.java`
+  - `DeleteProductCommand.java`
+- Folder: `src/main/java/org/trebol/product/application/service`
+  - `ProductApplicationService.java`
+- Folder: `src/main/java/org/trebol/product/application/mapper`
+  - `ProductApplicationMapper.java`
 
-### POST /data/products
-**Purpose**: Create a new product
+### Adapters layer
+- Inbound HTTP folder: `src/main/java/org/trebol/product/adapter/in/web`
+  - `ProductController.java`
+- Inbound DTO folder: `src/main/java/org/trebol/product/adapter/in/web/dto`
+  - `ProductRequest.java`
+  - `ProductResponse.java`
+  - `ProductDetailResponse.java`
+- Inbound mapper folder: `src/main/java/org/trebol/product/adapter/in/web/mapper`
+  - `ProductWebMapper.java`
+- Outbound persistence folder: `src/main/java/org/trebol/product/adapter/out/persistence/jpa`
+  - `ProductJpaEntity.java`
+  - `ProductJpaRepository.java`
+  - `ProductRepositoryAdapter.java`
+- Outbound mapper folder: `src/main/java/org/trebol/product/adapter/out/persistence/mapper`
+  - `ProductPersistenceMapper.java`
+- Outbound query folder: `src/main/java/org/trebol/product/adapter/out/persistence/query`
+  - `ProductQuerySpecification.java`
 
-**Request Body**
-```json
-{
-  "code": "PROD001",
-  "name": "Product Name",
-  "price": 29.99,
-  "type": {
-    "id": 1
-  },
-  "category": {
-    "id": 1
-  },
-  "description": "Product description",
-  "isActive": true
-}
-```
+### Infrastructure layer
+- Folder: `src/main/java/org/trebol/product/infrastructure/config`
+  - `ProductModuleConfiguration.java`
+- Folder: `src/main/java/org/trebol/product/infrastructure/transaction`
+  - `TransactionManagerAdapter.java`
 
-**Response (201)**
-```json
-{
-  "id": 1,
-  "code": "PROD001",
-  "name": "Product Name",
-  "price": 29.99,
-  "type": {
-    "id": 1,
-    "code": "TYPE_CODE",
-    "name": "Type Name"
-  },
-  "category": {
-    "id": 1,
-    "code": "CAT_CODE",
-    "name": "Category Name"
-  },
-  "description": "Product description",
-  "isActive": true,
-  "imageURLList": []
-}
-```
+### Tests
+- Folder: `src/test/java/org/trebol/product/domain`
+  - `ProductAggregateTest.java`
+  - `ProductDomainServiceTest.java`
+- Folder: `src/test/java/org/trebol/product/application`
+  - `CreateProductUseCaseTest.java`
+  - `UpdateProductUseCaseTest.java`
+- Folder: `src/test/java/org/trebol/product/adapter/in/web`
+  - `ProductControllerTest.java`
+- Folder: `src/test/java/org/trebol/product/adapter/out/persistence`
+  - `ProductRepositoryAdapterTest.java`
 
----
+## 2. Responsibility Rules
 
-### GET /data/products/{id}
-**Purpose**: Get a single product by ID
+1. Domain contains business rules only.
+2. Application orchestrates use cases.
+3. Adapters translate in and out.
+4. Infrastructure wires framework concerns.
 
-**Response (200)**
-Same as POST /data/products response format
+Dependency direction must stay inward:
 
-**Response (404)**
-```json
-{
-  "code": "NOTFOUND_01",
-  "message": "No such entity"
-}
-```
+- adapters -> application -> domain
+- infrastructure -> application and domain
+- domain -> no framework dependency
 
----
+## 3. Bit-by-Bit Migration Strategy
 
-### PUT /data/products?id={id}
-**Purpose**: Replace entire product
+Use a vertical-slice migration, not a big-bang package move.
 
-**Request Query Parameters**
-- `id`: Product ID (required)
+Recommended order:
 
-**Request Body**
-```json
-{
-  "code": "PROD001",
-  "name": "Updated Name",
-  "price": 39.99,
-  "type": {
-    "id": 1
-  },
-  "category": {
-    "id": 1
-  },
-  "description": "Updated description",
-  "isActive": true
-}
-```
+1. Get product.
+2. List products.
+3. Create product.
+4. Update product.
+5. Delete product.
+6. Shared concerns: events, mapping, transaction boundaries.
+7. Remove replaced legacy code.
 
-**Response (200)**
-Same format as GET response
+Per-slice recipe:
 
-**Response (400 - No query params)**
-```json
-{
-  "code": "REJECTED_01",
-  "message": "Bad input"
-}
-```
+1. Add use case contracts and models.
+2. Implement use case using ports only.
+3. Wire repository port implementation in adapter layer.
+4. Map HTTP DTOs to application models.
+5. Keep endpoint paths and payloads unchanged.
+6. Add or update tests.
+7. Merge only when tests are green.
 
-**Response (404)**
-```json
-{
-  "code": "NOTFOUND_01",
-  "message": "No such entity"
-}
-```
+## 4. What Freeze External Contract Means
 
----
+Freeze external contract first means lock what clients observe before refactoring internals.
 
-### PATCH /data/products?id={id}
-**Purpose**: Partially update product
+Contract includes:
 
-**Request Query Parameters**
-- `id`: Product ID (required)
+1. HTTP paths and methods.
+2. Query params and request body shape.
+3. Response JSON shape.
+4. Status codes.
+5. Error code payload behavior.
 
-**Request Body** (all fields optional)
-```json
-{
-  "name": "Updated Name",
-  "price": 39.99,
-  "isActive": false
-}
-```
+During migration, internals may change, but external behavior must not change.
 
-**Response (200)**
-Same format as GET response
+## 5. Current Contract Baseline
 
-**Response (400 - No query params)**
-```json
-{
-  "code": "REJECTED_01",
-  "message": "Bad input"
-}
-```
+### Product API
 
-**Response (404)**
-```json
-{
-  "code": "NOTFOUND_01",
-  "message": "No such entity"
-}
-```
+Path: `GET /data/products`
+- Returns HTTP 200.
+- Returns paged shape: `items`, `pageIndex`, `totalCount`, `pageSize`.
 
----
+Path: `POST /data/products`
+- Valid body returns HTTP 201.
 
-### DELETE /data/products?id={id}
-**Purpose**: Delete product
+Path: `PUT /data/products`
+- With filters returns HTTP 204.
+- Without filters returns HTTP 400 and code `REJECTED_01`.
 
-**Request Query Parameters**
-- `id`: Product ID (required)
+Path: `DELETE /data/products`
+- With filters returns HTTP 204.
 
-**Response (204)**
-No content
+### Product categories API
 
-**Response (400 - No query params)**
-```json
-{
-  "code": "REJECTED_01",
-  "message": "Bad input"
-}
-```
+Path: `GET /data/product_categories`
+- Returns HTTP 200 with paged shape.
 
-**Response (404)**
-```json
-{
-  "code": "NOTFOUND_01",
-  "message": "No such entity"
-}
-```
+Path: `POST /data/product_categories`
+- Valid body returns HTTP 201.
 
----
+Path: `PUT /data/product_categories`
+- With filters returns HTTP 204.
+- Without filters returns HTTP 400 and code `REJECTED_01`.
 
-## Error Codes Reference
+Path: `DELETE /data/product_categories`
+- With filters returns HTTP 204.
 
-Mapped by `ExceptionsControllerAdvice.java`:
+### Product list contents API
 
-| Exception | HTTP Status | Code | Message |
-|-----------|-------------|------|---------|
-| EntityNotFoundException | 404 | NOTFOUND_01 | No such entity |
-| EntityExistsException | 400 | EXISTS_01 | Entity already exists |
-| BadInputException | 400 | REJECTED_01 | Bad input |
-| MethodArgumentNotValidException | 400 | REJECTED_02 | Validation error |
+Path: `GET /data/product_list_contents?listCode=...`
+- Returns HTTP 200 with paged shape.
 
----
+Path: `POST /data/product_list_contents?listCode=...`
+- Valid body returns HTTP 201.
 
-## Migration Guardrails
+Path: `PUT /data/product_list_contents?listCode=...`
+- Valid body returns HTTP 204.
 
-1. **Immutable Endpoints**: Paths must remain unchanged during migration
-2. **Immutable Response Shape**: JSON structure of success responses must be preserved
-3. **Immutable Status Codes**: HTTP status for each endpoint+scenario locked
-4. **Immutable Error Codes**: Error code strings cannot change
-5. **Backward Compatibility**: Old endpoints must continue working throughout migration
-6. **Feature Flags**: New implementation hidden behind flags until ready
-7. **Gradual Traffic**: Old→New routing controlled incrementally
-8. **Schema Stability**: No database changes during migration
-9. **Regression Tests**: HTTP-level tests verify all contracts remain locked
+Path: `DELETE /data/product_list_contents?listCode=...`
+- Valid request returns HTTP 204.
 
----
+Path: `GET /data/product_list_contents` without `listCode`
+- Returns HTTP 400 and code `REJECTED_01`.
 
-## Verification
+### Error mapping reference
 
-All contracts verified against:
-- `DataProductsController.java` - Current endpoint definitions
-- `DataProductsControllerTest.java` - Existing unit tests
-- `ExceptionsControllerAdvice.java` - Error handling mapping
+Defined by `src/main/java/org/trebol/api/ExceptionsControllerAdvice.java`:
 
-Last verified: 2026-04-01
+- `EntityNotFoundException` -> 404, code `NOTFOUND_01`
+- `EntityExistsException` -> 400, code `EXISTS_01`
+- `BadInputException` -> 400, code `REJECTED_01`
+- `MethodArgumentNotValidException` -> 400, code `REJECTED_02`
+
+## 6. Contract Tests Added
+
+These tests are now the migration guardrails:
+
+1. `src/test/java/org/trebol/api/controllers/DataProductsControllerContractTest.java`
+2. `src/test/java/org/trebol/api/controllers/DataProductCategoriesControllerContractTest.java`
+3. `src/test/java/org/trebol/api/controllers/DataProductListContentsControllerContractTest.java`
+
+Most recent targeted test run for the last two files: 12 passed, 0 failed.
+
+## 7. Pull Request Rules For Safe Migration
+
+1. One vertical slice per PR.
+2. Keep external contract unchanged until explicitly versioned.
+3. Keep database schema unchanged unless planned separately.
+4. Merge only with green contract tests.
+5. Remove legacy code only after replacement slice is proven.
