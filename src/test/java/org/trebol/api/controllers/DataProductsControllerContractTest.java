@@ -37,6 +37,7 @@ import org.trebol.api.services.PaginationService;
 import org.trebol.jpa.services.SortSpecParserService;
 import org.trebol.jpa.services.crud.ProductsCrudService;
 import org.trebol.jpa.services.predicates.ProductsPredicateService;
+import org.trebol.product.application.usecase.ListProductsUseCase;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +62,7 @@ class DataProductsControllerContractTest {
     @Mock SortSpecParserService sortServiceMock;
     @Mock ProductsCrudService crudServiceMock;
     @Mock ProductsPredicateService predicateServiceMock;
+    @Mock ListProductsUseCase listProductsUseCaseMock;
 
     private MockMvc mockMvc;
 
@@ -70,7 +72,8 @@ class DataProductsControllerContractTest {
             paginationServiceMock,
             sortServiceMock,
             crudServiceMock,
-            predicateServiceMock
+            predicateServiceMock,
+            listProductsUseCaseMock
         );
 
         mockMvc = MockMvcBuilders
@@ -83,8 +86,12 @@ class DataProductsControllerContractTest {
     void get_products_returns_ok_with_paged_shape() throws Exception {
         when(paginationServiceMock.determineRequestedPageIndex(anyMap())).thenReturn(0);
         when(paginationServiceMock.determineRequestedPageSize(anyMap())).thenReturn(10);
-        when(crudServiceMock.readMany(eq(0), eq(10), eq(null), eq(null)))
-            .thenReturn(new DataPagePojo<>(List.of(), 0, 0, 10));
+        
+        // Mock the new ListProductsUseCase
+        org.trebol.product.application.result.PagedProductResult emptyResult = 
+            new org.trebol.product.application.result.PagedProductResult(List.of(), 0);
+        when(listProductsUseCaseMock.execute(any(org.trebol.product.application.query.ListProductsQuery.class)))
+            .thenReturn(emptyResult);
 
         mockMvc.perform(get("/data/products"))
             .andExpect(status().isOk())

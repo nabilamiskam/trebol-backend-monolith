@@ -45,6 +45,10 @@ import org.trebol.jpa.services.SortSpecParserService;
 import org.trebol.jpa.services.crud.ProductsCrudService;
 import org.trebol.jpa.services.predicates.ProductsPredicateService;
 import org.trebol.jpa.sortspecs.ProductsSortSpec;
+import org.trebol.product.application.query.ListProductsQuery;
+import org.trebol.product.application.result.PagedProductResult;
+import org.trebol.product.application.result.ProductResult;
+import org.trebol.product.application.usecase.ListProductsUseCase;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -60,21 +64,37 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 public class DataProductsController
     extends DataCrudGenericController<ProductPojo, Product> {
 
+    private final ListProductsUseCase listProductsUseCase;
+    private final PaginationService paginationService;
+
     @Autowired
     public DataProductsController(
         PaginationService paginationService,
         SortSpecParserService sortService,
         ProductsCrudService crudService,
-        ProductsPredicateService predicateService
+        ProductsPredicateService predicateService,
+        ListProductsUseCase listProductsUseCase
     ) {
         super(paginationService, sortService, crudService, predicateService);
+        this.paginationService = paginationService;
+        this.listProductsUseCase = listProductsUseCase;
     }
 
     @Override
     @GetMapping
     @Operation(summary = "List products.")
     public DataPagePojo<ProductPojo> readMany(@RequestParam Map<String, String> allRequestParams) {
-        return super.readMany(allRequestParams);
+        int pageIndex = paginationService.determineRequestedPageIndex(allRequestParams);
+        int pageSize = paginationService.determineRequestedPageSize(allRequestParams);
+        
+        ListProductsQuery query = new ListProductsQuery(pageIndex, pageSize);
+        PagedProductResult result = listProductsUseCase.execute(query);
+        
+        java.util.List<ProductPojo> items = result.items().stream()
+            .map(this::resultToPojo)
+            .toList();
+        
+        return new DataPagePojo<>(items, pageIndex, result.totalCount(), pageSize);
     }
 
     @Override
@@ -122,5 +142,13 @@ public class DataProductsController
     @Override
     protected Map<String, OrderSpecifier<?>> getOrderSpecMap() {
         return ProductsSortSpec.ORDER_SPEC_MAP;
+    }
+
+    private ProductPojo resultToPojo(ProductResult result) {
+        return ProductPojo.builder()
+            .name(result.name())
+            .barcode(result.code())
+            .price(result.price() != null ? result.price().intValue() : 0)
+            .build();
     }
 }

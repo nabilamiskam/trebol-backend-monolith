@@ -1,5 +1,7 @@
 package org.trebol.product.adapter.outbound.persistence;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.trebol.product.domain.aggregate.ProductAggregate;
 import org.trebol.product.domain.port.ProductRepository;
 import org.trebol.product.domain.vo.ProductCode;
@@ -35,7 +37,11 @@ public class ProductRepositoryAdapter implements ProductRepository {
 
     @Override
     public List<ProductAggregate> findAll(int pageIndex, int pageSize) {
-        return List.of();
+        Pageable pageable = PageRequest.of(pageIndex, pageSize);
+        return jpaRepository.findAll(pageable)
+            .stream()
+            .map(mapper::toAggregate)
+            .toList();
     }
 
     @Override

@@ -9,17 +9,17 @@ import jakarta.persistence.Table;
 @Table(name = "products")
 public class ProductJpaEntity {
     @Id
+    @Column(name = "product_id")
     private Long id;
 
-    @Column(name = "barcode")
+    @Column(name = "product_code")
     private String code;
 
+    @Column(name = "product_name")
     private String name;
 
-    private Double price;
-
-    @Column(name = "is_active")
-    private Boolean isActive;
+    @Column(name = "product_price")
+    private Integer price;
 
     public Long getId() {
         return id;
@@ -45,19 +45,11 @@ public class ProductJpaEntity {
         this.name = name;
     }
 
-    public Double getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(Integer price) {
         this.price = price;
-    }
-
-    public Boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(Boolean isActive) {
-        this.isActive = isActive;
     }
 }

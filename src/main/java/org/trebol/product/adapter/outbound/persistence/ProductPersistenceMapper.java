@@ -5,7 +5,6 @@ import org.trebol.product.domain.vo.ProductCode;
 import org.trebol.product.domain.vo.ProductId;
 import org.trebol.product.domain.vo.ProductName;
 import org.trebol.product.domain.vo.ProductPrice;
-import org.trebol.product.domain.vo.ProductStatus;
 
 import java.math.BigDecimal;
 
@@ -15,8 +14,7 @@ public class ProductPersistenceMapper {
         entity.setId(aggregate.getId().value());
         entity.setCode(aggregate.getCode().value());
         entity.setName(aggregate.getName().value());
-        entity.setPrice(aggregate.getPrice().value().doubleValue());
-        entity.setIsActive(aggregate.getStatus().asBoolean());
+        entity.setPrice(aggregate.getPrice().value().intValue());
         return entity;
     }
 
@@ -27,7 +25,6 @@ public class ProductPersistenceMapper {
             new ProductName(entity.getName()),
             new ProductPrice(BigDecimal.valueOf(entity.getPrice()))
         );
-        aggregate.updateStatus(ProductStatus.fromBoolean(entity.getIsActive()));
         return aggregate;
     }
 }

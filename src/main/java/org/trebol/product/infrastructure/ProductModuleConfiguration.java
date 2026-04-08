@@ -29,8 +29,8 @@ public class ProductModuleConfiguration {
     }
 
     @Bean
-    public ProductApplicationService productApplicationService() {
-        return new ProductApplicationService();
+    public ProductApplicationService productApplicationService(ProductRepository repository, ProductApplicationMapper mapper) {
+        return new ProductApplicationService(repository, mapper);
     }
 
     @Bean

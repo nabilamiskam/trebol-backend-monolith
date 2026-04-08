@@ -695,8 +695,8 @@ public class ProductJpaMapper {
 ## PART 7: MIGRATION ROADMAP
 
 ### Phase 1: Prepare (Week 1-2)
-- [ ] Create domain package structure
-- [ ] Create pure domain entities (Product, ProductCategory, ProductImage)
+- [ /] Create domain package structure
+- [ /] Create pure domain entities (Product, ProductCategory, ProductImage)
 - [ ] Create value objects (ProductName, ProductBarcode, ProductPrice, Stock)
 - [ ] Create domain exceptions
 
