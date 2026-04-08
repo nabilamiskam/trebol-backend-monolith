@@ -25,7 +25,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
-@EntityScan(basePackages = {"org.trebol.jpa.entities"})
-@EnableJpaRepositories(basePackages = {"org.trebol.jpa.repositories"})
+@EntityScan(basePackages = {
+	"org.trebol.jpa.entities",
+	"org.trebol.product.adapter.outbound.persistence"
+})
+@EnableJpaRepositories(basePackages = {
+	"org.trebol.jpa.repositories",
+	"org.trebol.product.adapter.outbound.persistence"
+})
 public class JpaConfig {
 }
