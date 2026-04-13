@@ -21,8 +21,13 @@
 package org.trebol.jpa.services.crud.impl;
 
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Predicate;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,27 +37,21 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.trebol.api.models.OrderPojo;
 import org.trebol.config.ApiProperties;
 import org.trebol.jpa.entities.Order;
+import org.trebol.jpa.repositories.OrderDetailsRepository;
 import org.trebol.jpa.repositories.OrdersRepository;
 import org.trebol.jpa.services.conversion.AddressesConverterService;
 import org.trebol.jpa.services.conversion.OrdersConverterService;
 import org.trebol.testing.OrdersTestHelper;
 
-import jakarta.persistence.EntityNotFoundException;
-import java.util.List;
-import java.util.Optional;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class OrdersCrudServiceImplTest {
     @InjectMocks OrdersCrudServiceImpl instance;
+    @Mock OrderDetailsRepository orderDetailsRepositoryMock;
     @Mock OrdersRepository ordersRepositoryMock;
     @Mock OrdersConverterService ordersConverterMock;
     @Mock AddressesConverterService addressesConverterServiceMock; // TODO verify usage of this mock when reading one
@@ -97,5 +96,28 @@ class OrdersCrudServiceImplTest {
         BooleanBuilder anyPredicate = new BooleanBuilder();
         when(ordersRepositoryMock.findOne(any(Predicate.class))).thenReturn(Optional.empty());
         assertThrows(EntityNotFoundException.class, () -> instance.readOne(anyPredicate));
+    }
+
+    @Test
+    void deletes_order_details_before_deleting_orders() {
+        BooleanBuilder anyPredicate = new BooleanBuilder();
+        Order existingOrder = ordersHelper.orderEntityAfterCreation();
+        when(ordersRepositoryMock.findAll(any(Predicate.class))).thenReturn(List.of(existingOrder));
+        when(orderDetailsRepositoryMock.findBySellId(existingOrder.getId())).thenReturn(List.of());
+
+        instance.delete(anyPredicate);
+
+        verify(orderDetailsRepositoryMock).findBySellId(existingOrder.getId());
+        verify(orderDetailsRepositoryMock).deleteAll(List.of());
+        verify(ordersRepositoryMock).deleteAll(List.of(existingOrder));
+    }
+
+    @Test
+    void throws_not_found_when_deleting_missing_orders() {
+        BooleanBuilder anyPredicate = new BooleanBuilder();
+        when(ordersRepositoryMock.findAll(any(Predicate.class))).thenReturn(List.of());
+
+        assertThrows(EntityNotFoundException.class, () -> instance.delete(anyPredicate));
+        verify(orderDetailsRepositoryMock, never()).deleteAll(any());
     }
 }

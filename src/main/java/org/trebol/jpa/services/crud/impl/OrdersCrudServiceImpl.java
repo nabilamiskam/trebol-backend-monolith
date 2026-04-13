@@ -30,6 +30,7 @@ import org.trebol.api.models.OrderPojo;
 import org.trebol.common.exceptions.BadInputException;
 import org.trebol.config.ApiProperties;
 import org.trebol.jpa.entities.Order;
+import org.trebol.jpa.repositories.OrderDetailsRepository;
 import org.trebol.jpa.repositories.OrdersRepository;
 import org.trebol.jpa.services.conversion.AddressesConverterService;
 import org.trebol.jpa.services.conversion.OrdersConverterService;
@@ -49,6 +50,7 @@ public class OrdersCrudServiceImpl
     extends CrudGenericService<OrderPojo, Order>
     implements OrdersCrudService {
     private final OrdersRepository ordersRepository;
+    private final OrderDetailsRepository orderDetailsRepository;
     private final OrdersConverterService ordersConverterService;
     private final AddressesConverterService addressesConverterService;
     private final ApiProperties apiProperties;
@@ -56,6 +58,7 @@ public class OrdersCrudServiceImpl
     @Autowired
     public OrdersCrudServiceImpl(
         OrdersRepository ordersRepository,
+        OrderDetailsRepository orderDetailsRepository,
         OrdersConverterService ordersConverterService,
         OrdersPatchService ordersPatchService,
         AddressesConverterService addressesConverterService,
@@ -63,6 +66,7 @@ public class OrdersCrudServiceImpl
     ) {
         super(ordersRepository, ordersConverterService, ordersPatchService);
         this.ordersRepository = ordersRepository;
+        this.orderDetailsRepository = orderDetailsRepository;
         this.ordersConverterService = ordersConverterService;
         this.addressesConverterService = addressesConverterService;
         this.apiProperties = apiProperties;
@@ -102,6 +106,19 @@ public class OrdersCrudServiceImpl
         } else {
             throw new EntityNotFoundException("No sell matches the filtering conditions");
         }
+    }
+
+    @Override
+    public void delete(Predicate filters) throws EntityNotFoundException {
+        Iterable<Order> matches = ordersRepository.findAll(filters);
+        if (!matches.iterator().hasNext()) {
+            throw new EntityNotFoundException(ITEM_NOT_FOUND);
+        }
+
+        for (Order order : matches) {
+            orderDetailsRepository.deleteAll(orderDetailsRepository.findBySellId(order.getId()));
+        }
+        ordersRepository.deleteAll(matches);
     }
 
     @Override
