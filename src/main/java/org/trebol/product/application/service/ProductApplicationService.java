@@ -60,8 +60,12 @@ public class ProductApplicationService implements
 
     @Override
     public PagedProductResult execute(ListProductsQuery query) {
-        List<ProductAggregate> aggregates = productRepository.findAll(query.pageIndex(), query.pageSize());
-        long totalCount = productRepository.countAll();
+        List<ProductAggregate> aggregates = productRepository.findAll(
+            query.pageIndex(),
+            query.pageSize(),
+            query.requestParams()
+        );
+        long totalCount = productRepository.countAll(query.requestParams());
         
         List<ProductResult> results = aggregates.stream()
             .map(mapper::toResult)

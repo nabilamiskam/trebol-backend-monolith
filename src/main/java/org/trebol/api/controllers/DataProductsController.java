@@ -87,7 +87,7 @@ public class DataProductsController
         int pageIndex = paginationService.determineRequestedPageIndex(allRequestParams);
         int pageSize = paginationService.determineRequestedPageSize(allRequestParams);
         
-        ListProductsQuery query = new ListProductsQuery(pageIndex, pageSize);
+        ListProductsQuery query = new ListProductsQuery(pageIndex, pageSize, allRequestParams);
         PagedProductResult result = listProductsUseCase.execute(query);
         
         java.util.List<ProductPojo> items = result.items().stream()

@@ -25,6 +25,7 @@ import com.querydsl.core.types.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
@@ -48,6 +49,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -99,6 +101,31 @@ class DataProductsControllerContractTest {
             .andExpect(jsonPath("$.pageIndex").value(0))
             .andExpect(jsonPath("$.totalCount").value(0))
             .andExpect(jsonPath("$.pageSize").value(10));
+    }
+
+    @Test
+    void get_products_forwards_filter_query_params_to_use_case() throws Exception {
+        when(paginationServiceMock.determineRequestedPageIndex(anyMap())).thenReturn(0);
+        when(paginationServiceMock.determineRequestedPageSize(anyMap())).thenReturn(10);
+
+        org.trebol.product.application.result.PagedProductResult emptyResult =
+            new org.trebol.product.application.result.PagedProductResult(List.of(), 0);
+        when(listProductsUseCaseMock.execute(any(org.trebol.product.application.query.ListProductsQuery.class)))
+            .thenReturn(emptyResult);
+
+        mockMvc.perform(get("/data/products")
+                .queryParam("nameLike", "coffee")
+                .queryParam("sortBy", "name")
+                .queryParam("order", "desc"))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<org.trebol.product.application.query.ListProductsQuery> queryCaptor =
+            ArgumentCaptor.forClass(org.trebol.product.application.query.ListProductsQuery.class);
+        verify(listProductsUseCaseMock).execute(queryCaptor.capture());
+
+        assertEquals("coffee", queryCaptor.getValue().requestParams().get("nameLike"));
+        assertEquals("name", queryCaptor.getValue().requestParams().get("sortBy"));
+        assertEquals("desc", queryCaptor.getValue().requestParams().get("order"));
     }
 
     @Test
