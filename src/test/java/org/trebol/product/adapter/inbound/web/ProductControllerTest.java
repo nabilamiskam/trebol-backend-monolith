@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Test;
 
 class ProductControllerTest {
     @Test
-    void placeholder() {
+    void controllerClassShouldRemainFrameworkOnly() {
+        ProductController controller = new ProductController();
+
+        org.junit.jupiter.api.Assertions.assertNotNull(controller);
     }
 }

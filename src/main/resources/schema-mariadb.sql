@@ -207,6 +207,7 @@ CREATE TABLE `products` (
   `product_description` varchar(4000) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `product_name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
   `product_price` int(11) NOT NULL,
+  `product_status` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ACTIVE',
   `product_stock_critical` int(11) NOT NULL,
   `product_stock_current` int(11) NOT NULL,
   `product_category_id` bigint(20) DEFAULT NULL,

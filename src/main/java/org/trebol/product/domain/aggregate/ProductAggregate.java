@@ -16,11 +16,40 @@ public class ProductAggregate {
     private ProductStatus status;
 
     public ProductAggregate(ProductId id, ProductCode code, ProductName name, ProductPrice price) {
+        this(id, code, name, price, ProductStatus.ACTIVE);
+    }
+
+    private ProductAggregate(
+        ProductId id,
+        ProductCode code,
+        ProductName name,
+        ProductPrice price,
+        ProductStatus status
+    ) {
         this.id = Objects.requireNonNull(id);
         this.code = Objects.requireNonNull(code);
         this.name = Objects.requireNonNull(name);
         this.price = Objects.requireNonNull(price);
-        this.status = ProductStatus.ACTIVE;
+        this.status = Objects.requireNonNull(status);
+    }
+
+    public static ProductAggregate create(
+        ProductId id,
+        ProductCode code,
+        ProductName name,
+        ProductPrice price
+    ) {
+        return new ProductAggregate(id, code, name, price, ProductStatus.ACTIVE);
+    }
+
+    public static ProductAggregate restore(
+        ProductId id,
+        ProductCode code,
+        ProductName name,
+        ProductPrice price,
+        ProductStatus status
+    ) {
+        return new ProductAggregate(id, code, name, price, status);
     }
 
     public ProductId getId() {
@@ -43,15 +72,19 @@ public class ProductAggregate {
         return status;
     }
 
-    public void updateName(ProductName name) {
+    public void rename(ProductName name) {
         this.name = Objects.requireNonNull(name);
     }
 
-    public void updatePrice(ProductPrice price) {
+    public void reprice(ProductPrice price) {
         this.price = Objects.requireNonNull(price);
     }
 
-    public void updateStatus(ProductStatus status) {
-        this.status = Objects.requireNonNull(status);
+    public void activate() {
+        this.status = ProductStatus.ACTIVE;
+    }
+
+    public void deactivate() {
+        this.status = ProductStatus.INACTIVE;
     }
 }

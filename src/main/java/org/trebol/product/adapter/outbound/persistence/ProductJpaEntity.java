@@ -21,6 +21,9 @@ public class ProductJpaEntity {
     @Column(name = "product_price")
     private Integer price;
 
+    @Column(name = "product_status")
+    private String status;
+
     public Long getId() {
         return id;
     }
@@ -51,5 +54,13 @@ public class ProductJpaEntity {
 
     public void setPrice(Integer price) {
         this.price = price;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
