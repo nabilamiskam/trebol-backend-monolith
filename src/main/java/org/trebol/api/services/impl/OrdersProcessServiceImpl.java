@@ -20,36 +20,31 @@
 
 package org.trebol.api.services.impl;
 
+import static org.trebol.config.Constants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.trebol.api.models.ProductPojo;
 import org.trebol.api.models.OrderDetailPojo;
 import org.trebol.api.models.OrderPojo;
+import org.trebol.api.models.ProductPojo;
 import org.trebol.api.services.OrdersProcessService;
 import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.Order;
 import org.trebol.jpa.entities.OrderDetail;
 import org.trebol.jpa.entities.OrderStatus;
-import org.trebol.jpa.repositories.OrdersRepository;
 import org.trebol.jpa.repositories.OrderDetailsRepository;
 import org.trebol.jpa.repositories.OrderStatusesRepository;
-import org.trebol.jpa.services.conversion.ProductsConverterService;
+import org.trebol.jpa.repositories.OrdersRepository;
 import org.trebol.jpa.services.conversion.OrdersConverterService;
+import org.trebol.jpa.services.conversion.ProductsConverterService;
 import org.trebol.jpa.services.crud.OrdersCrudService;
+import org.trebol.order.application.ConfirmOrderUseCase;
 
 import jakarta.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.trebol.config.Constants.ORDER_STATUS_COMPLETED;
-import static org.trebol.config.Constants.ORDER_STATUS_PAID_CONFIRMED;
-import static org.trebol.config.Constants.ORDER_STATUS_PAID_UNCONFIRMED;
-import static org.trebol.config.Constants.ORDER_STATUS_PAYMENT_CANCELLED;
-import static org.trebol.config.Constants.ORDER_STATUS_PAYMENT_FAILED;
-import static org.trebol.config.Constants.ORDER_STATUS_PAYMENT_STARTED;
-import static org.trebol.config.Constants.ORDER_STATUS_PENDING;
-import static org.trebol.config.Constants.ORDER_STATUS_REJECTED;
 
 @Transactional
 @Service
@@ -64,6 +59,7 @@ public class OrdersProcessServiceImpl
     private final OrderStatusesRepository orderStatusesRepository;
     private final OrdersConverterService converterService;
     private final ProductsConverterService productConverterService;
+    private final ConfirmOrderUseCase confirmOrderUseCase;
 
     public OrdersProcessServiceImpl(
         OrdersCrudService crudService,
@@ -71,7 +67,8 @@ public class OrdersProcessServiceImpl
         OrderDetailsRepository orderDetailsRepository,
         OrderStatusesRepository orderStatusesRepository,
         OrdersConverterService converterService,
-        ProductsConverterService productConverterService
+        ProductsConverterService productConverterService,
+        ConfirmOrderUseCase confirmOrderUseCase
     ) {
         this.crudService = crudService;
         this.ordersRepository = ordersRepository;
@@ -79,6 +76,7 @@ public class OrdersProcessServiceImpl
         this.orderStatusesRepository = orderStatusesRepository;
         this.converterService = converterService;
         this.productConverterService = productConverterService;
+        this.confirmOrderUseCase = confirmOrderUseCase;
     }
 
     // TODO figure out how to shorten below methods
@@ -174,38 +172,32 @@ public class OrdersProcessServiceImpl
     }
 
     @Override
-    public OrderPojo markAsConfirmed(OrderPojo sell)
-        throws BadInputException, EntityNotFoundException {
-        Order existingOrder = this.fetchExistingOrThrowException(sell);
+public OrderPojo markAsConfirmed(OrderPojo sell)
+    throws BadInputException, EntityNotFoundException {
 
-        if (!existingOrder.getStatus().getName().equals(ORDER_STATUS_PAID_UNCONFIRMED)) {
-            throw new BadInputException(THE_TRANSACTION_IS_NOT_IN_A_VALID_STATE_FOR_THIS_OPERATION);
-        }
+    // NEW: delegate state transition + persistence update to application layer
+    Order existingOrder = confirmOrderUseCase.confirm(sell);
 
-        Optional<OrderStatus> confirmedStatus = orderStatusesRepository.findByName(ORDER_STATUS_PAID_CONFIRMED);
-        if (confirmedStatus.isEmpty()) {
-            throw new IllegalStateException(NO_STATUS_MATCHES_THE + " '" + ORDER_STATUS_PAID_CONFIRMED + "' " + NAME_IS_THE_DATABASE_EMPTY_OR_CORRUPT);
-        }
-        ordersRepository.setStatus(existingOrder.getId(), confirmedStatus.get());
+    // keep the rest the same (conversion + details)
+    OrderPojo target = this.convertOrThrowException(existingOrder);
 
-        OrderPojo target = this.convertOrThrowException(existingOrder);
-
-        List<OrderDetailPojo> pojoDetails = new ArrayList<>();
-        for (OrderDetail detail : orderDetailsRepository.findBySellId(existingOrder.getId())) {
-            ProductPojo productPojo = productConverterService.convertToPojo(detail.getProduct());
-            OrderDetailPojo orderDetailPojo = OrderDetailPojo.builder()
-                .units(detail.getUnits())
-                .unitValue(detail.getUnitValue())
-                .product(productPojo)
-                .build();
-            pojoDetails.add(orderDetailPojo);
-        }
-        target.setDetails(pojoDetails);
-        target.setStatus(ORDER_STATUS_PAID_CONFIRMED);
-
-
-        return target;
+    List<OrderDetailPojo> pojoDetails = new ArrayList<>();
+    for (OrderDetail detail : orderDetailsRepository.findBySellId(existingOrder.getId())) {
+        ProductPojo productPojo = productConverterService.convertToPojo(detail.getProduct());
+        OrderDetailPojo orderDetailPojo = OrderDetailPojo.builder()
+            .units(detail.getUnits())
+            .unitValue(detail.getUnitValue())
+            .product(productPojo)
+            .build();
+        pojoDetails.add(orderDetailPojo);
     }
+    target.setDetails(pojoDetails);
+
+    // response status string stays the same (API compatibility)
+    target.setStatus(ORDER_STATUS_PAID_CONFIRMED);
+
+    return target;
+}
 
     @Override
     public OrderPojo markAsRejected(OrderPojo sell)

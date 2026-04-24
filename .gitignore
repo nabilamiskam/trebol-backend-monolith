@@ -44,3 +44,6 @@ Thumbs.db
 /CHERRY_PICK_HEAD
 /MERGE_MSG
 data/trebol.mv.db
+data/*.mv.db
+data/*.trace.db
+data/*.lock.db

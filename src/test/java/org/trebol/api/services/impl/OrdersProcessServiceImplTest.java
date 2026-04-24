@@ -20,6 +20,15 @@
 
 package org.trebol.api.services.impl;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.trebol.config.Constants.*;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,38 +36,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.trebol.api.models.ProductPojo;
 import org.trebol.api.models.OrderDetailPojo;
 import org.trebol.api.models.OrderPojo;
+import org.trebol.api.models.ProductPojo;
 import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.Order;
 import org.trebol.jpa.entities.OrderDetail;
 import org.trebol.jpa.entities.OrderStatus;
-import org.trebol.jpa.repositories.OrdersRepository;
 import org.trebol.jpa.repositories.OrderDetailsRepository;
 import org.trebol.jpa.repositories.OrderStatusesRepository;
-import org.trebol.jpa.services.conversion.ProductsConverterService;
+import org.trebol.jpa.repositories.OrdersRepository;
 import org.trebol.jpa.services.conversion.OrdersConverterService;
+import org.trebol.jpa.services.conversion.ProductsConverterService;
 import org.trebol.jpa.services.crud.OrdersCrudService;
+import org.trebol.order.application.ConfirmOrderUseCase;
 import org.trebol.testing.ProductsTestHelper;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.trebol.config.Constants.ORDER_STATUS_COMPLETED;
-import static org.trebol.config.Constants.ORDER_STATUS_PAID_CONFIRMED;
-import static org.trebol.config.Constants.ORDER_STATUS_PAID_UNCONFIRMED;
-import static org.trebol.config.Constants.ORDER_STATUS_PAYMENT_CANCELLED;
-import static org.trebol.config.Constants.ORDER_STATUS_PAYMENT_FAILED;
-import static org.trebol.config.Constants.ORDER_STATUS_PAYMENT_STARTED;
-import static org.trebol.config.Constants.ORDER_STATUS_PENDING;
-import static org.trebol.config.Constants.ORDER_STATUS_REJECTED;
 
 @ExtendWith(MockitoExtension.class)
 class OrdersProcessServiceImplTest {
@@ -75,6 +67,8 @@ class OrdersProcessServiceImplTest {
     @Mock
     OrdersConverterService sellConverterServiceMock;
     @Mock ProductsConverterService productConverterServiceMock;
+    @Mock
+private ConfirmOrderUseCase confirmOrderUseCaseMock;
     final ProductsTestHelper productsHelper = new ProductsTestHelper();
 
     @BeforeEach
@@ -352,94 +346,67 @@ class OrdersProcessServiceImplTest {
     @Nested
     class MarkAsConfirmed {
 
-        @Test
-        void markAsConfirmed__SellStatus_IsNotStarted_BadInputException() throws BadInputException {
-            // Setup mock objects
-            OrderPojo orderPojoMock = OrderPojo.builder().build();
+    @Test
+void markAsConfirmed__SellStatus_IsNotStarted_BadInputException() throws BadInputException {
+    OrderPojo orderPojoMock = OrderPojo.builder().build();
 
-            OrderStatus orderStatusMock = new OrderStatus();
-            orderStatusMock.setName("status");
+    when(confirmOrderUseCaseMock.confirm(any(OrderPojo.class)))
+        .thenThrow(new BadInputException("invalid transaction state for this api"));
 
-            Order orderMock = new Order();
-            orderMock.setStatus(orderStatusMock);
-
-            // Stubbing
-            when(crudServiceMock.getExisting(any(OrderPojo.class))).thenReturn(Optional.of(orderMock)); // fetchExistingOrThrowException
-
-            assertThrows(BadInputException.class, () -> instance.markAsConfirmed(orderPojoMock));
-        }
+    assertThrows(BadInputException.class, () -> instance.markAsConfirmed(orderPojoMock));
+}
 
         @Test
-        void markAsConfirmed_SellStatus_IsNotInRepo_IllegalStateException() throws BadInputException {
-            // Setup mock objects
-            OrderPojo orderPojoMock = OrderPojo.builder().build();
+void markAsConfirmed_SellStatus_IsNotInRepo_IllegalStateException() throws BadInputException {
+    OrderPojo orderPojoMock = OrderPojo.builder().build();
 
-            OrderStatus orderStatusMock = new OrderStatus();
-            orderStatusMock.setName(ORDER_STATUS_PAID_UNCONFIRMED);
+    when(confirmOrderUseCaseMock.confirm(any(OrderPojo.class)))
+        .thenThrow(new IllegalStateException("No status matches code: 4"));
 
-            Order orderMock = new Order();
-            orderMock.setStatus(orderStatusMock);
+    assertThrows(IllegalStateException.class, () -> instance.markAsConfirmed(orderPojoMock));
+}
 
-            // Stubbing
-            when(crudServiceMock.getExisting(any(OrderPojo.class))).thenReturn(Optional.of(orderMock)); // fetchExistingOrThrowException
-            when(orderStatusesRepositoryMock.findByName(anyString())).thenReturn(Optional.empty());
+    @Test
+void markAsConfirmed_ShouldReturn_SellPojo_WithStatusConfirmed() throws BadInputException {
+    OrderPojo orderPojoMock = OrderPojo.builder().build();
 
-            assertThrows(IllegalStateException.class, () -> instance.markAsConfirmed(orderPojoMock));
-        }
+    Order orderMock = new Order();
+    orderMock.setId(1L);
 
-        @Test
-        void markAsConfirmed_ShouldReturn_SellPojo_WithStatusConfirmed() throws BadInputException {
-            // Setup mock objects
-            OrderPojo orderPojoMock = OrderPojo.builder().build();
+    when(confirmOrderUseCaseMock.confirm(any(OrderPojo.class))).thenReturn(orderMock);
+    when(sellConverterServiceMock.convertToPojo(any())).thenReturn(orderPojoMock);
 
-            OrderStatus orderStatusMock = new OrderStatus();
-            orderStatusMock.setName(ORDER_STATUS_PAID_UNCONFIRMED);
-
-            Order orderMock = new Order();
-            orderMock.setStatus(orderStatusMock);
-
-            // Stubbing
-            when(crudServiceMock.getExisting(any(OrderPojo.class))).thenReturn(Optional.of(orderMock)); // fetchExistingOrThrowException
-            when(orderStatusesRepositoryMock.findByName(anyString())).thenReturn(Optional.of(orderStatusMock));
-            when(sellConverterServiceMock.convertToPojo(any())).thenReturn(orderPojoMock); // convertOrThrowException
-
-            assertEquals(ORDER_STATUS_PAID_CONFIRMED, instance.markAsConfirmed(orderPojoMock).getStatus());
-        }
+    assertEquals(ORDER_STATUS_PAID_CONFIRMED, instance.markAsConfirmed(orderPojoMock).getStatus());
+}
 
         @Test
-        void markAsConfirmed_ShouldReturn_SellPojo_WithCorrectDetails() throws BadInputException {
-            // Setup mock objects
-            OrderPojo orderPojoMock = OrderPojo.builder().build();
+void markAsConfirmed_ShouldReturn_SellPojo_WithCorrectDetails() throws BadInputException {
+    OrderPojo orderPojoMock = OrderPojo.builder().build();
 
-            OrderStatus orderStatusMock = new OrderStatus();
-            orderStatusMock.setName(ORDER_STATUS_PAID_UNCONFIRMED);
+    Order orderMock = new Order();
+    orderMock.setId(1L);
 
-            Order orderMock = new Order();
-            orderMock.setStatus(orderStatusMock);
+    OrderDetail orderDetailMock = new OrderDetail();
+    orderDetailMock.setId(1L);
+    orderDetailMock.setUnits(11);
+    orderDetailMock.setUnitValue(111);
+    List<OrderDetail> orderDetailsMock = List.of(orderDetailMock);
 
-            OrderDetail orderDetailMock = new OrderDetail();
-            orderDetailMock.setId(1L);
-            orderDetailMock.setUnits(11);
-            orderDetailMock.setUnitValue(111);
-            List<OrderDetail> orderDetailsMock = List.of(orderDetailMock);
+    ProductPojo productPojoMock = productsHelper.productPojoAfterCreationWithoutCategory();
 
-            ProductPojo productPojoMock = productsHelper.productPojoAfterCreationWithoutCategory();
+    when(confirmOrderUseCaseMock.confirm(any(OrderPojo.class))).thenReturn(orderMock);
+    when(sellConverterServiceMock.convertToPojo(any())).thenReturn(orderPojoMock);
+    when(orderDetailsRepositoryMock.findBySellId(any())).thenReturn(orderDetailsMock);
+    when(productConverterServiceMock.convertToPojo(any())).thenReturn(productPojoMock);
 
-            // Stubbing
-            when(crudServiceMock.getExisting(any(OrderPojo.class))).thenReturn(Optional.of(orderMock)); // fetchExistingOrThrowException
-            when(orderStatusesRepositoryMock.findByName(anyString())).thenReturn(Optional.of(orderStatusMock));
-            when(sellConverterServiceMock.convertToPojo(any())).thenReturn(orderPojoMock); // convertOrThrowException
-            when(orderDetailsRepositoryMock.findBySellId(any())).thenReturn(orderDetailsMock);
-            when(productConverterServiceMock.convertToPojo(any())).thenReturn(productPojoMock);
+    Collection<OrderDetailPojo> actualSellDetailsPojo = instance.markAsConfirmed(orderPojoMock).getDetails();
+    OrderDetailPojo actualOrderDetailPojo = actualSellDetailsPojo.iterator().next();
 
-            Collection<OrderDetailPojo> actualSellDetailsPojo = instance.markAsConfirmed(orderPojoMock).getDetails();
-            OrderDetailPojo actualOrderDetailPojo = actualSellDetailsPojo.iterator().next();
-
-            assertEquals(1, actualSellDetailsPojo.size());
-            assertEquals(11, actualOrderDetailPojo.getUnits());
-            assertEquals(111, actualOrderDetailPojo.getUnitValue());
-            assertEquals(productPojoMock, actualOrderDetailPojo.getProduct());
-        }
+    assertEquals(1, actualSellDetailsPojo.size());
+    assertEquals(11, actualOrderDetailPojo.getUnits());
+    assertEquals(111, actualOrderDetailPojo.getUnitValue());
+    assertEquals(productPojoMock, actualOrderDetailPojo.getProduct());
+}
     }
 
     @Nested

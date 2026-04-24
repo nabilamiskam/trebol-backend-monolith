@@ -20,14 +20,15 @@
 
 package org.trebol.jpa.repositories;
 
+import java.util.Optional;
+
 import org.trebol.jpa.Repository;
 import org.trebol.jpa.entities.OrderStatus;
-
-import java.util.Optional;
 
 @org.springframework.stereotype.Repository
 public interface OrderStatusesRepository
     extends Repository<OrderStatus> {
 
     Optional<OrderStatus> findByName(String name);
+    Optional<OrderStatus> findByCode(Integer code);
 }
