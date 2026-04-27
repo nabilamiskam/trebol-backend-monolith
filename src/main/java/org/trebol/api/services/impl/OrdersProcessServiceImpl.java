@@ -43,6 +43,8 @@ import org.trebol.jpa.services.conversion.OrdersConverterService;
 import org.trebol.jpa.services.conversion.ProductsConverterService;
 import org.trebol.jpa.services.crud.OrdersCrudService;
 import org.trebol.order.application.ConfirmOrderUseCase;
+import org.trebol.order.application.RejectOrderUseCase;
+import org.trebol.order.application.CompleteOrderUseCase;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -60,6 +62,8 @@ public class OrdersProcessServiceImpl
     private final OrdersConverterService converterService;
     private final ProductsConverterService productConverterService;
     private final ConfirmOrderUseCase confirmOrderUseCase;
+    private final RejectOrderUseCase rejectOrderUseCase;
+    private final CompleteOrderUseCase completeOrderUseCase;
 
     public OrdersProcessServiceImpl(
         OrdersCrudService crudService,
@@ -68,7 +72,9 @@ public class OrdersProcessServiceImpl
         OrderStatusesRepository orderStatusesRepository,
         OrdersConverterService converterService,
         ProductsConverterService productConverterService,
-        ConfirmOrderUseCase confirmOrderUseCase
+        ConfirmOrderUseCase confirmOrderUseCase,
+        RejectOrderUseCase rejectOrderUseCase,
+        CompleteOrderUseCase completeOrderUseCase
     ) {
         this.crudService = crudService;
         this.ordersRepository = ordersRepository;
@@ -77,6 +83,8 @@ public class OrdersProcessServiceImpl
         this.converterService = converterService;
         this.productConverterService = productConverterService;
         this.confirmOrderUseCase = confirmOrderUseCase;
+        this.rejectOrderUseCase = rejectOrderUseCase;
+        this.completeOrderUseCase = completeOrderUseCase;
     }
 
     // TODO figure out how to shorten below methods
@@ -200,70 +208,52 @@ public OrderPojo markAsConfirmed(OrderPojo sell)
 }
 
     @Override
-    public OrderPojo markAsRejected(OrderPojo sell)
-        throws BadInputException, EntityNotFoundException {
-        Order existingOrder = this.fetchExistingOrThrowException(sell);
+public OrderPojo markAsRejected(OrderPojo sell)
+    throws BadInputException, EntityNotFoundException {
 
-        if (!existingOrder.getStatus().getName().equals(ORDER_STATUS_PAID_UNCONFIRMED)) {
-            throw new BadInputException(THE_TRANSACTION_IS_NOT_IN_A_VALID_STATE_FOR_THIS_OPERATION);
-        }
+    Order existingOrder = rejectOrderUseCase.reject(sell);
 
-        Optional<OrderStatus> rejectedStatus = orderStatusesRepository.findByName(ORDER_STATUS_REJECTED);
-        if (rejectedStatus.isEmpty()) {
-            throw new IllegalStateException(NO_STATUS_MATCHES_THE + " '" + ORDER_STATUS_REJECTED + "' " + NAME_IS_THE_DATABASE_EMPTY_OR_CORRUPT);
-        }
-        ordersRepository.setStatus(existingOrder.getId(), rejectedStatus.get());
+    OrderPojo target = this.convertOrThrowException(existingOrder);
 
-        OrderPojo target = this.convertOrThrowException(existingOrder);
-
-        List<OrderDetailPojo> pojoDetails = new ArrayList<>();
-        for (OrderDetail detail : orderDetailsRepository.findBySellId(existingOrder.getId())) {
-            ProductPojo productPojo = productConverterService.convertToPojo(detail.getProduct());
-            OrderDetailPojo orderDetailPojo = OrderDetailPojo.builder()
-                .units(detail.getUnits())
-                .unitValue(detail.getUnitValue())
-                .product(productPojo)
-                .build();
-            pojoDetails.add(orderDetailPojo);
-        }
-        target.setDetails(pojoDetails);
-        target.setStatus(ORDER_STATUS_REJECTED);
-
-        return target;
+    List<OrderDetailPojo> pojoDetails = new ArrayList<>();
+    for (OrderDetail detail : orderDetailsRepository.findBySellId(existingOrder.getId())) {
+        ProductPojo productPojo = productConverterService.convertToPojo(detail.getProduct());
+        OrderDetailPojo orderDetailPojo = OrderDetailPojo.builder()
+            .units(detail.getUnits())
+            .unitValue(detail.getUnitValue())
+            .product(productPojo)
+            .build();
+        pojoDetails.add(orderDetailPojo);
     }
+    target.setDetails(pojoDetails);
+    target.setStatus(ORDER_STATUS_REJECTED);
+
+    return target;
+}
 
     @Override
-    public OrderPojo markAsCompleted(OrderPojo sell)
-        throws BadInputException, EntityNotFoundException {
-        Order existingOrder = this.fetchExistingOrThrowException(sell);
+public OrderPojo markAsCompleted(OrderPojo sell)
+    throws BadInputException, EntityNotFoundException {
 
-        if (!existingOrder.getStatus().getName().equals(ORDER_STATUS_PAID_CONFIRMED)) {
-            throw new BadInputException(THE_TRANSACTION_IS_NOT_IN_A_VALID_STATE_FOR_THIS_OPERATION);
-        }
+    Order existingOrder = completeOrderUseCase.complete(sell);
 
-        Optional<OrderStatus> completedStatus = orderStatusesRepository.findByName(ORDER_STATUS_COMPLETED);
-        if (completedStatus.isEmpty()) {
-            throw new IllegalStateException(NO_STATUS_MATCHES_THE + " '" + ORDER_STATUS_COMPLETED + "' " + NAME_IS_THE_DATABASE_EMPTY_OR_CORRUPT);
-        }
-        ordersRepository.setStatus(existingOrder.getId(), completedStatus.get());
+    OrderPojo target = this.convertOrThrowException(existingOrder);
 
-        OrderPojo target = this.convertOrThrowException(existingOrder);
-
-        List<OrderDetailPojo> pojoDetails = new ArrayList<>();
-        for (OrderDetail detail : orderDetailsRepository.findBySellId(existingOrder.getId())) {
-            ProductPojo productPojo = productConverterService.convertToPojo(detail.getProduct());
-            OrderDetailPojo orderDetailPojo = OrderDetailPojo.builder()
-                .units(detail.getUnits())
-                .unitValue(detail.getUnitValue())
-                .product(productPojo)
-                .build();
-            pojoDetails.add(orderDetailPojo);
-        }
-        target.setDetails(pojoDetails);
-        target.setStatus(ORDER_STATUS_COMPLETED);
-
-        return target;
+    List<OrderDetailPojo> pojoDetails = new ArrayList<>();
+    for (OrderDetail detail : orderDetailsRepository.findBySellId(existingOrder.getId())) {
+        ProductPojo productPojo = productConverterService.convertToPojo(detail.getProduct());
+        OrderDetailPojo orderDetailPojo = OrderDetailPojo.builder()
+            .units(detail.getUnits())
+            .unitValue(detail.getUnitValue())
+            .product(productPojo)
+            .build();
+        pojoDetails.add(orderDetailPojo);
     }
+    target.setDetails(pojoDetails);
+    target.setStatus(ORDER_STATUS_COMPLETED);
+
+    return target;
+}
 
     private Order fetchExistingOrThrowException(OrderPojo sell) throws BadInputException {
         Optional<Order> match = crudService.getExisting(sell);

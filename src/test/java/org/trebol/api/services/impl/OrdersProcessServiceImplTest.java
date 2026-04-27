@@ -50,6 +50,8 @@ import org.trebol.jpa.services.conversion.OrdersConverterService;
 import org.trebol.jpa.services.conversion.ProductsConverterService;
 import org.trebol.jpa.services.crud.OrdersCrudService;
 import org.trebol.order.application.ConfirmOrderUseCase;
+import org.trebol.order.application.RejectOrderUseCase;
+import org.trebol.order.application.CompleteOrderUseCase;
 import org.trebol.testing.ProductsTestHelper;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,9 +68,14 @@ class OrdersProcessServiceImplTest {
     OrderDetailsRepository orderDetailsRepositoryMock;
     @Mock
     OrdersConverterService sellConverterServiceMock;
-    @Mock ProductsConverterService productConverterServiceMock;
+    @Mock 
+    ProductsConverterService productConverterServiceMock;
+    @Mock 
+    ConfirmOrderUseCase confirmOrderUseCaseMock;
     @Mock
-private ConfirmOrderUseCase confirmOrderUseCaseMock;
+    RejectOrderUseCase rejectOrderUseCaseMock;
+    @Mock
+    CompleteOrderUseCase completeOrderUseCaseMock;
     final ProductsTestHelper productsHelper = new ProductsTestHelper();
 
     @BeforeEach
@@ -351,7 +358,7 @@ void markAsConfirmed__SellStatus_IsNotStarted_BadInputException() throws BadInpu
     OrderPojo orderPojoMock = OrderPojo.builder().build();
 
     when(confirmOrderUseCaseMock.confirm(any(OrderPojo.class)))
-        .thenThrow(new BadInputException("invalid transaction state for this api"));
+        .thenThrow(new BadInputException("The transaction is not in a valid state for this api"));
 
     assertThrows(BadInputException.class, () -> instance.markAsConfirmed(orderPojoMock));
 }
@@ -410,188 +417,134 @@ void markAsConfirmed_ShouldReturn_SellPojo_WithCorrectDetails() throws BadInputE
     }
 
     @Nested
-    class MarkAsRejected {
+class MarkAsRejected {
 
-        @Test
-        void markAsRejected__SellStatus_IsNotStarted_BadInputException() throws BadInputException {
-            // Setup mock objects
-            OrderPojo orderPojoMock = OrderPojo.builder().build();
+    @Test
+    void markAsRejected__SellStatus_IsNotStarted_BadInputException() throws BadInputException {
+        OrderPojo orderPojoMock = OrderPojo.builder().build();
 
-            OrderStatus orderStatusMock = new OrderStatus();
-            orderStatusMock.setName("status");
+        when(rejectOrderUseCaseMock.reject(any(OrderPojo.class)))
+            .thenThrow(new BadInputException("The transaction is not in a valid state for this api"));
 
-            Order orderMock = new Order();
-            orderMock.setStatus(orderStatusMock);
-
-            // Stubbing
-            when(crudServiceMock.getExisting(any(OrderPojo.class))).thenReturn(Optional.of(orderMock)); // fetchExistingOrThrowException
-
-            assertThrows(BadInputException.class, () -> instance.markAsRejected(orderPojoMock));
-        }
-
-        @Test
-        void markAsRejected_SellStatus_IsNotInRepo_IllegalStateException() throws BadInputException {
-            // Setup mock objects
-            OrderPojo orderPojoMock = OrderPojo.builder().build();
-
-            OrderStatus orderStatusMock = new OrderStatus();
-            orderStatusMock.setName(ORDER_STATUS_PAID_UNCONFIRMED);
-
-            Order orderMock = new Order();
-            orderMock.setStatus(orderStatusMock);
-
-            // Stubbing
-            when(crudServiceMock.getExisting(any(OrderPojo.class))).thenReturn(Optional.of(orderMock)); // fetchExistingOrThrowException
-            when(orderStatusesRepositoryMock.findByName(anyString())).thenReturn(Optional.empty());
-
-            assertThrows(IllegalStateException.class, () -> instance.markAsRejected(orderPojoMock));
-        }
-
-        @Test
-        void markAsRejected_ShouldReturn_SellPojo_WithStatusRejected() throws BadInputException {
-            // Setup mock objects
-            OrderPojo orderPojoMock = OrderPojo.builder().build();
-
-            OrderStatus orderStatusMock = new OrderStatus();
-            orderStatusMock.setName(ORDER_STATUS_PAID_UNCONFIRMED);
-
-            Order orderMock = new Order();
-            orderMock.setStatus(orderStatusMock);
-
-            // Stubbing
-            when(crudServiceMock.getExisting(any(OrderPojo.class))).thenReturn(Optional.of(orderMock)); // fetchExistingOrThrowException
-            when(orderStatusesRepositoryMock.findByName(anyString())).thenReturn(Optional.of(orderStatusMock));
-            when(sellConverterServiceMock.convertToPojo(any())).thenReturn(orderPojoMock); // convertOrThrowException
-
-            assertEquals(ORDER_STATUS_REJECTED, instance.markAsRejected(orderPojoMock).getStatus());
-        }
-
-        @Test
-        void markAsRejected_ShouldReturn_SellPojo_WithCorrectDetails() throws BadInputException {
-            // Setup mock objects
-            OrderPojo orderPojoMock = OrderPojo.builder().build();
-
-            OrderStatus orderStatusMock = new OrderStatus();
-            orderStatusMock.setName(ORDER_STATUS_PAID_UNCONFIRMED);
-
-            Order orderMock = new Order();
-            orderMock.setStatus(orderStatusMock);
-
-            OrderDetail orderDetailMock = new OrderDetail();
-            orderDetailMock.setId(1L);
-            orderDetailMock.setUnits(11);
-            orderDetailMock.setUnitValue(111);
-            List<OrderDetail> orderDetailsMock = List.of(orderDetailMock);
-
-            ProductPojo productPojoMock = productsHelper.productPojoAfterCreationWithoutCategory();
-
-            // Stubbing
-            when(crudServiceMock.getExisting(any(OrderPojo.class))).thenReturn(Optional.of(orderMock)); // fetchExistingOrThrowException
-            when(orderStatusesRepositoryMock.findByName(anyString())).thenReturn(Optional.of(orderStatusMock));
-            when(sellConverterServiceMock.convertToPojo(any())).thenReturn(orderPojoMock); // convertOrThrowException
-            when(orderDetailsRepositoryMock.findBySellId(any())).thenReturn(orderDetailsMock);
-            when(productConverterServiceMock.convertToPojo(any())).thenReturn(productPojoMock);
-
-            Collection<OrderDetailPojo> actualSellDetailsPojo = instance.markAsRejected(orderPojoMock).getDetails();
-            OrderDetailPojo actualOrderDetailPojo = actualSellDetailsPojo.iterator().next();
-
-            assertEquals(1, actualSellDetailsPojo.size());
-            assertEquals(11, actualOrderDetailPojo.getUnits());
-            assertEquals(111, actualOrderDetailPojo.getUnitValue());
-            assertEquals(productPojoMock, actualOrderDetailPojo.getProduct());
-        }
+        assertThrows(BadInputException.class, () -> instance.markAsRejected(orderPojoMock));
     }
+
+    @Test
+    void markAsRejected_SellStatus_IsNotInRepo_IllegalStateException() throws BadInputException {
+        OrderPojo orderPojoMock = OrderPojo.builder().build();
+
+        when(rejectOrderUseCaseMock.reject(any(OrderPojo.class)))
+            .thenThrow(new IllegalStateException("No status matches code: -3"));
+
+        assertThrows(IllegalStateException.class, () -> instance.markAsRejected(orderPojoMock));
+    }
+
+    @Test
+    void markAsRejected_ShouldReturn_SellPojo_WithStatusRejected() throws BadInputException {
+        OrderPojo orderPojoMock = OrderPojo.builder().build();
+
+        Order orderMock = new Order();
+        orderMock.setId(1L);
+
+        when(rejectOrderUseCaseMock.reject(any(OrderPojo.class))).thenReturn(orderMock);
+        when(sellConverterServiceMock.convertToPojo(any())).thenReturn(orderPojoMock);
+
+        assertEquals(ORDER_STATUS_REJECTED, instance.markAsRejected(orderPojoMock).getStatus());
+    }
+
+    @Test
+    void markAsRejected_ShouldReturn_SellPojo_WithCorrectDetails() throws BadInputException {
+        OrderPojo orderPojoMock = OrderPojo.builder().build();
+
+        Order orderMock = new Order();
+        orderMock.setId(1L);
+
+        OrderDetail orderDetailMock = new OrderDetail();
+        orderDetailMock.setId(1L);
+        orderDetailMock.setUnits(11);
+        orderDetailMock.setUnitValue(111);
+        List<OrderDetail> orderDetailsMock = List.of(orderDetailMock);
+
+        ProductPojo productPojoMock = productsHelper.productPojoAfterCreationWithoutCategory();
+
+        when(rejectOrderUseCaseMock.reject(any(OrderPojo.class))).thenReturn(orderMock);
+        when(sellConverterServiceMock.convertToPojo(any())).thenReturn(orderPojoMock);
+        when(orderDetailsRepositoryMock.findBySellId(any())).thenReturn(orderDetailsMock);
+        when(productConverterServiceMock.convertToPojo(any())).thenReturn(productPojoMock);
+
+        Collection<OrderDetailPojo> actualSellDetailsPojo = instance.markAsRejected(orderPojoMock).getDetails();
+        OrderDetailPojo actualOrderDetailPojo = actualSellDetailsPojo.iterator().next();
+
+        assertEquals(1, actualSellDetailsPojo.size());
+        assertEquals(11, actualOrderDetailPojo.getUnits());
+        assertEquals(111, actualOrderDetailPojo.getUnitValue());
+        assertEquals(productPojoMock, actualOrderDetailPojo.getProduct());
+    }
+}
 
     @Nested
-    class MarkAsCompleted {
+class MarkAsCompleted {
 
-        @Test
-        void markAsCompleted__SellStatus_IsNotStarted_BadInputException() throws BadInputException {
-            // Setup mock objects
-            OrderPojo orderPojoMock = OrderPojo.builder().build();
+    @Test
+    void markAsCompleted__SellStatus_IsNotStarted_BadInputException() throws BadInputException {
+        OrderPojo orderPojoMock = OrderPojo.builder().build();
 
-            OrderStatus orderStatusMock = new OrderStatus();
-            orderStatusMock.setName("status");
+        when(completeOrderUseCaseMock.complete(any(OrderPojo.class)))
+            .thenThrow(new BadInputException("The transaction is not in a valid state for this api"));
 
-            Order orderMock = new Order();
-            orderMock.setStatus(orderStatusMock);
-
-            // Stubbing
-            when(crudServiceMock.getExisting(any(OrderPojo.class))).thenReturn(Optional.of(orderMock)); // fetchExistingOrThrowException
-
-            assertThrows(BadInputException.class, () -> instance.markAsCompleted(orderPojoMock));
-        }
-
-        @Test
-        void markAsCompleted_SellStatus_IsNotInRepo_IllegalStateException() throws BadInputException {
-            // Setup mock objects
-            OrderPojo orderPojoMock = OrderPojo.builder().build();
-
-            OrderStatus orderStatusMock = new OrderStatus();
-            orderStatusMock.setName(ORDER_STATUS_PAID_CONFIRMED);
-
-            Order orderMock = new Order();
-            orderMock.setStatus(orderStatusMock);
-
-            // Stubbing
-            when(crudServiceMock.getExisting(any(OrderPojo.class))).thenReturn(Optional.of(orderMock)); // fetchExistingOrThrowException
-            when(orderStatusesRepositoryMock.findByName(anyString())).thenReturn(Optional.empty());
-
-            assertThrows(IllegalStateException.class, () -> instance.markAsCompleted(orderPojoMock));
-        }
-
-        @Test
-        void markAsCompleted_ShouldReturn_SellPojo_WithStatusCompleted() throws BadInputException {
-            // Setup mock objects
-            OrderPojo orderPojoMock = OrderPojo.builder().build();
-
-            OrderStatus orderStatusMock = new OrderStatus();
-            orderStatusMock.setName(ORDER_STATUS_PAID_CONFIRMED);
-
-            Order orderMock = new Order();
-            orderMock.setStatus(orderStatusMock);
-
-            // Stubbing
-            when(crudServiceMock.getExisting(any(OrderPojo.class))).thenReturn(Optional.of(orderMock)); // fetchExistingOrThrowException
-            when(orderStatusesRepositoryMock.findByName(anyString())).thenReturn(Optional.of(orderStatusMock));
-            when(sellConverterServiceMock.convertToPojo(any())).thenReturn(orderPojoMock); // convertOrThrowException
-
-            assertEquals(ORDER_STATUS_COMPLETED, instance.markAsCompleted(orderPojoMock).getStatus());
-        }
-
-        @Test
-        void markAsCompleted_ShouldReturn_SellPojo_WithCorrectDetails() throws BadInputException {
-            // Setup mock objects
-            OrderPojo orderPojoMock = OrderPojo.builder().build();
-
-            OrderStatus orderStatusMock = new OrderStatus();
-            orderStatusMock.setName(ORDER_STATUS_PAID_CONFIRMED);
-
-            Order orderMock = new Order();
-            orderMock.setStatus(orderStatusMock);
-
-            OrderDetail orderDetailMock = new OrderDetail();
-            orderDetailMock.setId(1L);
-            orderDetailMock.setUnits(11);
-            orderDetailMock.setUnitValue(111);
-            List<OrderDetail> orderDetailsMock = List.of(orderDetailMock);
-
-            ProductPojo productPojoMock = productsHelper.productPojoAfterCreationWithoutCategory();
-
-            // Stubbing
-            when(crudServiceMock.getExisting(any(OrderPojo.class))).thenReturn(Optional.of(orderMock)); // fetchExistingOrThrowException
-            when(orderStatusesRepositoryMock.findByName(anyString())).thenReturn(Optional.of(orderStatusMock));
-            when(sellConverterServiceMock.convertToPojo(any())).thenReturn(orderPojoMock); // convertOrThrowException
-            when(orderDetailsRepositoryMock.findBySellId(any())).thenReturn(orderDetailsMock);
-            when(productConverterServiceMock.convertToPojo(any())).thenReturn(productPojoMock);
-
-            Collection<OrderDetailPojo> actualSellDetailsPojo = instance.markAsCompleted(orderPojoMock).getDetails();
-            OrderDetailPojo actualOrderDetailPojo = actualSellDetailsPojo.iterator().next();
-
-            assertEquals(1, actualSellDetailsPojo.size());
-            assertEquals(11, actualOrderDetailPojo.getUnits());
-            assertEquals(111, actualOrderDetailPojo.getUnitValue());
-            assertEquals(productPojoMock, actualOrderDetailPojo.getProduct());
-        }
+        assertThrows(BadInputException.class, () -> instance.markAsCompleted(orderPojoMock));
     }
+
+    @Test
+    void markAsCompleted_SellStatus_IsNotInRepo_IllegalStateException() throws BadInputException {
+        OrderPojo orderPojoMock = OrderPojo.builder().build();
+
+        when(completeOrderUseCaseMock.complete(any(OrderPojo.class)))
+            .thenThrow(new IllegalStateException("No status matches code: 6"));
+
+        assertThrows(IllegalStateException.class, () -> instance.markAsCompleted(orderPojoMock));
+    }
+
+    @Test
+    void markAsCompleted_ShouldReturn_SellPojo_WithStatusCompleted() throws BadInputException {
+        OrderPojo orderPojoMock = OrderPojo.builder().build();
+
+        Order orderMock = new Order();
+        orderMock.setId(1L);
+
+        when(completeOrderUseCaseMock.complete(any(OrderPojo.class))).thenReturn(orderMock);
+        when(sellConverterServiceMock.convertToPojo(any())).thenReturn(orderPojoMock);
+
+        assertEquals(ORDER_STATUS_COMPLETED, instance.markAsCompleted(orderPojoMock).getStatus());
+    }
+
+    @Test
+    void markAsCompleted_ShouldReturn_SellPojo_WithCorrectDetails() throws BadInputException {
+        OrderPojo orderPojoMock = OrderPojo.builder().build();
+
+        Order orderMock = new Order();
+        orderMock.setId(1L);
+
+        OrderDetail orderDetailMock = new OrderDetail();
+        orderDetailMock.setId(1L);
+        orderDetailMock.setUnits(11);
+        orderDetailMock.setUnitValue(111);
+        List<OrderDetail> orderDetailsMock = List.of(orderDetailMock);
+
+        ProductPojo productPojoMock = productsHelper.productPojoAfterCreationWithoutCategory();
+
+        when(completeOrderUseCaseMock.complete(any(OrderPojo.class))).thenReturn(orderMock);
+        when(sellConverterServiceMock.convertToPojo(any())).thenReturn(orderPojoMock);
+        when(orderDetailsRepositoryMock.findBySellId(any())).thenReturn(orderDetailsMock);
+        when(productConverterServiceMock.convertToPojo(any())).thenReturn(productPojoMock);
+
+        Collection<OrderDetailPojo> actualSellDetailsPojo = instance.markAsCompleted(orderPojoMock).getDetails();
+        OrderDetailPojo actualOrderDetailPojo = actualSellDetailsPojo.iterator().next();
+
+        assertEquals(1, actualSellDetailsPojo.size());
+        assertEquals(11, actualOrderDetailPojo.getUnits());
+        assertEquals(111, actualOrderDetailPojo.getUnitValue());
+        assertEquals(productPojoMock, actualOrderDetailPojo.getProduct());
+    }
+}
 }
