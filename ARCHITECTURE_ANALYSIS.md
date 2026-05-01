@@ -1,6 +1,6 @@
 # Products Domain: Current vs. Clean/Hexagonal Architecture
 
-## PART 1: CURRENT STATE (3-LAYERED ARCHITECTURE)
+  ## PART 1: CURRENT STATE (3-LAYERED ARCHITECTURE)
 
 ### 1.1 Current Architecture Diagram
 
@@ -97,6 +97,135 @@
 | **No Explicit Use Cases** | Hard to understand what system does | CRUD operations not explicitly named |
 | **Tight Coupling Between Domains** | Changes in other domains break this | `ProductsCrudService` directly depends on `ImagesCrudService` |
 | **No Anti-Corruption Layer** | External changes directly affect domain | External image representation = internal representation |
+
+---
+
+## PART 1A: THESIS FIGURES (CURRENT STATE)
+
+### Figure 2.1: Package Tree Map Of The Current Product-Domain Structure
+
+```mermaid
+flowchart TD
+    ROOT["src/main/java/org/trebol"]
+
+    ROOT --> API["api"]
+    ROOT --> JPA["jpa"]
+
+    API --> API_CTRL["controllers\n- DataProductsController\n- DataProductCategoriesController\n- DataProductListsController\n- DataProductListContentsController"]
+    API --> API_MODELS["models\n- ProductPojo\n- ProductCategoryPojo\n- ProductListPojo"]
+
+    JPA --> JPA_SVC["services"]
+    JPA --> JPA_SORT["sortspecs\n- ProductsSortSpec\n- ProductCategoriesSortSpec\n- ProductListsSortSpec\n- ProductListItemsSortSpec"]
+    JPA --> JPA_ENT["entities\n- Product\n- ProductCategory\n- ProductList\n- ProductListItem\n- ProductImage"]
+    JPA --> JPA_REPO["repositories\n- ProductsRepository\n- ProductsCategoriesRepository\n- ProductListsRepository\n- ProductListItemsRepository\n- ProductImagesRepository"]
+
+    JPA_SVC --> SVC_CRUD["crud / impl\n- ProductsCrudServiceImpl\n- ProductCategoriesCrudServiceImpl\n- ProductListsCrudServiceImpl"]
+    JPA_SVC --> SVC_CONV["conversion / impl\n- ProductsConverterServiceImpl\n- ProductCategoriesConverterServiceImpl\n- ProductListConverterServiceImpl\n- ProductListItemsConverterServiceImpl"]
+    JPA_SVC --> SVC_PATCH["patch / impl\n- ProductsPatchServiceImpl\n- ProductCategoriesPatchServiceImpl\n- ProductListPatchServiceImpl"]
+    JPA_SVC --> SVC_PRED["predicates / impl\n- ProductsPredicateServiceImpl\n- ProductCategoriesPredicateServiceImpl\n- ProductListsPredicateServiceImpl\n- ProductListItemsPredicateServiceImpl"]
+```
+
+### Figure 2.2: Responsibility Matrix Of Representative Classes And Packages
+
+| Layer/Package | Main classes | Responsibility | Framework dependency | Problem/risk |
+|---|---|---|---|---|
+| `org.trebol.api.controllers` | `DataProductsController`, `DataProductCategoriesController`, `DataProductListsController`, `DataProductListContentsController` | Expose REST endpoints, validate request shape, map HTTP to service calls | Spring MVC, Spring Security, Bean Validation | Controllers can become orchestration-heavy and tightly coupled to service internals |
+| `org.trebol.api.models` | `ProductPojo`, `ProductCategoryPojo`, `ProductListPojo` | Transport models used between API and service layer | Jackson, Bean Validation | DTOs may leak into business logic and become de facto domain models |
+| `org.trebol.jpa.services.crud` | `ProductsCrudServiceImpl`, `ProductCategoriesCrudServiceImpl`, `ProductListsCrudServiceImpl` | Orchestrate create/read/update/delete flows | Spring DI, Spring Transactions, Spring Data JPA types | Mixed responsibilities (use-case orchestration + persistence concerns) |
+| `org.trebol.jpa.services.conversion` | `ProductsConverterServiceImpl`, `ProductCategoriesConverterServiceImpl`, `ProductListConverterServiceImpl`, `ProductListItemsConverterServiceImpl` | Convert between JPA entities and API models | JPA entity model, Spring DI | Mapping logic coupled to persistence schema |
+| `org.trebol.jpa.services.patch` | `ProductsPatchServiceImpl`, `ProductCategoriesPatchServiceImpl`, `ProductListPatchServiceImpl` | Apply partial update logic to entities | Spring DI, JPA entities | Patch behavior can bypass domain invariants |
+| `org.trebol.jpa.services.predicates` | `ProductsPredicateServiceImpl`, `ProductCategoriesPredicateServiceImpl`, `ProductListsPredicateServiceImpl`, `ProductListItemsPredicateServiceImpl` | Build dynamic filter predicates for queries | QueryDSL, Spring Data Querydsl integrations | Technical query DSL leaks into business flow |
+| `org.trebol.jpa.sortspecs` | `ProductsSortSpec`, `ProductCategoriesSortSpec`, `ProductListsSortSpec`, `ProductListItemsSortSpec` | Define allowed sorting fields and parsing rules | Spring Data `Pageable`/`Sort` | Sorting tied to persistence field names |
+| `org.trebol.jpa.repositories` | `ProductsRepository`, `ProductsCategoriesRepository`, `ProductListsRepository`, `ProductListItemsRepository`, `ProductImagesRepository` | Database access via Spring Data JPA | Spring Data JPA, Hibernate, QueryDSL | Repository abstractions expose framework-centric querying |
+| `org.trebol.jpa.entities` | `Product`, `ProductCategory`, `ProductList`, `ProductListItem`, `ProductImage` | ORM persistence model mapped to database tables | JPA/Hibernate annotations | Persistence entities often treated as business model |
+
+### Figure 2.3: Dependency Graph Before Refactoring
+
+```mermaid
+flowchart TB
+    subgraph PL[Presentation Layer]
+        C1[DataProductsController]
+        C2[DataProductCategoriesController]
+        C3[DataProductListsController]
+        C4[DataProductListContentsController]
+    end
+
+    subgraph BL[Business Logic Layer]
+        S1[ProductsCrudServiceImpl]
+        S2[ProductsConverterServiceImpl]
+        S3[ProductsPatchServiceImpl]
+        S4[ProductsPredicateServiceImpl]
+        SX[Other Product* Service Impls]
+    end
+
+    subgraph DL[Data Access Layer]
+        R1[ProductsRepository]
+        R2[ProductsCategoriesRepository]
+        R3[ProductListsRepository]
+        R4[ProductListItemsRepository]
+        R5[ProductImagesRepository]
+        ORM[JPA/Hibernate]
+        QD[QueryDSL]
+    end
+
+    DB[(MariaDB)]
+
+    C1 --> S1
+    C1 --> S4
+    C2 --> SX
+    C3 --> SX
+    C4 --> SX
+
+    S1 --> S2
+    S1 --> S3
+    S1 --> R1
+    S1 --> R2
+    S1 --> R3
+    S1 --> R4
+    S1 --> R5
+    S4 --> QD
+
+    R1 --> ORM
+    R2 --> ORM
+    R3 --> ORM
+    R4 --> ORM
+    R5 --> ORM
+    ORM --> DB
+```
+
+### Figure 2.4: Pain-Point Overlay (Coupling, Leakage, Boundary Blur, Change Amplification)
+
+```mermaid
+flowchart TB
+    C[Controller Layer\nData*Controllers]
+    S[Service Cluster\nCrud + Conversion + Patch + Predicates]
+    R[Repositories\nSpring Data JPA]
+    T[Technical Providers\nJPA/Hibernate + QueryDSL]
+    D[(MariaDB)]
+
+    C --> S
+    S --> R
+    S --> T
+    R --> T
+    T --> D
+
+    P1{{P1\nFramework\nCoupling}}
+    P2{{P2\nPersistence\nLeakage}}
+    P3{{P3\nBoundary\nBlur}}
+    P4{{P4\nChange\nAmplification}}
+
+    P1 -. Spring/JPA types in core flow .-> S
+    P1 -. Framework-centric repository APIs .-> R
+
+    P2 -. Query and DB semantics in business services .-> S
+    P2 -. Predicate/Sort/Repository details shape logic .-> T
+
+    P3 -. No explicit use-case boundary .-> C
+    P3 -. Controller delegates directly to technical service cluster .-> S
+
+    P4 -. Small API/DB changes ripple upward .-> C
+    P4 -. Converter/Repository/schema changes cascade across layers .-> R
+```
 
 ---
 
