@@ -42,9 +42,11 @@ import org.trebol.jpa.repositories.OrdersRepository;
 import org.trebol.jpa.services.conversion.OrdersConverterService;
 import org.trebol.jpa.services.conversion.ProductsConverterService;
 import org.trebol.jpa.services.crud.OrdersCrudService;
-import org.trebol.order.application.ConfirmOrderUseCase;
-import org.trebol.order.application.RejectOrderUseCase;
+import org.trebol.order.application.AbortPaymentUseCase;
 import org.trebol.order.application.CompleteOrderUseCase;
+import org.trebol.order.application.ConfirmOrderUseCase;
+import org.trebol.order.application.FailPaymentUseCase;
+import org.trebol.order.application.RejectOrderUseCase;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -64,6 +66,8 @@ public class OrdersProcessServiceImpl
     private final ConfirmOrderUseCase confirmOrderUseCase;
     private final RejectOrderUseCase rejectOrderUseCase;
     private final CompleteOrderUseCase completeOrderUseCase;
+    private final AbortPaymentUseCase abortPaymentUseCase;
+    private final FailPaymentUseCase failPaymentUseCase;
 
     public OrdersProcessServiceImpl(
         OrdersCrudService crudService,
@@ -74,7 +78,10 @@ public class OrdersProcessServiceImpl
         ProductsConverterService productConverterService,
         ConfirmOrderUseCase confirmOrderUseCase,
         RejectOrderUseCase rejectOrderUseCase,
-        CompleteOrderUseCase completeOrderUseCase
+        CompleteOrderUseCase completeOrderUseCase,
+        AbortPaymentUseCase abortPaymentUseCase,
+        FailPaymentUseCase failPaymentUseCase
+
     ) {
         this.crudService = crudService;
         this.ordersRepository = ordersRepository;
@@ -85,6 +92,8 @@ public class OrdersProcessServiceImpl
         this.confirmOrderUseCase = confirmOrderUseCase;
         this.rejectOrderUseCase = rejectOrderUseCase;
         this.completeOrderUseCase = completeOrderUseCase;
+        this.abortPaymentUseCase = abortPaymentUseCase;
+        this.failPaymentUseCase = failPaymentUseCase;
     }
 
     // TODO figure out how to shorten below methods
@@ -110,42 +119,52 @@ public class OrdersProcessServiceImpl
     }
 
     @Override
-    public OrderPojo markAsAborted(OrderPojo sell) throws BadInputException, EntityNotFoundException {
-        Order existingOrder = this.fetchExistingOrThrowException(sell);
+public OrderPojo markAsAborted(OrderPojo sell)
+    throws BadInputException, EntityNotFoundException {
 
-        if (!existingOrder.getStatus().getName().equals(ORDER_STATUS_PAYMENT_STARTED)) {
-            throw new BadInputException(THE_TRANSACTION_IS_NOT_IN_A_VALID_STATE_FOR_THIS_OPERATION);
-        }
+    Order existingOrder = abortPaymentUseCase.abortPayment(sell);
 
-        Optional<OrderStatus> abortedStatus = orderStatusesRepository.findByName(ORDER_STATUS_PAYMENT_CANCELLED);
-        if (abortedStatus.isEmpty()) {
-            throw new IllegalStateException(NO_STATUS_MATCHES_THE + " '" + ORDER_STATUS_PAYMENT_CANCELLED + "' " + NAME_IS_THE_DATABASE_EMPTY_OR_CORRUPT);
-        }
-        ordersRepository.setStatus(existingOrder.getId(), abortedStatus.get());
+    OrderPojo target = this.convertOrThrowException(existingOrder);
 
-        OrderPojo target = this.convertOrThrowException(existingOrder);
-        target.setStatus(ORDER_STATUS_PAYMENT_CANCELLED);
-        return target;
+    List<OrderDetailPojo> pojoDetails = new ArrayList<>();
+    for (OrderDetail detail : orderDetailsRepository.findBySellId(existingOrder.getId())) {
+        ProductPojo productPojo = productConverterService.convertToPojo(detail.getProduct());
+        OrderDetailPojo orderDetailPojo = OrderDetailPojo.builder()
+            .units(detail.getUnits())
+            .unitValue(detail.getUnitValue())
+            .product(productPojo)
+            .build();
+        pojoDetails.add(orderDetailPojo);
     }
+    target.setDetails(pojoDetails);
+    target.setStatus(ORDER_STATUS_PAYMENT_CANCELLED);
 
-    @Override
-    public OrderPojo markAsFailed(OrderPojo sell) throws BadInputException, EntityNotFoundException {
-        Order existingOrder = this.fetchExistingOrThrowException(sell);
+    return target;
+}
 
-        if (!existingOrder.getStatus().getName().equals(ORDER_STATUS_PAYMENT_STARTED)) {
-            throw new BadInputException(THE_TRANSACTION_IS_NOT_IN_A_VALID_STATE_FOR_THIS_OPERATION);
-        }
+@Override
+public OrderPojo markAsFailed(OrderPojo sell)
+    throws BadInputException, EntityNotFoundException {
 
-        Optional<OrderStatus> failedStatus = orderStatusesRepository.findByName(ORDER_STATUS_PAYMENT_FAILED);
-        if (failedStatus.isEmpty()) {
-            throw new IllegalStateException(NO_STATUS_MATCHES_THE + " '" + ORDER_STATUS_PAYMENT_FAILED + "' " + NAME_IS_THE_DATABASE_EMPTY_OR_CORRUPT);
-        }
-        ordersRepository.setStatus(existingOrder.getId(), failedStatus.get());
+    Order existingOrder = failPaymentUseCase.failPayment(sell);
 
-        OrderPojo target = this.convertOrThrowException(existingOrder);
-        target.setStatus(ORDER_STATUS_PAYMENT_FAILED);
-        return target;
+    OrderPojo target = this.convertOrThrowException(existingOrder);
+
+    List<OrderDetailPojo> pojoDetails = new ArrayList<>();
+    for (OrderDetail detail : orderDetailsRepository.findBySellId(existingOrder.getId())) {
+        ProductPojo productPojo = productConverterService.convertToPojo(detail.getProduct());
+        OrderDetailPojo orderDetailPojo = OrderDetailPojo.builder()
+            .units(detail.getUnits())
+            .unitValue(detail.getUnitValue())
+            .product(productPojo)
+            .build();
+        pojoDetails.add(orderDetailPojo);
     }
+    target.setDetails(pojoDetails);
+    target.setStatus(ORDER_STATUS_PAYMENT_FAILED);
+
+    return target;
+}
 
     @Override
     public OrderPojo markAsPaid(OrderPojo sell) throws BadInputException, EntityNotFoundException {
