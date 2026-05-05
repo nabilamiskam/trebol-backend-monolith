@@ -11,6 +11,7 @@ import org.trebol.product.domain.vo.ProductId;
 
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -78,10 +79,18 @@ public class ProductRepositoryAdapter implements ProductRepository {
                         }
                         break;
                     case "barcode":
+                    case "code":
                         predicates.add(criteriaBuilder.equal(root.get("code"), paramValue));
                         break;
                     case "name":
                         predicates.add(criteriaBuilder.equal(root.get("name"), paramValue));
+                        break;
+                    case "price":
+                        try {
+                            predicates.add(criteriaBuilder.equal(root.get("price"), Integer.valueOf(paramValue)));
+                        }
+                        catch (NumberFormatException ignored) {
+                        }
                         break;
                     case "barcodeLike":
                         predicates.add(criteriaBuilder.like(
