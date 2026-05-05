@@ -1,0 +1,141 @@
+{
+  "client": "Thunder Client",
+  "collectionName": "Product Module Day 5",
+  "dateExported": "2026-05-05T00:00:00.000Z",
+  "version": "1.1",
+  "folders": [],
+  "requests": [
+    {
+      "_id": "req_create_product",
+      "colId": "product-module-day5",
+      "containerId": "",
+      "name": "POST Create Product",
+      "url": "{{baseUrl}}/product-module",
+      "method": "POST",
+      "sortNum": 10000,
+      "created": "2026-05-05T00:00:00.000Z",
+      "modified": "2026-05-05T00:00:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"code\": \"P-1001\",\n  \"name\": \"Test Product\",\n  \"price\": 99.99,\n  \"isActive\": true\n}"
+      }
+    },
+    {
+      "_id": "req_get_product_by_id",
+      "colId": "product-module-day5",
+      "containerId": "",
+      "name": "GET Product By ID",
+      "url": "{{baseUrl}}/product-module/{{productId}}",
+      "method": "GET",
+      "sortNum": 20000,
+      "created": "2026-05-05T00:00:00.000Z",
+      "modified": "2026-05-05T00:00:00.000Z",
+      "headers": []
+    },
+    {
+      "_id": "req_list_products",
+      "colId": "product-module-day5",
+      "containerId": "",
+      "name": "GET Product List (Filtered)",
+      "url": "{{baseUrl}}/product-module?pageIndex=0&pageSize=10&name=test",
+      "method": "GET",
+      "sortNum": 30000,
+      "created": "2026-05-05T00:00:00.000Z",
+      "modified": "2026-05-05T00:00:00.000Z",
+      "headers": []
+    },
+    {
+      "_id": "req_update_product",
+      "colId": "product-module-day5",
+      "containerId": "",
+      "name": "PUT Update Product",
+      "url": "{{baseUrl}}/product-module/{{productId}}",
+      "method": "PUT",
+      "sortNum": 40000,
+      "created": "2026-05-05T00:00:00.000Z",
+      "modified": "2026-05-05T00:00:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"Updated Test Product\",\n  \"price\": 120.0,\n  \"isActive\": true\n}"
+      }
+    },
+    {
+      "_id": "req_delete_product",
+      "colId": "product-module-day5",
+      "containerId": "",
+      "name": "DELETE Product",
+      "url": "{{baseUrl}}/product-module/{{productId}}",
+      "method": "DELETE",
+      "sortNum": 50000,
+      "created": "2026-05-05T00:00:00.000Z",
+      "modified": "2026-05-05T00:00:00.000Z",
+      "headers": []
+    },
+    {
+      "_id": "req_error_404",
+      "colId": "product-module-day5",
+      "containerId": "",
+      "name": "GET Not Found (404)",
+      "url": "{{baseUrl}}/product-module/999999",
+      "method": "GET",
+      "sortNum": 60000,
+      "created": "2026-05-05T00:00:00.000Z",
+      "modified": "2026-05-05T00:00:00.000Z",
+      "headers": []
+    },
+    {
+      "_id": "req_error_409",
+      "colId": "product-module-day5",
+      "containerId": "",
+      "name": "POST Duplicate Code (409)",
+      "url": "{{baseUrl}}/product-module",
+      "method": "POST",
+      "sortNum": 70000,
+      "created": "2026-05-05T00:00:00.000Z",
+      "modified": "2026-05-05T00:00:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"code\": \"P-1001\",\n  \"name\": \"Duplicate Code Product\",\n  \"price\": 88.0,\n  \"isActive\": true\n}"
+      }
+    },
+    {
+      "_id": "req_error_400",
+      "colId": "product-module-day5",
+      "containerId": "",
+      "name": "PUT Validation Error (400)",
+      "url": "{{baseUrl}}/product-module/{{productId}}",
+      "method": "PUT",
+      "sortNum": 80000,
+      "created": "2026-05-05T00:00:00.000Z",
+      "modified": "2026-05-05T00:00:00.000Z",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"name\": \"\",\n  \"price\": -5\n}"
+      }
+    }
+  ]
+}

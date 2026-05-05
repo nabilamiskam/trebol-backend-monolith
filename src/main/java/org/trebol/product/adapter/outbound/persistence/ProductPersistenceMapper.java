@@ -11,10 +11,15 @@ import java.math.BigDecimal;
 public class ProductPersistenceMapper {
     public ProductJpaEntity toEntity(ProductAggregate aggregate) {
         ProductJpaEntity entity = new ProductJpaEntity();
-        entity.setId(aggregate.getId().value());
+        if (aggregate.getId() != null) {
+            entity.setId(aggregate.getId().value());
+        }
         entity.setCode(aggregate.getCode().value());
         entity.setName(aggregate.getName().value());
         entity.setPrice(aggregate.getPrice().value().intValue());
+        entity.setDescription("");
+        entity.setCurrentStock(0);
+        entity.setCriticalStock(0);
         return entity;
     }
 

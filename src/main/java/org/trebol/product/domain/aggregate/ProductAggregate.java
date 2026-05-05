@@ -16,7 +16,7 @@ public class ProductAggregate {
     private ProductStatus status;
 
     public ProductAggregate(ProductId id, ProductCode code, ProductName name, ProductPrice price) {
-        this.id = Objects.requireNonNull(id);
+        this.id = id;
         this.code = Objects.requireNonNull(code);
         this.name = Objects.requireNonNull(name);
         this.price = Objects.requireNonNull(price);

@@ -14,8 +14,14 @@ import org.trebol.product.application.usecase.GetProductUseCase;
 import org.trebol.product.application.usecase.ListProductsUseCase;
 import org.trebol.product.application.usecase.UpdateProductUseCase;
 import org.trebol.product.domain.aggregate.ProductAggregate;
+import org.trebol.product.domain.exception.ProductCodeAlreadyExistsException;
+import org.trebol.product.domain.exception.ProductNotFoundException;
 import org.trebol.product.domain.port.ProductRepository;
+import org.trebol.product.domain.vo.ProductCode;
 import org.trebol.product.domain.vo.ProductId;
+import org.trebol.product.domain.vo.ProductName;
+import org.trebol.product.domain.vo.ProductPrice;
+import org.trebol.product.domain.vo.ProductStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,17 +44,58 @@ public class ProductApplicationService implements
 
     @Override
     public ProductResult execute(CreateProductCommand command) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        // 1. Check if code already exists
+        Optional<ProductAggregate> existingByCode = 
+            productRepository.findByCode(new ProductCode(command.code()));
+        if (existingByCode.isPresent()) {
+            throw new ProductCodeAlreadyExistsException("Product code already exists: " + command.code());
+        }
+
+        // 2. Create aggregate with value objects
+        ProductAggregate product = new ProductAggregate(
+            null, // ID assigned by DB
+            new ProductCode(command.code()),
+            new ProductName(command.name()),
+            new ProductPrice(command.price())
+        );
+
+        // 3. Save via port
+        ProductAggregate saved = productRepository.save(product);
+
+        // 4. Return result
+        return mapper.toResult(saved);
     }
 
     @Override
     public ProductResult execute(UpdateProductCommand command) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        // 1. Load existing aggregate
+        ProductAggregate product = productRepository.findById(new ProductId(command.id()))
+            .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + command.id()));
+
+        // 2. Apply mutations (if field provided)
+        if (command.name() != null) {
+            product.updateName(new ProductName(command.name()));
+        }
+        if (command.price() != null) {
+            product.updatePrice(new ProductPrice(command.price()));
+        }
+        product.updateStatus(ProductStatus.fromBoolean(command.isActive()));
+
+        // 3. Save via port
+        ProductAggregate updated = productRepository.save(product);
+
+        // 4. Return result
+        return mapper.toResult(updated);
     }
 
     @Override
     public void execute(DeleteProductCommand command) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        // 1. Verify product exists
+        productRepository.findById(new ProductId(command.id()))
+            .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + command.id()));
+
+        // 2. Delete
+        productRepository.deleteById(new ProductId(command.id()));
     }
 
     @Override
