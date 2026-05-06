@@ -20,14 +20,14 @@
 
 package org.trebol.jpa.repositories;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.trebol.jpa.Repository;
 import org.trebol.jpa.entities.Order;
 import org.trebol.jpa.entities.OrderStatus;
-
-import java.util.Optional;
 
 @org.springframework.stereotype.Repository
 public interface OrdersRepository
@@ -51,4 +51,18 @@ public interface OrdersRepository
         + "SET s.transactionToken = :token "
         + "WHERE s.id = :id")
     int setTransactionToken(@Param("id") Long id, @Param("token") String token);
+
+    @Query("""
+    SELECT DISTINCT o FROM Order o
+    LEFT JOIN FETCH o.details
+    LEFT JOIN FETCH o.customer
+    LEFT JOIN FETCH o.status
+    LEFT JOIN FETCH o.paymentType
+    LEFT JOIN FETCH o.billingType
+    LEFT JOIN FETCH o.salesperson
+    LEFT JOIN FETCH o.shipper
+    LEFT JOIN FETCH o.billingCompany
+    WHERE o.id = :id
+""")
+Optional<Order> findByIdWithDetailsAndRefs(@Param("id") Long id);
 }

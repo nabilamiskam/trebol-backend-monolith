@@ -20,10 +20,12 @@
 
 package org.trebol.api.controllers;
 
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Predicate;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.springframework.http.HttpStatus.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,8 +42,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.trebol.api.DataCrudGenericController;
 import org.trebol.api.models.DataPagePojo;
 import org.trebol.api.models.OrderPojo;
-import org.trebol.api.services.PaginationService;
 import org.trebol.api.services.OrdersProcessService;
+import org.trebol.api.services.PaginationService;
 import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.Order;
 import org.trebol.jpa.services.SortSpecParserService;
@@ -51,15 +53,14 @@ import org.trebol.jpa.sortspecs.OrdersSortSpec;
 import org.trebol.mailing.MailingService;
 import org.trebol.mailing.MailingServiceException;
 
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Predicate;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequestMapping("/data/orders")
@@ -197,6 +198,13 @@ public class DataOrdersController
             mailingService.notifyOrderStatusToClient(updatedSell);
         }
     }
+
+    @PostMapping("/payment/start")
+@Operation(summary = "Start payment for an order (generates transaction token).")
+@PreAuthorize("hasAuthority('orders:update')")
+public OrderPojo startPayment(@RequestBody OrderPojo sell) throws BadInputException {
+    return processService.markAsStarted(sell);
+}
 
     @Override
     protected Map<String, OrderSpecifier<?>> getOrderSpecMap() {

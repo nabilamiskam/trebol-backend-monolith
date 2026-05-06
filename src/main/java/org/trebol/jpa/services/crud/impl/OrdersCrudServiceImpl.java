@@ -20,7 +20,11 @@
 
 package org.trebol.jpa.services.crud.impl;
 
-import com.querydsl.core.types.Predicate;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,11 +42,9 @@ import org.trebol.jpa.services.crud.CrudGenericService;
 import org.trebol.jpa.services.crud.OrdersCrudService;
 import org.trebol.jpa.services.patch.OrdersPatchService;
 
+import com.querydsl.core.types.Predicate;
+
 import jakarta.persistence.EntityNotFoundException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -78,7 +80,7 @@ public class OrdersCrudServiceImpl
         if (buyOrder==null) {
             return Optional.empty();
         } else {
-            return this.ordersRepository.findById(buyOrder);
+            return this.ordersRepository.findByIdWithDetailsAndRefs(buyOrder);
         }
     }
 
