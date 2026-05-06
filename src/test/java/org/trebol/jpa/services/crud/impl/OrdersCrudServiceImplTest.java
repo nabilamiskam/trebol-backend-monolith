@@ -54,8 +54,8 @@ class OrdersCrudServiceImplTest {
     @Mock OrderDetailsRepository orderDetailsRepositoryMock;
     @Mock OrdersRepository ordersRepositoryMock;
     @Mock OrdersConverterService ordersConverterMock;
-    @Mock AddressesConverterService addressesConverterServiceMock; // TODO verify usage of this mock when reading one
-    @Mock ApiProperties apiProperties; // TODO verify usage of this mock when doing a partial update
+    @Mock AddressesConverterService addressesConverterServiceMock;
+    @Mock ApiProperties apiProperties;
     final OrdersTestHelper ordersHelper = new OrdersTestHelper();
 
     @BeforeEach
@@ -64,17 +64,19 @@ class OrdersCrudServiceImplTest {
     }
 
     @Test
-    void finds_by_example_using_buy_order() {
-        OrderPojo input = ordersHelper.orderPojoForFetch();
-        Order expectedResult = ordersHelper.orderEntityAfterCreation();
-        when(ordersRepositoryMock.findById(anyLong())).thenReturn(Optional.of(expectedResult));
+void finds_by_example_using_buy_order() {
+    OrderPojo input = ordersHelper.orderPojoForFetch();
+    Order expectedResult = ordersHelper.orderEntityAfterCreation();
 
-        Optional<Order> match = instance.getExisting(input);
+    when(ordersRepositoryMock.findByIdWithDetailsAndRefs(anyLong()))
+        .thenReturn(Optional.of(expectedResult));
 
-        verify(ordersRepositoryMock).findById(input.getBuyOrder());
-        assertTrue(match.isPresent());
-        assertEquals(expectedResult, match.get());
-    }
+    Optional<Order> match = instance.getExisting(input);
+
+    verify(ordersRepositoryMock).findByIdWithDetailsAndRefs(input.getBuyOrder());
+    assertTrue(match.isPresent());
+    assertEquals(expectedResult, match.get());
+}
 
     @Test
     void finds_using_predicate() throws EntityNotFoundException {
