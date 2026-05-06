@@ -24,7 +24,6 @@ import static org.trebol.config.Constants.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,18 +34,16 @@ import org.trebol.api.services.OrdersProcessService;
 import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.Order;
 import org.trebol.jpa.entities.OrderDetail;
-import org.trebol.jpa.entities.OrderStatus;
 import org.trebol.jpa.repositories.OrderDetailsRepository;
-import org.trebol.jpa.repositories.OrderStatusesRepository;
-import org.trebol.jpa.repositories.OrdersRepository;
 import org.trebol.jpa.services.conversion.OrdersConverterService;
 import org.trebol.jpa.services.conversion.ProductsConverterService;
-import org.trebol.jpa.services.crud.OrdersCrudService;
 import org.trebol.order.application.AbortPaymentUseCase;
 import org.trebol.order.application.CompleteOrderUseCase;
 import org.trebol.order.application.ConfirmOrderUseCase;
 import org.trebol.order.application.FailPaymentUseCase;
+import org.trebol.order.application.MarkPaidUseCase;
 import org.trebol.order.application.RejectOrderUseCase;
+import org.trebol.order.application.StartPaymentUseCase;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -54,13 +51,7 @@ import jakarta.persistence.EntityNotFoundException;
 @Service
 public class OrdersProcessServiceImpl
     implements OrdersProcessService {
-    private static final String THE_TRANSACTION_IS_NOT_IN_A_VALID_STATE_FOR_THIS_OPERATION = "The transaction is not in a valid state for this api";
-    private static final String NO_STATUS_MATCHES_THE = "No status matches the";
-    private static final String NAME_IS_THE_DATABASE_EMPTY_OR_CORRUPT = "name - Is the database empty or corrupt?";
-    private final OrdersCrudService crudService;
-    private final OrdersRepository ordersRepository;
     private final OrderDetailsRepository orderDetailsRepository;
-    private final OrderStatusesRepository orderStatusesRepository;
     private final OrdersConverterService converterService;
     private final ProductsConverterService productConverterService;
     private final ConfirmOrderUseCase confirmOrderUseCase;
@@ -68,25 +59,23 @@ public class OrdersProcessServiceImpl
     private final CompleteOrderUseCase completeOrderUseCase;
     private final AbortPaymentUseCase abortPaymentUseCase;
     private final FailPaymentUseCase failPaymentUseCase;
+    private final StartPaymentUseCase startPaymentUseCase;
+    private final MarkPaidUseCase markPaidUseCase;
 
     public OrdersProcessServiceImpl(
-        OrdersCrudService crudService,
-        OrdersRepository ordersRepository,
         OrderDetailsRepository orderDetailsRepository,
-        OrderStatusesRepository orderStatusesRepository,
         OrdersConverterService converterService,
         ProductsConverterService productConverterService,
         ConfirmOrderUseCase confirmOrderUseCase,
         RejectOrderUseCase rejectOrderUseCase,
         CompleteOrderUseCase completeOrderUseCase,
         AbortPaymentUseCase abortPaymentUseCase,
-        FailPaymentUseCase failPaymentUseCase
+        FailPaymentUseCase failPaymentUseCase,
+        StartPaymentUseCase startPaymentUseCase,
+        MarkPaidUseCase markPaidUseCase
 
     ) {
-        this.crudService = crudService;
-        this.ordersRepository = ordersRepository;
         this.orderDetailsRepository = orderDetailsRepository;
-        this.orderStatusesRepository = orderStatusesRepository;
         this.converterService = converterService;
         this.productConverterService = productConverterService;
         this.confirmOrderUseCase = confirmOrderUseCase;
@@ -94,29 +83,17 @@ public class OrdersProcessServiceImpl
         this.completeOrderUseCase = completeOrderUseCase;
         this.abortPaymentUseCase = abortPaymentUseCase;
         this.failPaymentUseCase = failPaymentUseCase;
+        this.startPaymentUseCase = startPaymentUseCase;
+        this.markPaidUseCase = markPaidUseCase;
     }
-
-    // TODO figure out how to shorten below methods
-    // TODO to compare statuses use numbers, not strings
     @Override
-    public OrderPojo markAsStarted(OrderPojo sell) throws BadInputException, EntityNotFoundException {
-        Order existingOrder = this.fetchExistingOrThrowException(sell);
+public OrderPojo markAsStarted(OrderPojo sell) throws BadInputException, EntityNotFoundException {
+    Order updated = startPaymentUseCase.startPayment(sell);
 
-        if (!existingOrder.getStatus().getName().equals(ORDER_STATUS_PENDING)) {
-            throw new BadInputException(THE_TRANSACTION_IS_NOT_IN_A_VALID_STATE_FOR_THIS_OPERATION);
-        }
-
-        Optional<OrderStatus> startedStatus = orderStatusesRepository.findByName(ORDER_STATUS_PAYMENT_STARTED);
-        if (startedStatus.isEmpty()) {
-            throw new IllegalStateException(NO_STATUS_MATCHES_THE + " '" + ORDER_STATUS_PAYMENT_STARTED + "' " + NAME_IS_THE_DATABASE_EMPTY_OR_CORRUPT);
-        }
-        ordersRepository.setStatus(existingOrder.getId(), startedStatus.get());
-        ordersRepository.setTransactionToken(existingOrder.getId(), sell.getToken());
-
-        OrderPojo target = this.convertOrThrowException(existingOrder);
-        target.setStatus(ORDER_STATUS_PAYMENT_STARTED);
-        return target;
-    }
+    OrderPojo target = this.convertOrThrowException(updated);
+    target.setStatus(ORDER_STATUS_PAYMENT_STARTED);
+    return target;
+}
 
     @Override
 public OrderPojo markAsAborted(OrderPojo sell)
@@ -167,36 +144,30 @@ public OrderPojo markAsFailed(OrderPojo sell)
 }
 
     @Override
-    public OrderPojo markAsPaid(OrderPojo sell) throws BadInputException, EntityNotFoundException {
-        Order existingOrder = this.fetchExistingOrThrowException(sell);
+public OrderPojo markAsPaid(OrderPojo sell) throws BadInputException, EntityNotFoundException {
+    // Delegate the transition (2 -> 3) to the use case
+    Order updatedOrder = markPaidUseCase.markPaid(sell);
 
-        if (!existingOrder.getStatus().getName().equals(ORDER_STATUS_PAYMENT_STARTED)) {
-            throw new BadInputException(THE_TRANSACTION_IS_NOT_IN_A_VALID_STATE_FOR_THIS_OPERATION);
-        }
+    // Convert base order fields
+    OrderPojo target = this.convertOrThrowException(updatedOrder);
 
-        Optional<OrderStatus> paidStatus = orderStatusesRepository.findByName(ORDER_STATUS_PAID_UNCONFIRMED);
-        if (paidStatus.isEmpty()) {
-            throw new IllegalStateException(NO_STATUS_MATCHES_THE + " '" + ORDER_STATUS_PAID_UNCONFIRMED + "' " + NAME_IS_THE_DATABASE_EMPTY_OR_CORRUPT);
-        }
-        ordersRepository.setStatus(existingOrder.getId(), paidStatus.get());
-
-        OrderPojo target = this.convertOrThrowException(existingOrder);
-
-        List<OrderDetailPojo> pojoDetails = new ArrayList<>();
-        for (OrderDetail detail : orderDetailsRepository.findBySellId(existingOrder.getId())) {
-            ProductPojo productPojo = productConverterService.convertToPojo(detail.getProduct());
-            OrderDetailPojo orderDetailPojo = OrderDetailPojo.builder()
-                .units(detail.getUnits())
-                .unitValue(detail.getUnitValue())
-                .product(productPojo)
-                .build();
-            pojoDetails.add(orderDetailPojo);
-        }
-        target.setStatus(ORDER_STATUS_PAID_UNCONFIRMED);
-        target.setDetails(pojoDetails);
-
-        return target;
+    // Keep your existing detail aggregation logic
+    List<OrderDetailPojo> pojoDetails = new ArrayList<>();
+    for (OrderDetail detail : orderDetailsRepository.findBySellId(updatedOrder.getId())) {
+        ProductPojo productPojo = productConverterService.convertToPojo(detail.getProduct());
+        OrderDetailPojo orderDetailPojo = OrderDetailPojo.builder()
+            .units(detail.getUnits())
+            .unitValue(detail.getUnitValue())
+            .product(productPojo)
+            .build();
+        pojoDetails.add(orderDetailPojo);
     }
+
+    target.setStatus(ORDER_STATUS_PAID_UNCONFIRMED);
+    target.setDetails(pojoDetails);
+
+    return target;
+}
 
     @Override
 public OrderPojo markAsConfirmed(OrderPojo sell)
@@ -273,21 +244,11 @@ public OrderPojo markAsCompleted(OrderPojo sell)
 
     return target;
 }
-
-    private Order fetchExistingOrThrowException(OrderPojo sell) throws BadInputException {
-        Optional<Order> match = crudService.getExisting(sell);
-        if (match.isEmpty()) {
-            throw new EntityNotFoundException("No transaction matches given input");
-        }
-        return match.get();
-    }
-
     private OrderPojo convertOrThrowException(Order existingOrder) {
-        Order freshInstance = ordersRepository.getById(existingOrder.getId());
-        OrderPojo target = converterService.convertToPojo(freshInstance);
-        if (target==null) {
-            throw new IllegalStateException("Converter could not turn Sell into its Pojo equivalent");
-        }
-        return target;
+    OrderPojo target = converterService.convertToPojo(existingOrder);
+    if (target == null) {
+        throw new IllegalStateException("Converter could not turn Sell into its Pojo equivalent");
+    }
+    return target;
     }
 }
