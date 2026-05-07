@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,14 +16,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.trebol.product.adapter.inbound.dto.PagedProductResponse;
+import org.trebol.product.adapter.inbound.dto.BulkPatchProductResponse;
 import org.trebol.product.adapter.inbound.dto.ErrorResponse;
 import org.trebol.product.adapter.inbound.dto.ProductRequest;
 import org.trebol.product.adapter.inbound.dto.ProductResponse;
 import org.trebol.product.application.command.CreateProductCommand;
+import org.trebol.product.application.command.BulkPatchProductCommand;
 import org.trebol.product.application.command.DeleteProductCommand;
 import org.trebol.product.application.command.UpdateProductCommand;
 import org.trebol.product.application.query.GetProductQuery;
 import org.trebol.product.application.query.ListProductsQuery;
+import org.trebol.product.application.result.BulkPatchProductResult;
 import org.trebol.product.application.result.PagedProductResult;
 import org.trebol.product.application.result.ProductResult;
 import org.trebol.product.application.service.ProductApplicationService;
@@ -80,6 +84,17 @@ public class ProductController {
 			.toUri();
 
 		return ResponseEntity.created(location).body(response);
+	}
+
+	@PatchMapping
+	@PreAuthorize("hasAuthority('products:update')")
+	public ResponseEntity<BulkPatchProductResponse> patchProducts(
+		@RequestParam Map<String, String> requestParams,
+		@RequestBody Map<String, Object> changes
+	) {
+		BulkPatchProductCommand command = new BulkPatchProductCommand(requestParams, changes);
+		BulkPatchProductResult result = productApplicationService.execute(command);
+		return ResponseEntity.ok(productWebMapper.toBulkPatchResponse(result));
 	}
 
 	@PutMapping("/{id}")

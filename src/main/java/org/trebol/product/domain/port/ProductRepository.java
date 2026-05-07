@@ -13,6 +13,7 @@ public interface ProductRepository {
     Optional<ProductAggregate> findById(ProductId id);
     Optional<ProductAggregate> findByCode(ProductCode code);
     List<ProductAggregate> findAll(int pageIndex, int pageSize, Map<String, String> requestParams);
+    List<ProductAggregate> findAll(Map<String, String> requestParams);
     long countAll(Map<String, String> requestParams);
     void deleteById(ProductId id);
 }

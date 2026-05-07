@@ -52,6 +52,15 @@ public class ProductRepositoryAdapter implements ProductRepository {
     }
 
     @Override
+    public List<ProductAggregate> findAll(Map<String, String> requestParams) {
+        Specification<ProductJpaEntity> specification = buildSpecification(requestParams);
+        return jpaRepository.findAll(specification, Pageable.unpaged())
+            .stream()
+            .map(mapper::toAggregate)
+            .toList();
+    }
+
+    @Override
     public long countAll(Map<String, String> requestParams) {
         Specification<ProductJpaEntity> specification = buildSpecification(requestParams);
         return jpaRepository.count(specification);

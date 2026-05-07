@@ -35,6 +35,7 @@ import org.trebol.jpa.entities.Product;
 import org.trebol.jpa.services.SortSpecParserService;
 import org.trebol.jpa.services.crud.ProductsCrudService;
 import org.trebol.jpa.services.predicates.ProductsPredicateService;
+import org.trebol.product.application.usecase.ListProductsUseCase;
 
 import java.util.Map;
 import java.util.Optional;
@@ -54,6 +55,7 @@ class DataProductsControllerTest
     @Mock SortSpecParserService sortServiceMock;
     @Mock ProductsCrudService crudServiceMock;
     @Mock ProductsPredicateService predicateServiceMock;
+    @Mock ListProductsUseCase listProductsUseCaseMock;
 
     @Override
     @BeforeEach
@@ -69,6 +71,8 @@ class DataProductsControllerTest
     @Test
     void reads_products() {
         assertDoesNotThrow(() -> {
+            when(listProductsUseCaseMock.execute(any(org.trebol.product.application.query.ListProductsQuery.class)))
+                .thenReturn(new org.trebol.product.application.result.PagedProductResult(java.util.List.of(), 0));
             super.reads_data(null);
             super.reads_data(Map.of());
             super.reads_data(Map.of(ANY, ANY));

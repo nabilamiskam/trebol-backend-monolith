@@ -195,7 +195,44 @@
 
 ---
 
-## 🟡 WEEK 2: Comprehensive Testing (Days 8-14)
+## � Endpoint Semantics Reference
+
+### PUT (Single Resource Update)
+- **Path:** `PUT /product-module/{id}`
+- **Query:** None (resource selected by path ID)
+- **Body:** Full `ProductRequest` object (all fields required)
+- **Semantics:** Replace entire resource with provided values
+- **Response:** `200 OK` with updated resource, `404 Not Found` if ID doesn't exist
+- **Idempotent:** Yes (repeated calls produce same result)
+- **Use Case:** Update a specific known product by ID
+
+### PATCH (Filtered Bulk Partial Update)
+- **Path:** `PATCH /product-module`
+- **Query:** Filters to select target product(s) (e.g., `?code=ABC123&name=test`)
+- **Body:** Partial `ProductRequest` map (only fields to change provided)
+- **Semantics:** Apply partial changes to all products matching query filters
+- **Response:** `200 OK` with count/list of updated resources, `400 Bad Request` if no filters provided
+- **Idempotent:** No (repeated calls may apply changes to newly matching records)
+- **Use Case:** Update multiple products matching criteria (e.g., "increase all prices by 10%" or "deactivate products in category X")
+
+### Key Differences
+
+| Aspect | PUT | PATCH |
+|--------|-----|-------|
+| Selectivity | Single resource by ID | Multiple by query filter |
+| Body Completeness | Full object required | Partial object allowed |
+| Query Filters | Not used | Required |
+| Idempotent | Yes | No |
+| Scope | One resource | Many resources |
+| Implementation Layer | Path parameter + service | Query parsing + repository spec |
+
+### Current Implementation Status
+- **PUT:** ✅ Implemented (single resource by ID, partial fields supported)
+- **PATCH:** 🟡 Pending (needs filter parsing + bulk mutation support)
+
+---
+
+## �🟡 WEEK 2: Comprehensive Testing (Days 8-14)
 ### Focus: 60-75 total tests across all 4 layers
 
 **Starting Point:** 11 tests (from Week 1)  
