@@ -42,7 +42,7 @@ public class FailPaymentUseCase {
 
         final OrderStatusCode next;
         try {
-            next = workflow.failPayment(current); // 2 -> -2
+            next = workflow.next(OrderTransitionCommand.FAIL_PAYMENT, current); // 2 -> -2
         } catch (InvalidOrderTransitionException ex) {
             throw new BadInputException(THE_TRANSACTION_IS_NOT_IN_A_VALID_STATE_FOR_THIS_OPERATION);
         }

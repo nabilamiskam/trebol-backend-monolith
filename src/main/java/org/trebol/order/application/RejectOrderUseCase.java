@@ -1,17 +1,18 @@
 package org.trebol.order.application;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.trebol.api.models.OrderPojo;
 import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.Order;
 import org.trebol.jpa.entities.OrderStatus;
-import org.trebol.jpa.repositories.OrdersRepository;
 import org.trebol.jpa.repositories.OrderStatusesRepository;
+import org.trebol.jpa.repositories.OrdersRepository;
 import org.trebol.jpa.services.crud.OrdersCrudService;
 import org.trebol.order.domain.InvalidOrderTransitionException;
 import org.trebol.order.domain.OrderStatusCode;
 import org.trebol.order.domain.OrderWorkflow;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class RejectOrderUseCase {
@@ -41,7 +42,7 @@ public class RejectOrderUseCase {
 
         final OrderStatusCode next;
         try {
-            next = workflow.reject(current); // should yield REJECTED
+            next = workflow.next(OrderTransitionCommand.REJECT, current);
         } catch (InvalidOrderTransitionException ex) {
             throw new BadInputException(THE_TRANSACTION_IS_NOT_IN_A_VALID_STATE_FOR_THIS_OPERATION);
         }

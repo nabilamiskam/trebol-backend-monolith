@@ -46,7 +46,7 @@ public class StartPaymentUseCase {
 
         final OrderStatusCode next;
         try {
-            next = workflow.startPayment(current); // 1 -> 2
+            next = workflow.next(OrderTransitionCommand.START_PAYMENT, current); // 1 -> 2
         } catch (InvalidOrderTransitionException ex) {
             throw new BadInputException(THE_TRANSACTION_IS_NOT_IN_A_VALID_STATE_FOR_THIS_OPERATION);
         }
@@ -56,7 +56,7 @@ public class StartPaymentUseCase {
         existingOrder.setTransactionToken(token); // ensures converter returns token
 
         OrderStatus nextStatus = orderStatusesRepository.findByCode(next.code())
-        .orElseThrow(() -> new IllegalStateException("No status matches code: " + next.code()));
+            .orElseThrow(() -> new IllegalStateException("No status matches code: " + next.code()));
 
         ordersRepository.setStatus(existingOrder.getId(), nextStatus);
         existingOrder.setStatus(nextStatus); // optional but recommended

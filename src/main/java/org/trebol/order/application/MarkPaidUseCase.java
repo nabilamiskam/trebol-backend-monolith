@@ -42,7 +42,7 @@ public class MarkPaidUseCase {
 
         final OrderStatusCode next;
         try {
-            next = workflow.markPaid(current); // 2 -> 3
+            next = workflow.next(OrderTransitionCommand.MARK_PAID, current); // 2 -> 3
         } catch (InvalidOrderTransitionException ex) {
             throw new BadInputException(THE_TRANSACTION_IS_NOT_IN_A_VALID_STATE_FOR_THIS_OPERATION);
         }

@@ -1,20 +1,36 @@
 package org.trebol.order.domain;
 
-public class InvalidOrderTransitionException extends RuntimeException {
-    private final OrderStatusCode from;
-    private final OrderStatusCode to;
+import java.util.Set;
 
-    public InvalidOrderTransitionException(OrderStatusCode from, OrderStatusCode to) {
-        super("Invalid order status transition: " + from + " -> " + to);
+import org.trebol.order.application.OrderTransitionCommand;
+
+public class InvalidOrderTransitionException extends RuntimeException {
+    private final OrderTransitionCommand command;
+    private final OrderStatusCode from;
+    private final Set<OrderStatusCode> allowedFrom;
+
+    public InvalidOrderTransitionException(
+        OrderTransitionCommand command,
+        OrderStatusCode from,
+        Set<OrderStatusCode> allowedFrom
+    ) {
+        super("Invalid order transition for command " + command
+            + ": current=" + from
+            + ", allowedFrom=" + allowedFrom);
+        this.command = command;
         this.from = from;
-        this.to = to;
+        this.allowedFrom = allowedFrom;
+    }
+
+    public OrderTransitionCommand getCommand() {
+        return command;
     }
 
     public OrderStatusCode getFrom() {
         return from;
     }
 
-    public OrderStatusCode getTo() {
-        return to;
+    public Set<OrderStatusCode> getAllowedFrom() {
+        return allowedFrom;
     }
 }

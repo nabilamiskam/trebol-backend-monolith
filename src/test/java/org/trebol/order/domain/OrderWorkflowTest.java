@@ -2,129 +2,50 @@ package org.trebol.order.domain;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Test;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.trebol.order.application.OrderTransitionCommand;
 
 class OrderWorkflowTest {
 
     private final OrderWorkflow workflow = new OrderWorkflow();
 
-    // --------------------
-    // 7 passing tests
-    // --------------------
-
-    @Test
-    void startPayment_fromPending_toPaymentStarted() {
-        var next = workflow.startPayment(OrderStatusCode.PENDING);
-        assertEquals(OrderStatusCode.PAYMENT_STARTED, next);
-    }
-
-    @Test
-    void markPaid_fromPaymentStarted_toPaidUnconfirmed() {
-        var next = workflow.markPaid(OrderStatusCode.PAYMENT_STARTED);
-        assertEquals(OrderStatusCode.PAID_UNCONFIRMED, next);
-    }
-
-    @Test
-    void confirm_fromPaidUnconfirmed_toPaidConfirmed() {
-        var next = workflow.confirm(OrderStatusCode.PAID_UNCONFIRMED);
-        assertEquals(OrderStatusCode.PAID_CONFIRMED, next);
-    }
-
-    @Test
-    void reject_fromPaidUnconfirmed_toRejected() {
-        var next = workflow.reject(OrderStatusCode.PAID_UNCONFIRMED);
-        assertEquals(OrderStatusCode.REJECTED, next);
-    }
-
-    @Test
-    void complete_fromPaidConfirmed_toDeliveryComplete() {
-        var next = workflow.complete(OrderStatusCode.PAID_CONFIRMED);
-        assertEquals(OrderStatusCode.DELIVERY_COMPLETE, next);
-    }
-
-    @Test
-    void abortPayment_fromPaymentStarted_toPaymentCancelled() {
-        var next = workflow.abortPayment(OrderStatusCode.PAYMENT_STARTED);
-        assertEquals(OrderStatusCode.PAYMENT_CANCELLED, next);
-    }
-
-    @Test
-    void failPayment_fromPaymentStarted_toPaymentFailed() {
-        var next = workflow.failPayment(OrderStatusCode.PAYMENT_STARTED);
-        assertEquals(OrderStatusCode.PAYMENT_FAILED, next);
-    }
-
-    // --------------------
-    // 7 failing tests (invalid "from" state)
-    // --------------------
-
-    @Test
-    void startPayment_notFromPending_throws() {
-        var ex = assertThrows(
-            InvalidOrderTransitionException.class,
-            () -> workflow.startPayment(OrderStatusCode.PAYMENT_STARTED)
+    static Stream<Arguments> allowedTransitions() {
+        return Stream.of(
+            Arguments.of(OrderTransitionCommand.START_PAYMENT, OrderStatusCode.PENDING, OrderStatusCode.PAYMENT_STARTED),
+            Arguments.of(OrderTransitionCommand.MARK_PAID, OrderStatusCode.PAYMENT_STARTED, OrderStatusCode.PAID_UNCONFIRMED),
+            Arguments.of(OrderTransitionCommand.CONFIRM, OrderStatusCode.PAID_UNCONFIRMED, OrderStatusCode.PAID_CONFIRMED),
+            Arguments.of(OrderTransitionCommand.REJECT, OrderStatusCode.PAID_UNCONFIRMED, OrderStatusCode.REJECTED),
+            Arguments.of(OrderTransitionCommand.COMPLETE, OrderStatusCode.PAID_CONFIRMED, OrderStatusCode.DELIVERY_COMPLETE),
+            Arguments.of(OrderTransitionCommand.ABORT_PAYMENT, OrderStatusCode.PAYMENT_STARTED, OrderStatusCode.PAYMENT_CANCELLED),
+            Arguments.of(OrderTransitionCommand.FAIL_PAYMENT, OrderStatusCode.PAYMENT_STARTED, OrderStatusCode.PAYMENT_FAILED)
         );
-        assertEquals(OrderStatusCode.PAYMENT_STARTED, ex.getFrom());
-        assertEquals(OrderStatusCode.PAYMENT_STARTED, ex.getTo());
     }
 
-    @Test
-    void markPaid_notFromPaymentStarted_throws() {
-        var ex = assertThrows(
-            InvalidOrderTransitionException.class,
-            () -> workflow.markPaid(OrderStatusCode.PENDING)
-        );
-        assertEquals(OrderStatusCode.PENDING, ex.getFrom());
-        assertEquals(OrderStatusCode.PAID_UNCONFIRMED, ex.getTo());
+    @ParameterizedTest
+    @MethodSource("allowedTransitions")
+    void returns_expected_next_state(OrderTransitionCommand cmd, OrderStatusCode from, OrderStatusCode to) {
+        assertEquals(to, workflow.next(cmd, from));
     }
 
-    @Test
-    void confirm_notFromPaidUnconfirmed_throws() {
-        var ex = assertThrows(
-            InvalidOrderTransitionException.class,
-            () -> workflow.confirm(OrderStatusCode.PAID_CONFIRMED)
+    static Stream<Arguments> rejectedTransitions() {
+        return Stream.of(
+            Arguments.of(OrderTransitionCommand.START_PAYMENT, OrderStatusCode.PAYMENT_STARTED),
+            Arguments.of(OrderTransitionCommand.MARK_PAID, OrderStatusCode.PENDING),
+            Arguments.of(OrderTransitionCommand.CONFIRM, OrderStatusCode.PAID_CONFIRMED),
+            Arguments.of(OrderTransitionCommand.REJECT, OrderStatusCode.PAID_CONFIRMED),
+            Arguments.of(OrderTransitionCommand.COMPLETE, OrderStatusCode.PAID_UNCONFIRMED),
+            Arguments.of(OrderTransitionCommand.ABORT_PAYMENT, OrderStatusCode.PENDING),
+            Arguments.of(OrderTransitionCommand.FAIL_PAYMENT, OrderStatusCode.PAID_UNCONFIRMED)
         );
-        assertEquals(OrderStatusCode.PAID_CONFIRMED, ex.getFrom());
-        assertEquals(OrderStatusCode.PAID_CONFIRMED, ex.getTo());
     }
 
-    @Test
-    void reject_notFromPaidUnconfirmed_throws() {
-        var ex = assertThrows(
-            InvalidOrderTransitionException.class,
-            () -> workflow.reject(OrderStatusCode.PAID_CONFIRMED)
-        );
-        assertEquals(OrderStatusCode.PAID_CONFIRMED, ex.getFrom());
-        assertEquals(OrderStatusCode.REJECTED, ex.getTo());
-    }
-
-    @Test
-    void complete_notFromPaidConfirmed_throws() {
-        var ex = assertThrows(
-            InvalidOrderTransitionException.class,
-            () -> workflow.complete(OrderStatusCode.PAID_UNCONFIRMED)
-        );
-        assertEquals(OrderStatusCode.PAID_UNCONFIRMED, ex.getFrom());
-        assertEquals(OrderStatusCode.DELIVERY_COMPLETE, ex.getTo());
-    }
-
-    @Test
-    void abortPayment_notFromPaymentStarted_throws() {
-        var ex = assertThrows(
-            InvalidOrderTransitionException.class,
-            () -> workflow.abortPayment(OrderStatusCode.PENDING)
-        );
-        assertEquals(OrderStatusCode.PENDING, ex.getFrom());
-        assertEquals(OrderStatusCode.PAYMENT_CANCELLED, ex.getTo());
-    }
-
-    @Test
-    void failPayment_notFromPaymentStarted_throws() {
-        var ex = assertThrows(
-            InvalidOrderTransitionException.class,
-            () -> workflow.failPayment(OrderStatusCode.PAID_UNCONFIRMED)
-        );
-        assertEquals(OrderStatusCode.PAID_UNCONFIRMED, ex.getFrom());
-        assertEquals(OrderStatusCode.PAYMENT_FAILED, ex.getTo());
+    @ParameterizedTest
+    @MethodSource("rejectedTransitions")
+    void rejects_invalid_transitions(OrderTransitionCommand cmd, OrderStatusCode from) {
+        assertThrows(InvalidOrderTransitionException.class, () -> workflow.next(cmd, from));
     }
 }

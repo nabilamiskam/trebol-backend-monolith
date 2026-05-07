@@ -42,7 +42,7 @@ public class AbortPaymentUseCase {
 
         final OrderStatusCode next;
         try {
-            next = workflow.abortPayment(current); // 2 -> -1
+            next = workflow.next(OrderTransitionCommand.ABORT_PAYMENT, current); // 2 -> -1
         } catch (InvalidOrderTransitionException ex) {
             throw new BadInputException(THE_TRANSACTION_IS_NOT_IN_A_VALID_STATE_FOR_THIS_OPERATION);
         }
