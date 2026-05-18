@@ -1,0 +1,673 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------< org.trebolecommerce:trebol-backend-monolith-java17 >---------
+[INFO] Building Trébol Backend Monolith 0.2.5-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ war ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ trebol-backend-monolith-java17 ---
+[INFO] Deleting C:\Users\USER\Projects\trebol-backend-monolith\target
+[INFO] 
+[INFO] --- jacoco:0.8.8:prepare-agent (default-prepare-agent) @ trebol-backend-monolith-java17 ---
+[INFO] argLine set to -javaagent:C:\\Users\\USER\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.8\\org.jacoco.agent-0.8.8-runtime.jar=destfile=C:\\Users\\USER\\Projects\\trebol-backend-monolith\\target\\jacoco.exec
+[INFO] 
+[INFO] --- apt:1.1.3:process (default) @ trebol-backend-monolith-java17 ---
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ trebol-backend-monolith-java17 ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 3 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ trebol-backend-monolith-java17 ---
+[WARNING]  Parameter 'compilerArguments' is deprecated: use compilerArgs instead.
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 360 source files with javac [debug release 17] to target\classes
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/patch/impl/OrdersPatchServiceImpl.java:[99,18] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/PeopleConverterServiceImpl.java:[69,19] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/crud/CrudGenericService.java:[112,14] update(M) in org.trebol.jpa.services.CrudService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/patch/impl/UserRolesPatchServiceImpl.java:[53,21] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/SalespeopleConverterServiceImpl.java:[58,24] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/patch/impl/OrderStatusesPatchServiceImpl.java:[60,24] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/patch/impl/ProductCategoriesPatchServiceImpl.java:[60,28] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/ImagesConverterServiceImpl.java:[53,18] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/ProductCategoriesConverterServiceImpl.java:[66,28] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/AddressesConverterServiceImpl.java:[67,20] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/patch/impl/BillingCompaniesPatchServiceImpl.java:[60,27] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/BillingTypesConverterServiceImpl.java:[49,24] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/OrdersConverterServiceImpl.java:[218,18] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/api/services/impl/ProfileServiceImpl.java:[104,40] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/ShippersConverterServiceImpl.java:[49,20] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/patch/impl/CustomersPatchServiceImpl.java:[64,21] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/CustomersConverterServiceImpl.java:[58,21] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/patch/impl/SalespeoplePatchServiceImpl.java:[62,24] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/patch/impl/ProductsPatchServiceImpl.java:[82,20] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/ProductListItemsConverterServiceImpl.java:[55,28] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/patch/impl/UsersPatchServiceImpl.java:[68,17] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/patch/impl/ImagesPatchServiceImpl.java:[67,18] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/BillingCompaniesConverterServiceImpl.java:[51,27] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/patch/impl/ShippersPatchServiceImpl.java:[53,20] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/patch/impl/PeoplePatchServiceImpl.java:[84,19] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/ProductsConverterServiceImpl.java:[118,20] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/UserRolesConverterServiceImpl.java:[49,21] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/ProductListConverterServiceImpl.java:[63,24] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/OrderStatusesConverterServiceImpl.java:[51,24] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/conversion/impl/UsersConverterServiceImpl.java:[117,17] applyChangesToExistingEntity(P,E) in org.trebol.jpa.services.ConverterService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/patch/impl/ProductListPatchServiceImpl.java:[60,24] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/jpa/services/patch/impl/BillingTypesPatchServiceImpl.java:[53,24] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[INFO] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/api/services/impl/OrdersProcessServiceImpl.java: C:\Users\USER\Projects\trebol-backend-monolith\src\main\java\org\trebol\api\services\impl\OrdersProcessServiceImpl.java uses or overrides a deprecated API.
+[INFO] /C:/Users/USER/Projects/trebol-backend-monolith/src/main/java/org/trebol/api/services/impl/OrdersProcessServiceImpl.java: Recompile with -Xlint:deprecation for details.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ trebol-backend-monolith-java17 ---
+[INFO] skip non existing resourceDirectory C:\Users\USER\Projects\trebol-backend-monolith\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ trebol-backend-monolith-java17 ---
+[WARNING]  Parameter 'compilerArguments' is deprecated: use compilerArgs instead.
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 127 source files with javac [debug release 17] to target\test-classes
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] /C:/Users/USER/Projects/trebol-backend-monolith/src/test/java/org/trebol/api/services/impl/ProfileServiceImplTest.java:[104,32] patchExistingEntity(P,E) in org.trebol.jpa.services.PatchService has been deprecated and marked for removal
+[INFO] 
+[INFO] --- surefire:3.1.2:test (default-test) @ trebol-backend-monolith-java17 ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running org.trebol.api.controllers.AccessControllerTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.736 s -- in org.trebol.api.controllers.AccessControllerTest
+[INFO] Running org.trebol.api.controllers.AccountProfileControllerTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.112 s -- in org.trebol.api.controllers.AccountProfileControllerTest
+[INFO] Running org.trebol.api.controllers.DataBillingTypesControllerTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.452 s -- in org.trebol.api.controllers.DataBillingTypesControllerTest
+[INFO] Running org.trebol.api.controllers.DataCustomersControllerTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.213 s -- in org.trebol.api.controllers.DataCustomersControllerTest
+[INFO] Running org.trebol.api.controllers.DataImagesControllerTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.278 s -- in org.trebol.api.controllers.DataImagesControllerTest
+[INFO] Running org.trebol.api.controllers.DataOrdersControllerTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.653 s -- in org.trebol.api.controllers.DataOrdersControllerTest
+[INFO] Running org.trebol.api.controllers.DataOrderStatusesControllerTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.148 s -- in org.trebol.api.controllers.DataOrderStatusesControllerTest
+[INFO] Running org.trebol.api.controllers.DataPeopleControllerTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.116 s -- in org.trebol.api.controllers.DataPeopleControllerTest
+[INFO] Running org.trebol.api.controllers.DataProductCategoriesControllerContractTest
+13:05:18.340 [main] INFO org.hibernate.validator.internal.util.Version -- HV000001: Hibernate Validator 8.0.1.Final
+13:05:20.759 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+13:05:20.759 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+13:05:20.773 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 10 ms
+13:05:21.857 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+13:05:21.858 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+13:05:21.858 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+13:05:22.006 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+13:05:22.007 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+13:05:22.007 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+13:05:22.065 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+13:05:22.066 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+13:05:22.066 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 0 ms
+13:05:22.105 [main] INFO org.springframework.mock.web.MockServletContext -- Initializing Spring TestDispatcherServlet ''
+13:05:22.105 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Initializing Servlet ''
+13:05:22.106 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet -- Completed initialization in 1 ms
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.868 s -- in org.trebol.api.controllers.DataProductCategoriesControllerContractTest
+[INFO] Running org.trebol.api.controllers.DataProductCategoriesControllerTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.043 s -- in org.trebol.api.controllers.DataProductCategoriesControllerTest
+[INFO] Running org.trebol.api.controllers.DataProductListContentsControllerTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.817 s -- in org.trebol.api.controllers.DataProductListContentsControllerTest
+[INFO] Running org.trebol.api.controllers.DataProductListsControllerTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.149 s -- in org.trebol.api.controllers.DataProductListsControllerTest
+[INFO] Running org.trebol.api.controllers.DataProductsControllerTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.082 s -- in org.trebol.api.controllers.DataProductsControllerTest
+[INFO] Running org.trebol.api.controllers.DataSalespeopleControllerTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.144 s -- in org.trebol.api.controllers.DataSalespeopleControllerTest
+[INFO] Running org.trebol.api.controllers.DataShippersControllerTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.161 s -- in org.trebol.api.controllers.DataShippersControllerTest
+[INFO] Running org.trebol.api.controllers.DataUserRolesControllerTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.191 s -- in org.trebol.api.controllers.DataUserRolesControllerTest
+[INFO] Running org.trebol.api.controllers.DataUsersControllerTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.145 s -- in org.trebol.api.controllers.DataUsersControllerTest
+[INFO] Running org.trebol.api.controllers.PublicAboutControllerTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.056 s -- in org.trebol.api.controllers.PublicAboutControllerTest
+[INFO] Running org.trebol.api.controllers.PublicCheckoutControllerTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.098 s -- in org.trebol.api.controllers.PublicCheckoutControllerTest
+[INFO] Running org.trebol.api.controllers.PublicReceiptControllerTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.050 s -- in org.trebol.api.controllers.PublicReceiptControllerTest
+[INFO] Running org.trebol.api.controllers.PublicRegisterControllerTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.061 s -- in org.trebol.api.controllers.PublicRegisterControllerTest
+[INFO] Running org.trebol.api.controllers.RootControllerTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in org.trebol.api.controllers.RootControllerTest
+[INFO] Running org.trebol.api.services.impl.CheckoutServiceImplTest
+13:05:24.362 [main] ERROR org.trebol.api.services.impl.CheckoutServiceImpl -- Incorrect state of sell, was: Pending
+13:05:24.389 [main] ERROR org.trebol.api.services.impl.CheckoutServiceImpl -- Malformed redirection URL; make sure the 'final URL for payment method' property is correctly configured.
+java.net.MalformedURLException: no protocol: ANY?token=ANY
+	at java.base/java.net.URL.<init>(URL.java:674)
+	at java.base/java.net.URL.<init>(URL.java:569)
+	at java.base/java.net.URL.<init>(URL.java:516)
+	at org.trebol.api.services.impl.CheckoutServiceImpl.generateResultPageUrl(CheckoutServiceImpl.java:103)
+	at org.trebol.api.services.impl.CheckoutServiceImplTest.lambda$generate_result_page_url_throws_illegal_argument_exception$2(CheckoutServiceImplTest.java:251)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:53)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:39)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3131)
+	at org.trebol.api.services.impl.CheckoutServiceImplTest.generate_result_page_url_throws_illegal_argument_exception(CheckoutServiceImplTest.java:251)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:728)
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147)
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45)
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:218)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:214)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:139)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148)
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122)
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)
+13:05:24.406 [main] ERROR org.trebol.api.services.impl.CheckoutServiceImpl -- Incorrect state of sell, was: Pending
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.143 s -- in org.trebol.api.services.impl.CheckoutServiceImplTest
+[INFO] Running org.trebol.api.services.impl.CompanyServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.169 s -- in org.trebol.api.services.impl.CompanyServiceImplTest
+[INFO] Running org.trebol.api.services.impl.OrdersProcessServiceImplTest
+[INFO] Running org.trebol.api.services.impl.OrdersProcessServiceImplTest$MarkAsCompleted
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.465 s -- in org.trebol.api.services.impl.OrdersProcessServiceImplTest$MarkAsCompleted
+[INFO] Running org.trebol.api.services.impl.OrdersProcessServiceImplTest$MarkAsRejected
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.022 s -- in org.trebol.api.services.impl.OrdersProcessServiceImplTest$MarkAsRejected
+[INFO] Running org.trebol.api.services.impl.OrdersProcessServiceImplTest$MarkAsConfirmed
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.024 s -- in org.trebol.api.services.impl.OrdersProcessServiceImplTest$MarkAsConfirmed
+[INFO] Running org.trebol.api.services.impl.OrdersProcessServiceImplTest$MarkAsPaid
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.045 s -- in org.trebol.api.services.impl.OrdersProcessServiceImplTest$MarkAsPaid
+[INFO] Running org.trebol.api.services.impl.OrdersProcessServiceImplTest$MarkAsFailed
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.024 s -- in org.trebol.api.services.impl.OrdersProcessServiceImplTest$MarkAsFailed
+[INFO] Running org.trebol.api.services.impl.OrdersProcessServiceImplTest$MarkAsAborted
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.022 s -- in org.trebol.api.services.impl.OrdersProcessServiceImplTest$MarkAsAborted
+[INFO] Running org.trebol.api.services.impl.OrdersProcessServiceImplTest$MarkAsStarted
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.022 s -- in org.trebol.api.services.impl.OrdersProcessServiceImplTest$MarkAsStarted
+[INFO] Tests run: 0, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.646 s -- in org.trebol.api.services.impl.OrdersProcessServiceImplTest
+[INFO] Running org.trebol.api.services.impl.ProfileServiceImplTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.430 s -- in org.trebol.api.services.impl.ProfileServiceImplTest
+[INFO] Running org.trebol.api.services.impl.ReceiptServiceImplTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.134 s -- in org.trebol.api.services.impl.ReceiptServiceImplTest
+[INFO] Running org.trebol.api.services.impl.RegistrationServiceImplTest
+13:05:26.171 [main] INFO org.trebol.api.services.impl.RegistrationServiceImpl -- New user created with name 'name' and idNumber '111111111'
+13:05:26.214 [main] INFO org.trebol.api.services.impl.RegistrationServiceImpl -- New user created with name 'name' and idNumber '111111111'
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.312 s -- in org.trebol.api.services.impl.RegistrationServiceImplTest
+[INFO] Running org.trebol.BackendAppTest
+13:05:26.454 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [org.trebol.BackendAppTest]: BackendAppTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+13:05:26.866 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration org.trebol.BackendApp for test class org.trebol.BackendAppTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.9)
+
+2026-05-18T13:05:27.896+02:00  INFO 3608 --- [           main] org.trebol.BackendAppTest                : Starting BackendAppTest using Java 17.0.17 with PID 3608 (started by USER in C:\Users\USER\Projects\trebol-backend-monolith)
+2026-05-18T13:05:27.899+02:00  INFO 3608 --- [           main] org.trebol.BackendAppTest                : No active profile set, falling back to 1 default profile: "default"
+2026-05-18T13:05:30.368+02:00  INFO 3608 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-18T13:05:30.644+02:00  INFO 3608 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 239 ms. Found 23 JPA repository interfaces.
+2026-05-18T13:05:32.999+02:00  INFO 3608 --- [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-18T13:05:33.231+02:00  INFO 3608 --- [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.10.Final
+2026-05-18T13:05:33.401+02:00  INFO 3608 --- [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-18T13:05:33.673+02:00  INFO 3608 --- [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-18T13:05:33.726+02:00  INFO 3608 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-18T13:05:34.754+02:00  INFO 3608 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:file:./data/trebol user=ADMIN
+2026-05-18T13:05:34.763+02:00  INFO 3608 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-18T13:05:38.530+02:00  INFO 3608 --- [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-18T13:05:38.801+02:00  INFO 3608 --- [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-18T13:05:40.115+02:00  INFO 3608 --- [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-05-18T13:05:43.518+02:00  WARN 3608 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-05-18T13:05:44.675+02:00  INFO 3608 --- [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@52a6acce, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@5465621e, org.springframework.security.web.context.SecurityContextHolderFilter@a22a902, org.springframework.security.web.header.HeaderWriterFilter@4a4357f5, org.springframework.security.web.authentication.logout.LogoutFilter@453dccb6, org.trebol.security.JwtLoginAuthenticationFilter@3ece2e4, org.trebol.security.JwtGuestAuthenticationFilter@5655f950, org.trebol.security.JwtTokenVerifierFilter@31f2ff88, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@5836c3ff, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@45099c63, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@4e780e3a, org.springframework.security.web.session.SessionManagementFilter@61264932, org.springframework.security.web.access.ExceptionTranslationFilter@1c8ced72]
+2026-05-18T13:05:45.884+02:00  INFO 3608 --- [           main] org.trebol.BackendAppTest                : Started BackendAppTest in 18.737 seconds (process running for 37.073)
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 19.82 s -- in org.trebol.BackendAppTest
+[INFO] Running org.trebol.common.annotations.PhoneNumberValidatorTest
+2026-05-18T13:05:46.067+02:00  INFO 3608 --- [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [org.trebol.common.annotations.PhoneNumberValidatorTest]: PhoneNumberValidatorTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.597 s -- in org.trebol.common.annotations.PhoneNumberValidatorTest
+[INFO] Running org.trebol.common.converters.OrderDetailEntity2ReceiptDetailPojoTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in org.trebol.common.converters.OrderDetailEntity2ReceiptDetailPojoTest
+[INFO] Running org.trebol.common.converters.OrderEntity2ReceiptPojoTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in org.trebol.common.converters.OrderEntity2ReceiptPojoTest
+[INFO] Running org.trebol.common.exceptions.BadInputExceptionTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in org.trebol.common.exceptions.BadInputExceptionTest
+[INFO] Running org.trebol.config.exceptions.CorsMappingParseExceptionTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in org.trebol.config.exceptions.CorsMappingParseExceptionTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.AddressesConverterServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in org.trebol.jpa.services.conversion.impl.AddressesConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.BillingCompaniesConverterServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 s -- in org.trebol.jpa.services.conversion.impl.BillingCompaniesConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.BillingTypesConverterServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in org.trebol.jpa.services.conversion.impl.BillingTypesConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.CustomersConverterServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.015 s -- in org.trebol.jpa.services.conversion.impl.CustomersConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.ImagesConverterServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in org.trebol.jpa.services.conversion.impl.ImagesConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.OrdersConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.OrdersConverterServiceImplTest$NewEntityValidationFailureCases
+[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.175 s -- in org.trebol.jpa.services.conversion.impl.OrdersConverterServiceImplTest$NewEntityValidationFailureCases
+[INFO] Running org.trebol.jpa.services.conversion.impl.OrdersConverterServiceImplTest$NewEntityCascadingCases
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.040 s -- in org.trebol.jpa.services.conversion.impl.OrdersConverterServiceImplTest$NewEntityCascadingCases
+[INFO] Tests run: 0, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.668 s -- in org.trebol.jpa.services.conversion.impl.OrdersConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.OrderStatusesConverterServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.039 s -- in org.trebol.jpa.services.conversion.impl.OrderStatusesConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.PeopleConverterServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.040 s -- in org.trebol.jpa.services.conversion.impl.PeopleConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.ProductCategoriesConverterServiceImplTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.162 s -- in org.trebol.jpa.services.conversion.impl.ProductCategoriesConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.ProductListConverterServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in org.trebol.jpa.services.conversion.impl.ProductListConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.ProductListItemsConverterServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 s -- in org.trebol.jpa.services.conversion.impl.ProductListItemsConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.ProductsConverterServiceImplTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.304 s -- in org.trebol.jpa.services.conversion.impl.ProductsConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.SalespeopleConverterServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in org.trebol.jpa.services.conversion.impl.SalespeopleConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.ShippersConverterServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in org.trebol.jpa.services.conversion.impl.ShippersConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.UserRolesConverterServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in org.trebol.jpa.services.conversion.impl.UserRolesConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.conversion.impl.UsersConverterServiceImplTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.021 s -- in org.trebol.jpa.services.conversion.impl.UsersConverterServiceImplTest
+[INFO] Running org.trebol.jpa.services.crud.impl.BillingCompaniesCrudServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.188 s -- in org.trebol.jpa.services.crud.impl.BillingCompaniesCrudServiceImplTest
+[INFO] Running org.trebol.jpa.services.crud.impl.BillingTypesCrudServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in org.trebol.jpa.services.crud.impl.BillingTypesCrudServiceImplTest
+[INFO] Running org.trebol.jpa.services.crud.impl.CustomersCrudServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in org.trebol.jpa.services.crud.impl.CustomersCrudServiceImplTest
+[INFO] Running org.trebol.jpa.services.crud.impl.ImagesCrudServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.136 s -- in org.trebol.jpa.services.crud.impl.ImagesCrudServiceImplTest
+[INFO] Running org.trebol.jpa.services.crud.impl.OrdersCrudServiceImplTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.157 s -- in org.trebol.jpa.services.crud.impl.OrdersCrudServiceImplTest
+[INFO] Running org.trebol.jpa.services.crud.impl.OrderStatusesCrudServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 s -- in org.trebol.jpa.services.crud.impl.OrderStatusesCrudServiceImplTest
+[INFO] Running org.trebol.jpa.services.crud.impl.PeopleCrudServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in org.trebol.jpa.services.crud.impl.PeopleCrudServiceImplTest
+[INFO] Running org.trebol.jpa.services.crud.impl.ProductCategoriesCrudServiceImplTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.124 s -- in org.trebol.jpa.services.crud.impl.ProductCategoriesCrudServiceImplTest
+[INFO] Running org.trebol.jpa.services.crud.impl.ProductListCrudServiceImplTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in org.trebol.jpa.services.crud.impl.ProductListCrudServiceImplTest
+[INFO] Running org.trebol.jpa.services.crud.impl.ProductsCrudServiceImplTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in org.trebol.jpa.services.crud.impl.ProductsCrudServiceImplTest
+[INFO] Running org.trebol.jpa.services.crud.impl.SalespeopleCrudServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.137 s -- in org.trebol.jpa.services.crud.impl.SalespeopleCrudServiceImplTest
+[INFO] Running org.trebol.jpa.services.crud.impl.ShippersCrudServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in org.trebol.jpa.services.crud.impl.ShippersCrudServiceImplTest
+[INFO] Running org.trebol.jpa.services.crud.impl.UserRolesCrudServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in org.trebol.jpa.services.crud.impl.UserRolesCrudServiceImplTest
+[INFO] Running org.trebol.jpa.services.crud.impl.UsersCrudServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.151 s -- in org.trebol.jpa.services.crud.impl.UsersCrudServiceImplTest
+[INFO] Running org.trebol.jpa.services.CrudGenericServiceTest
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.220 s -- in org.trebol.jpa.services.CrudGenericServiceTest
+[INFO] Running org.trebol.jpa.services.impl.ProductCategoryTreeResolverServiceImplTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in org.trebol.jpa.services.impl.ProductCategoryTreeResolverServiceImplTest
+[INFO] Running org.trebol.jpa.services.impl.SortSpecParserServiceImplTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in org.trebol.jpa.services.impl.SortSpecParserServiceImplTest
+[INFO] Running org.trebol.jpa.services.patch.impl.BillingCompaniesPatchServiceImplTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.087 s -- in org.trebol.jpa.services.patch.impl.BillingCompaniesPatchServiceImplTest
+[INFO] Running org.trebol.jpa.services.patch.impl.BillingTypesPatchServiceImplTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.019 s -- in org.trebol.jpa.services.patch.impl.BillingTypesPatchServiceImplTest
+[INFO] Running org.trebol.jpa.services.patch.impl.CustomersPatchServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.038 s -- in org.trebol.jpa.services.patch.impl.CustomersPatchServiceImplTest
+[INFO] Running org.trebol.jpa.services.patch.impl.ImagesPatchServiceImplTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.033 s -- in org.trebol.jpa.services.patch.impl.ImagesPatchServiceImplTest
+[INFO] Running org.trebol.jpa.services.patch.impl.OrdersPatchServiceImplTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.064 s -- in org.trebol.jpa.services.patch.impl.OrdersPatchServiceImplTest
+[INFO] Running org.trebol.jpa.services.patch.impl.OrderStatusesPatchServiceImplTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.017 s -- in org.trebol.jpa.services.patch.impl.OrderStatusesPatchServiceImplTest
+[INFO] Running org.trebol.jpa.services.patch.impl.PeoplePatchServiceImplTest
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.022 s -- in org.trebol.jpa.services.patch.impl.PeoplePatchServiceImplTest
+[INFO] Running org.trebol.jpa.services.patch.impl.ProductCategoriesPatchServiceImplTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.020 s -- in org.trebol.jpa.services.patch.impl.ProductCategoriesPatchServiceImplTest
+[INFO] Running org.trebol.jpa.services.patch.impl.ProductListPatchServiceImplTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.020 s -- in org.trebol.jpa.services.patch.impl.ProductListPatchServiceImplTest
+[INFO] Running org.trebol.jpa.services.patch.impl.ProductsPatchServiceImplTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.032 s -- in org.trebol.jpa.services.patch.impl.ProductsPatchServiceImplTest
+[INFO] Running org.trebol.jpa.services.patch.impl.SalespeoplePatchServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in org.trebol.jpa.services.patch.impl.SalespeoplePatchServiceImplTest
+[INFO] Running org.trebol.jpa.services.patch.impl.ShippersPatchServiceImplTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in org.trebol.jpa.services.patch.impl.ShippersPatchServiceImplTest
+[INFO] Running org.trebol.jpa.services.patch.impl.UserRolesPatchServiceImplTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in org.trebol.jpa.services.patch.impl.UserRolesPatchServiceImplTest
+[INFO] Running org.trebol.jpa.services.patch.impl.UsersPatchServiceImplTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.023 s -- in org.trebol.jpa.services.patch.impl.UsersPatchServiceImplTest
+[INFO] Running org.trebol.jpa.services.predicates.impl.BillingCompaniesPredicateServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in org.trebol.jpa.services.predicates.impl.BillingCompaniesPredicateServiceImplTest
+[INFO] Running org.trebol.jpa.services.predicates.impl.BillingTypesPredicateServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in org.trebol.jpa.services.predicates.impl.BillingTypesPredicateServiceImplTest
+[INFO] Running org.trebol.jpa.services.predicates.impl.CustomersPredicateServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in org.trebol.jpa.services.predicates.impl.CustomersPredicateServiceImplTest
+[INFO] Running org.trebol.jpa.services.predicates.impl.ImagesPredicateServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in org.trebol.jpa.services.predicates.impl.ImagesPredicateServiceImplTest
+[INFO] Running org.trebol.jpa.services.predicates.impl.OrdersPredicateServiceImplTest
+2026-05-18T13:05:50.855+02:00  WARN 3608 --- [           main] o.t.j.s.p.i.OrdersPredicateServiceImpl   : Param 'date' couldn't be parsed as date (value: '1')
+2026-05-18T13:05:50.856+02:00  WARN 3608 --- [           main] o.t.j.s.p.i.OrdersPredicateServiceImpl   : Param 'date' couldn't be parsed as date (value: '10/10')
+2026-05-18T13:05:50.857+02:00  WARN 3608 --- [           main] o.t.j.s.p.i.OrdersPredicateServiceImpl   : Param 'date' couldn't be parsed as date (value: '1984')
+2026-05-18T13:05:50.857+02:00  WARN 3608 --- [           main] o.t.j.s.p.i.OrdersPredicateServiceImpl   : Param 'date' couldn't be parsed as date (value: '!?')
+2026-05-18T13:05:50.857+02:00  WARN 3608 --- [           main] o.t.j.s.p.i.OrdersPredicateServiceImpl   : Param 'date' couldn't be parsed as date (value: 'not a date')
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.006 s -- in org.trebol.jpa.services.predicates.impl.OrdersPredicateServiceImplTest
+[INFO] Running org.trebol.jpa.services.predicates.impl.OrderStatusesPredicateServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in org.trebol.jpa.services.predicates.impl.OrderStatusesPredicateServiceImplTest
+[INFO] Running org.trebol.jpa.services.predicates.impl.PeoplePredicateServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in org.trebol.jpa.services.predicates.impl.PeoplePredicateServiceImplTest
+[INFO] Running org.trebol.jpa.services.predicates.impl.ProductCategoriesPredicateServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.092 s -- in org.trebol.jpa.services.predicates.impl.ProductCategoriesPredicateServiceImplTest
+[INFO] Running org.trebol.jpa.services.predicates.impl.ProductsPredicateServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.007 s -- in org.trebol.jpa.services.predicates.impl.ProductsPredicateServiceImplTest
+[INFO] Running org.trebol.jpa.services.predicates.impl.SalespeoplePredicateServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in org.trebol.jpa.services.predicates.impl.SalespeoplePredicateServiceImplTest
+[INFO] Running org.trebol.jpa.services.predicates.impl.ShippersPredicateServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in org.trebol.jpa.services.predicates.impl.ShippersPredicateServiceImplTest
+[INFO] Running org.trebol.jpa.services.predicates.impl.UserRolesPredicateServiceTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in org.trebol.jpa.services.predicates.impl.UserRolesPredicateServiceTest
+[INFO] Running org.trebol.jpa.services.predicates.impl.UsersPredicateServiceTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in org.trebol.jpa.services.predicates.impl.UsersPredicateServiceTest
+[INFO] Running org.trebol.mailing.impl.mailgun.MailgunMailingPropertiesTest
+2026-05-18T13:05:50.997+02:00  INFO 3608 --- [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [org.trebol.mailing.impl.mailgun.MailgunMailingPropertiesTest]: MailgunMailingPropertiesTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.179 s -- in org.trebol.mailing.impl.mailgun.MailgunMailingPropertiesTest
+[INFO] Running org.trebol.mailing.impl.mailgun.MailgunMailingServiceImplTest
+[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.435 s -- in org.trebol.mailing.impl.mailgun.MailgunMailingServiceImplTest
+[INFO] Running org.trebol.mailing.MailingServiceExceptionTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 s -- in org.trebol.mailing.MailingServiceExceptionTest
+[INFO] Running org.trebol.payment.exceptions.PaymentServiceExceptionTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 s -- in org.trebol.payment.exceptions.PaymentServiceExceptionTest
+[INFO] Running org.trebol.payment.impl.webpayplus.WebpayplusPaymentServiceImplTest
+[INFO] Running org.trebol.payment.impl.webpayplus.WebpayplusPaymentServiceImplTest$ProductionModeWithoutConfig
+2026-05-18T13:05:54.496+02:00 ERROR 3608 --- [           main] o.t.p.i.w.WebpayplusPaymentServiceImpl   : Exception raised while creating transaction: 
+
+cl.transbank.webpay.exception.TransactionCreateException: cl.transbank.webpay.exception.TransbankHttpApiException: Not Authorized | code : 401
+	at cl.transbank.webpay.webpayplus.WebpayTransaction.create(WebpayTransaction.java:36) ~[transbank-sdk-java-3.0.2.jar:na]
+	at cl.transbank.webpay.webpayplus.WebpayPlus$Transaction.create(WebpayPlus.java:12) ~[transbank-sdk-java-3.0.2.jar:na]
+	at org.trebol.payment.impl.webpayplus.WebpayplusPaymentServiceImpl.requestNewPaymentPageDetails(WebpayplusPaymentServiceImpl.java:72) ~[classes/:na]
+	at org.trebol.payment.impl.webpayplus.WebpayplusPaymentServiceImplTest$ProductionModeWithoutConfig.lambda$will_not_begin_transactions$0(WebpayplusPaymentServiceImplTest.java:73) ~[test-classes/:na]
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:53) ~[junit-jupiter-api-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35) ~[junit-jupiter-api-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3115) ~[junit-jupiter-api-5.10.3.jar:5.10.3]
+	at org.trebol.payment.impl.webpayplus.WebpayplusPaymentServiceImplTest$ProductionModeWithoutConfig.will_not_begin_transactions(WebpayplusPaymentServiceImplTest.java:73) ~[test-classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569) ~[na:na]
+	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:728) ~[junit-platform-commons-1.10.3.jar:1.10.3]
+	at org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:156) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:147) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:103) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:93) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:64) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:45) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:37) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:92) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:86) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$7(TestMethodTestDescriptor.java:218) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:214) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:139) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:69) ~[junit-jupiter-engine-5.10.3.jar:5.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:151) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:155) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:141) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:139) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:138) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.10.3.jar:1.10.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.10.3.jar:1.10.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.10.3.jar:1.10.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.10.3.jar:1.10.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.10.3.jar:1.10.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.10.3.jar:1.10.3]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.10.3.jar:1.10.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.10.3.jar:1.10.3]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.10.3.jar:1.10.3]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.10.3.jar:1.10.3]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) ~[surefire-junit-platform-3.1.2.jar:3.1.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:184) ~[surefire-junit-platform-3.1.2.jar:3.1.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:148) ~[surefire-junit-platform-3.1.2.jar:3.1.2]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:122) ~[surefire-junit-platform-3.1.2.jar:3.1.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.1.2.jar:3.1.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.1.2.jar:3.1.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.1.2.jar:3.1.2]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.1.2.jar:3.1.2]
+Caused by: cl.transbank.webpay.exception.TransbankHttpApiException: Not Authorized
+	at cl.transbank.util.HttpUtilImpl.request(HttpUtilImpl.java:118) ~[transbank-sdk-java-3.0.2.jar:na]
+	at cl.transbank.util.HttpUtilImpl.request(HttpUtilImpl.java:53) ~[transbank-sdk-java-3.0.2.jar:na]
+	at cl.transbank.util.HttpUtilImpl.request(HttpUtilImpl.java:32) ~[transbank-sdk-java-3.0.2.jar:na]
+	at cl.transbank.util.WebpayApiResource.execute(WebpayApiResource.java:51) ~[transbank-sdk-java-3.0.2.jar:na]
+	at cl.transbank.webpay.webpayplus.WebpayTransaction.create(WebpayTransaction.java:34) ~[transbank-sdk-java-3.0.2.jar:na]
+	... 88 common frames omitted
+
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.866 s -- in org.trebol.payment.impl.webpayplus.WebpayplusPaymentServiceImplTest$ProductionModeWithoutConfig
+[INFO] Running org.trebol.payment.impl.webpayplus.WebpayplusPaymentServiceImplTest$TestMode
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.501 s -- in org.trebol.payment.impl.webpayplus.WebpayplusPaymentServiceImplTest$TestMode
+[INFO] Tests run: 0, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.371 s -- in org.trebol.payment.impl.webpayplus.WebpayplusPaymentServiceImplTest
+[INFO] Running org.trebol.product.adapter.inbound.web.ProductControllerTest
+2026-05-18T13:05:56.033+02:00  INFO 3608 --- [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [org.trebol.product.adapter.inbound.web.ProductControllerTest]: ProductControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-05-18T13:05:56.132+02:00  INFO 3608 --- [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration org.trebol.BackendApp for test class org.trebol.product.adapter.inbound.web.ProductControllerTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.9)
+
+2026-05-18T13:05:56.204+02:00  INFO 3608 --- [           main] o.t.p.a.i.web.ProductControllerTest      : Starting ProductControllerTest using Java 17.0.17 with PID 3608 (started by USER in C:\Users\USER\Projects\trebol-backend-monolith)
+2026-05-18T13:05:56.205+02:00  INFO 3608 --- [           main] o.t.p.a.i.web.ProductControllerTest      : No active profile set, falling back to 1 default profile: "default"
+2026-05-18T13:05:58.197+02:00  WARN 3608 --- [           main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 9324fd10-9845-452e-8a24-d00322034959
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-05-18T13:05:58.322+02:00  INFO 3608 --- [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@41226bc6, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@68e23bc4, org.springframework.security.web.context.SecurityContextHolderFilter@62764122, org.springframework.security.web.header.HeaderWriterFilter@267fa1f9, org.springframework.security.web.csrf.CsrfFilter@1f15f430, org.springframework.security.web.authentication.logout.LogoutFilter@4bcc264f, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@55e8467a, org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@714efe53, org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@5ff98ed7, org.springframework.security.web.authentication.www.BasicAuthenticationFilter@1585b3f7, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@52f29d28, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@2a65f28f, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@675b84d4, org.springframework.security.web.access.ExceptionTranslationFilter@1cfc8263, org.springframework.security.web.access.intercept.AuthorizationFilter@660b0ab6]
+2026-05-18T13:05:58.380+02:00  INFO 3608 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-05-18T13:05:58.382+02:00  INFO 3608 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-05-18T13:05:58.384+02:00  INFO 3608 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 2 ms
+2026-05-18T13:05:58.397+02:00  INFO 3608 --- [           main] o.t.p.a.i.web.ProductControllerTest      : Started ProductControllerTest in 2.256 seconds (process running for 49.586)
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.993 s -- in org.trebol.product.adapter.inbound.web.ProductControllerTest
+[INFO] Running org.trebol.product.adapter.outbound.persistence.ProductRepositoryAdapterTest
+[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.631 s -- in org.trebol.product.adapter.outbound.persistence.ProductRepositoryAdapterTest
+[INFO] Running org.trebol.product.application.service.ProductApplicationServiceTest
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.147 s -- in org.trebol.product.application.service.ProductApplicationServiceTest
+[INFO] Running org.trebol.product.domain.aggregate.ProductAggregateTest
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.020 s -- in org.trebol.product.domain.aggregate.ProductAggregateTest
+[INFO] Running org.trebol.product.domain.service.ProductDomainServiceTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 s -- in org.trebol.product.domain.service.ProductDomainServiceTest
+[INFO] Running org.trebol.product.domain.vo.ProductCodeTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.014 s -- in org.trebol.product.domain.vo.ProductCodeTest
+[INFO] Running org.trebol.product.domain.vo.ProductIdTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.009 s -- in org.trebol.product.domain.vo.ProductIdTest
+[INFO] Running org.trebol.product.domain.vo.ProductNameTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.013 s -- in org.trebol.product.domain.vo.ProductNameTest
+[INFO] Running org.trebol.product.domain.vo.ProductPriceTest
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.016 s -- in org.trebol.product.domain.vo.ProductPriceTest
+[INFO] Running org.trebol.security.exceptions.AccountProtectionViolationExceptionTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in org.trebol.security.exceptions.AccountProtectionViolationExceptionTest
+[INFO] Running org.trebol.security.JwtGuestAuthenticationFilterTest
+2026-05-18T13:06:00.978+02:00  INFO 3608 --- [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration org.trebol.BackendApp for test class org.trebol.security.JwtGuestAuthenticationFilterTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.9)
+
+2026-05-18T13:06:01.020+02:00  INFO 3608 --- [           main] o.t.s.JwtGuestAuthenticationFilterTest   : Starting JwtGuestAuthenticationFilterTest using Java 17.0.17 with PID 3608 (started by USER in C:\Users\USER\Projects\trebol-backend-monolith)
+2026-05-18T13:06:01.020+02:00  INFO 3608 --- [           main] o.t.s.JwtGuestAuthenticationFilterTest   : No active profile set, falling back to 1 default profile: "default"
+2026-05-18T13:06:02.049+02:00  INFO 3608 --- [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@7d3a1ca5, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@205b1629, org.springframework.security.web.context.SecurityContextHolderFilter@12f55f96, org.springframework.security.web.header.HeaderWriterFilter@42d855b8, org.springframework.security.web.authentication.logout.LogoutFilter@7cf43902, org.trebol.security.JwtGuestAuthenticationFilter@5a24fb51, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@27112dce, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@44302f48, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@1c93dab2, org.springframework.security.web.access.ExceptionTranslationFilter@596754b0, org.springframework.security.web.access.intercept.AuthorizationFilter@172a3b7c]
+2026-05-18T13:06:02.238+02:00  INFO 3608 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-05-18T13:06:02.239+02:00  INFO 3608 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-05-18T13:06:02.239+02:00  INFO 3608 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-05-18T13:06:02.247+02:00  INFO 3608 --- [           main] o.t.s.JwtGuestAuthenticationFilterTest   : Started JwtGuestAuthenticationFilterTest in 1.263 seconds (process running for 53.437)
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.495 s -- in org.trebol.security.JwtGuestAuthenticationFilterTest
+[INFO] Running org.trebol.security.JwtLoginAuthenticationFilterTest
+2026-05-18T13:06:02.391+02:00  INFO 3608 --- [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration org.trebol.BackendApp for test class org.trebol.security.JwtLoginAuthenticationFilterTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.9)
+
+2026-05-18T13:06:02.429+02:00  INFO 3608 --- [           main] o.t.s.JwtLoginAuthenticationFilterTest   : Starting JwtLoginAuthenticationFilterTest using Java 17.0.17 with PID 3608 (started by USER in C:\Users\USER\Projects\trebol-backend-monolith)
+2026-05-18T13:06:02.430+02:00  INFO 3608 --- [           main] o.t.s.JwtLoginAuthenticationFilterTest   : No active profile set, falling back to 1 default profile: "default"
+2026-05-18T13:06:04.070+02:00  INFO 3608 --- [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@1629265c, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@722afeef, org.springframework.security.web.context.SecurityContextHolderFilter@60dc5e76, org.springframework.security.web.header.HeaderWriterFilter@4776355b, org.springframework.security.web.authentication.logout.LogoutFilter@2b49e5cb, org.trebol.security.JwtLoginAuthenticationFilter@7794e2a5, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@2431cd8, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@5fce0b20, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@1929b4ff, org.springframework.security.web.access.ExceptionTranslationFilter@262f6fe7, org.springframework.security.web.access.intercept.AuthorizationFilter@1ece13a3]
+2026-05-18T13:06:04.138+02:00  INFO 3608 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-05-18T13:06:04.141+02:00  INFO 3608 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-05-18T13:06:04.144+02:00  INFO 3608 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 2 ms
+2026-05-18T13:06:04.176+02:00  INFO 3608 --- [           main] o.t.s.JwtLoginAuthenticationFilterTest   : Started JwtLoginAuthenticationFilterTest in 1.78 seconds (process running for 55.364)
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.870 s -- in org.trebol.security.JwtLoginAuthenticationFilterTest
+[INFO] Running org.trebol.security.JwtVerifiterFilterTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.9)
+
+2026-05-18T13:06:04.359+02:00  INFO 3608 --- [           main] o.t.security.JwtVerifiterFilterTest      : Starting JwtVerifiterFilterTest using Java 17.0.17 with PID 3608 (started by USER in C:\Users\USER\Projects\trebol-backend-monolith)
+2026-05-18T13:06:04.359+02:00  INFO 3608 --- [           main] o.t.security.JwtVerifiterFilterTest      : No active profile set, falling back to 1 default profile: "default"
+2026-05-18T13:06:04.688+02:00  INFO 3608 --- [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@65d1b5a6, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@778c23de, org.springframework.security.web.context.SecurityContextHolderFilter@62b84334, org.springframework.security.web.header.HeaderWriterFilter@11800530, org.springframework.security.web.authentication.logout.LogoutFilter@da3ed97, org.trebol.security.JwtTokenVerifierFilter@64fb61b, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@32471a14, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@23ff20e9, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@39e33cb0, org.springframework.security.web.session.SessionManagementFilter@5f7a352f, org.springframework.security.web.access.ExceptionTranslationFilter@28bf120d, org.springframework.security.web.access.intercept.AuthorizationFilter@5d1c41fb]
+2026-05-18T13:06:04.750+02:00  INFO 3608 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-05-18T13:06:04.750+02:00  INFO 3608 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-05-18T13:06:04.751+02:00  INFO 3608 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+2026-05-18T13:06:04.759+02:00  INFO 3608 --- [           main] o.t.security.JwtVerifiterFilterTest      : Started JwtVerifiterFilterTest in 0.465 seconds (process running for 55.948)
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.568 s -- in org.trebol.security.JwtVerifiterFilterTest
+[INFO] Running org.trebol.security.services.impl.AuthorizedApiServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.003 s -- in org.trebol.security.services.impl.AuthorizedApiServiceImplTest
+[INFO] Running org.trebol.security.services.impl.ClaimsAuthorizationHeaderParserServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.077 s -- in org.trebol.security.services.impl.ClaimsAuthorizationHeaderParserServiceImplTest
+[INFO] Running org.trebol.security.services.impl.UserPermissionsServiceImplTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.118 s -- in org.trebol.security.services.impl.UserPermissionsServiceImplTest
+[INFO] Running org.trebol.security.UserDetailsServiceImplTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.128 s -- in org.trebol.security.UserDetailsServiceImplTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 454, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jacoco:0.8.8:report (default-cli) @ trebol-backend-monolith-java17 ---
+[INFO] Loading execution data file C:\Users\USER\Projects\trebol-backend-monolith\target\jacoco.exec
+[INFO] Analyzed bundle 'Trébol Backend Monolith' with 229 classes
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:33 min
+[INFO] Finished at: 2026-05-18T13:06:09+02:00
+[INFO] ------------------------------------------------------------------------
