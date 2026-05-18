@@ -678,207 +678,169 @@ class ProductApplicationServiceTest {
 
 ---
 
-### Day 8: Adapter Persistence Tests (TestContainers + Real MariaDB)
+### Day 8: Adapter Persistence Tests (H2-backed Spring Boot integration tests)
 
-**Target:** 15-20 tests for ProductRepositoryAdapter  
+**Target:** 15-20 tests for `ProductRepositoryAdapter`  
 **File to Create:** `src/test/java/org/trebol/product/adapter/outbound/persistence/ProductRepositoryAdapterTest.java`
 
-**Setup (with TestContainers):**
+**Setup (using the existing H2 file database):**
 ```java
-@SpringBootTest
-@Testcontainers
+@SpringBootTest(classes = BackendApp.class)
 class ProductRepositoryAdapterTest {
-    
-    @Container
-    static MariaDBContainer<?> mariadb = new MariaDBContainer<>(DockerImageName.parse("mariadb:latest"));
-    
-    @DynamicPropertySource
-    static void mariadbProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", mariadb::getJdbcUrl);
-        registry.add("spring.datasource.username", mariadb::getUsername);
-        registry.add("spring.datasource.password", mariadb::getPassword);
-    }
-    
+
     @Autowired
     ProductRepositoryAdapter productRepository;
-    
+
     @Autowired
     ProductJpaRepository jpaRepository;
-    
+
     @BeforeEach
     void cleanup() {
         jpaRepository.deleteAll();
     }
-    
+
     // SAVE TESTS
     @Test
     void shouldSaveNewProduct() {
-        // Given
         ProductAggregate product = new ProductAggregate(
             null,
             new ProductCode("LAP001"),
             new ProductName("Laptop"),
-            new ProductPrice(new BigDecimal("999.99")),
-            ProductStatus.ACTIVE
+            new ProductPrice(new BigDecimal("999.99"))
         );
-        
-        // When
+
         ProductAggregate saved = productRepository.save(product);
-        
-        // Then
+
         assertNotNull(saved.getId());
-        assertTrue(jpaRepository.existsById(saved.getId()));
+        assertTrue(jpaRepository.existsById(saved.getId().value()));
     }
-    
+
     // FIND BY ID TESTS
     @Test
     void shouldFindProductById() {
-        // Given
         ProductJpaEntity entity = new ProductJpaEntity();
         entity.setCode("LAP001");
         entity.setName("Laptop");
-        entity.setPrice(new BigDecimal("999.99"));
-        entity.setActive(true);
+        entity.setPrice(999);
+        entity.setDescription("");
+        entity.setCurrentStock(0);
+        entity.setCriticalStock(0);
         ProductJpaEntity saved = jpaRepository.save(entity);
-        
-        // When
-        Optional<ProductAggregate> found = productRepository.findById(saved.getId());
-        
-        // Then
+
+        Optional<ProductAggregate> found = productRepository.findById(new ProductId(saved.getId()));
+
         assertTrue(found.isPresent());
         assertEquals("LAP001", found.get().getCode().value());
     }
-    
+
     @Test
     void shouldReturnEmptyWhenNotFound() {
-        // When
-        Optional<ProductAggregate> found = productRepository.findById(999L);
-        
-        // Then
+        Optional<ProductAggregate> found = productRepository.findById(new ProductId(999L));
+
         assertTrue(found.isEmpty());
     }
-    
+
     // FIND BY CODE TESTS
     @Test
     void shouldFindProductByCode() {
-        // Given
         ProductJpaEntity entity = new ProductJpaEntity();
         entity.setCode("LAP001");
         entity.setName("Laptop");
-        entity.setPrice(new BigDecimal("999.99"));
-        entity.setActive(true);
+        entity.setPrice(999);
+        entity.setDescription("");
+        entity.setCurrentStock(0);
+        entity.setCriticalStock(0);
         jpaRepository.save(entity);
-        
-        // When
-        Optional<ProductAggregate> found = productRepository.findByCode("LAP001");
-        
-        // Then
+
+        Optional<ProductAggregate> found = productRepository.findByCode(new ProductCode("LAP001"));
+
         assertTrue(found.isPresent());
         assertEquals("Laptop", found.get().getName().value());
     }
-    
+
     // FIND ALL WITH FILTERING TESTS
     @Test
     void shouldFindAllWithoutFilters() {
-        // Given
         createTestProducts(3);
-        
-        // When
-        Page<ProductAggregate> page = productRepository.findAll(
-            new ListProductsQuery(0, 10, Map.of()));
-        
-        // Then
-        assertEquals(3, page.getTotalElements());
+
+        List<ProductAggregate> products = productRepository.findAll(Map.of());
+
+        assertEquals(3, products.size());
     }
-    
+
     @Test
     void shouldFindAllWithPagination() {
-        // Given
         createTestProducts(25);
-        
-        // When
-        Page<ProductAggregate> page = productRepository.findAll(
-            new ListProductsQuery(0, 10, Map.of()));
-        
-        // Then
-        assertEquals(25, page.getTotalElements());
-        assertEquals(10, page.getContent().size());
-        assertEquals(3, page.getTotalPages());
+
+        List<ProductAggregate> products = productRepository.findAll(0, 10, Map.of());
+
+        assertEquals(10, products.size());
+        assertEquals(25, productRepository.countAll(Map.of()));
     }
-    
+
     @Test
     void shouldFilterByName() {
-        // Given
         createTestProduct("LAP001", "Gaming Laptop");
         createTestProduct("MON001", "Monitor");
-        
-        // When
-        Page<ProductAggregate> page = productRepository.findAll(
-            new ListProductsQuery(0, 10, Map.of("name", "Gaming")));
-        
-        // Then
-        assertEquals(1, page.getTotalElements());
-        assertEquals("Gaming Laptop", page.getContent().get(0).getName().value());
+
+        List<ProductAggregate> products = productRepository.findAll(Map.of("name", "Gaming Laptop"));
+
+        assertEquals(1, products.size());
+        assertEquals("Gaming Laptop", products.get(0).getName().value());
     }
-    
+
     @Test
     void shouldSortByPrice() {
-        // Given
         createTestProduct("LAP001", "Laptop", new BigDecimal("1000"));
         createTestProduct("LAP002", "Cheap Laptop", new BigDecimal("500"));
         createTestProduct("LAP003", "Premium Laptop", new BigDecimal("2000"));
-        
-        // When
-        Page<ProductAggregate> page = productRepository.findAll(
-            new ListProductsQuery(0, 10, Map.of("sort", "price:asc")));
-        
-        // Then
-        assertEquals(3, page.getTotalElements());
-        assertEquals(new BigDecimal("500"), page.getContent().get(0).getPrice().value());
-        assertEquals(new BigDecimal("2000"), page.getContent().get(2).getPrice().value());
+
+        List<ProductAggregate> products = productRepository.findAll(0, 10, Map.of("sortBy", "price", "order", "asc"));
+
+        assertEquals(3, products.size());
+        assertEquals(new BigDecimal("500"), products.get(0).getPrice().value());
+        assertEquals(new BigDecimal("2000"), products.get(2).getPrice().value());
     }
-    
+
     // DELETE TESTS
     @Test
     void shouldDeleteProduct() {
-        // Given
         ProductAggregate product = createAndSaveProduct();
-        Long id = product.getId();
-        
-        // When
-        productRepository.deleteById(id);
-        
-        // Then
+        Long id = product.getId().value();
+
+        productRepository.deleteById(product.getId());
+
         assertFalse(jpaRepository.existsById(id));
     }
-    
+
     // HELPER METHODS
     private void createTestProducts(int count) {
         for (int i = 0; i < count; i++) {
             createTestProduct("CODE" + i, "Product " + i);
         }
     }
-    
+
     private void createTestProduct(String code, String name) {
         createTestProduct(code, name, new BigDecimal("100.00"));
     }
-    
+
     private void createTestProduct(String code, String name, BigDecimal price) {
         ProductJpaEntity entity = new ProductJpaEntity();
         entity.setCode(code);
         entity.setName(name);
-        entity.setPrice(price);
-        entity.setActive(true);
+        entity.setPrice(price.intValue());
+        entity.setDescription("");
+        entity.setCurrentStock(0);
+        entity.setCriticalStock(0);
         jpaRepository.save(entity);
     }
-    
+
     private ProductAggregate createAndSaveProduct() {
         ProductAggregate product = new ProductAggregate(
             null,
             new ProductCode("TEST001"),
             new ProductName("Test Product"),
-            new ProductPrice(new BigDecimal("99.99")),
-            ProductStatus.ACTIVE
+            new ProductPrice(new BigDecimal("99.99"))
         );
         return productRepository.save(product);
     }
@@ -886,34 +848,21 @@ class ProductRepositoryAdapterTest {
 ```
 
 **What to Test:**
-- ✅ Save new product (ID assignment)
-- ✅ Find by ID (success and not found)
-- ✅ Find by code (success and not found)
+- ✅ Save new product and verify ID assignment
+- ✅ Find by ID, including not-found case
+- ✅ Find by code, including not-found case
 - ✅ Find all with pagination
-- ✅ Filtering by name/code
-- ✅ Sorting by various fields
+- ✅ Filtering by name/code and simple search criteria
+- ✅ Sorting by price and other supported fields
 - ✅ Delete product
-- ✅ JPA entity ↔ aggregate mapping
+- ✅ JPA entity to aggregate mapping
 
-**Maven Dependency (pom.xml):**
-```xml
-<dependency>
-    <groupId>org.testcontainers</groupId>
-    <artifactId>testcontainers</artifactId>
-    <version>1.20.1</version>
-    <scope>test</scope>
-</dependency>
-<dependency>
-    <groupId>org.testcontainers</groupId>
-    <artifactId>mariadb</artifactId>
-    <version>1.20.1</version>
-    <scope>test</scope>
-</dependency>
-```
+**Maven Dependency:**
+- No new dependency is required for this repo because the tests run against the existing H2 setup already configured in `application.properties`.
 
 **Validation:**
 - [ ] All adapter tests pass (15-20 tests)
-- [ ] TestContainers properly configured
+- [ ] Tests run against the existing H2 file database
 - [ ] No test data bleeds between tests (cleanup in @BeforeEach)
 
 ---
@@ -2790,7 +2739,7 @@ The Product domain now serves as a template for refactoring other domains in the
 ### Week 2: Testing ✅
 - [ ] Day 6: Domain layer tests (25-30 tests)
 - [ ] Day 7: Application layer tests (10-15 tests)
-- [ ] Day 8: Adapter layer tests with TestContainers (15-20 tests)
+- [ ] Day 8: Adapter layer tests with H2-backed repository integration tests (15-20 tests)
 - [ ] Day 9: Controller layer tests with MockMvc (5-10 tests)
 - [ ] Day 10: Run all tests, generate coverage report
 
