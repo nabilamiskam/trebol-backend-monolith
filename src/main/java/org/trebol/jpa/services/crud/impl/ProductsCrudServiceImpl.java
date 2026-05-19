@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.trebol.api.adapters.legacy.ProductLookupService;
 import org.trebol.api.models.ImagePojo;
 import org.trebol.api.models.ProductPojo;
 import org.trebol.common.exceptions.BadInputException;
@@ -50,6 +51,7 @@ import java.util.Optional;
 
 @Transactional
 @Service
+@Deprecated
 public class ProductsCrudServiceImpl
     extends CrudGenericService<ProductPojo, Product>
     implements ProductsCrudService {
@@ -57,6 +59,7 @@ public class ProductsCrudServiceImpl
     private final ProductsConverterService productsConverterService;
     private final ProductImagesRepository productImagesRepository;
     private final ImagesCrudService imagesCrudService;
+    private final ProductLookupService productLookupService;
     private final Logger logger = LoggerFactory.getLogger(ProductsCrudServiceImpl.class);
 
     @Autowired
@@ -66,12 +69,14 @@ public class ProductsCrudServiceImpl
         ProductsPatchService productsPatchService,
         ProductImagesRepository productImagesRepository,
         ImagesCrudService imagesCrudService
+        , ProductLookupService productLookupService
     ) {
         super(productsRepository, productsConverterService, productsPatchService);
         this.productsRepository = productsRepository;
         this.productsConverterService = productsConverterService;
         this.imagesCrudService = imagesCrudService;
         this.productImagesRepository = productImagesRepository;
+        this.productLookupService = productLookupService;
     }
 
     @Transactional
@@ -117,11 +122,15 @@ public class ProductsCrudServiceImpl
             throw new EntityNotFoundException(ITEM_NOT_FOUND);
         }
         Product found = entity.get();
-        ProductPojo target = productsConverterService.convertToPojo(found);
-        List<ProductImage> productImages = productImagesRepository.deepFindProductImagesByProductId(found.getId());
-        Collection<ImagePojo> imagePojos = productsConverterService.convertImagesToPojo(productImages);
-        target.setImages(imagePojos);
-        return target;
+        // Prefer ACL-backed data from new Product module; fall back to legacy conversion when missing
+        return productLookupService.findPojoById(found.getId())
+            .orElseGet(() -> {
+                ProductPojo target = productsConverterService.convertToPojo(found);
+                List<ProductImage> productImages = productImagesRepository.deepFindProductImagesByProductId(found.getId());
+                Collection<ImagePojo> imagePojos = productsConverterService.convertImagesToPojo(productImages);
+                target.setImages(imagePojos);
+                return target;
+            });
     }
 
     @Override
@@ -130,9 +139,15 @@ public class ProductsCrudServiceImpl
         String barcode = input.getBarcode();
         if (StringUtils.isBlank(barcode)) {
             throw new BadInputException("Invalid product barcode");
-        } else {
-            return productsRepository.findByBarcode(barcode);
         }
+        // Try ACL lookup first, then fallback to legacy repository
+        return productLookupService.findPojoByBarcode(barcode)
+            .map(pojo -> Product.builder()
+                .barcode(pojo.getBarcode())
+                .name(pojo.getName())
+                .price(pojo.getPrice() == null ? 0 : pojo.getPrice())
+                .build())
+            .or(() -> productsRepository.findByBarcode(barcode));
     }
 
     /**

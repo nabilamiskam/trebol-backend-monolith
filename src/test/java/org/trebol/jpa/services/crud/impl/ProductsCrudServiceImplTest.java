@@ -28,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.trebol.api.models.ImagePojo;
 import org.trebol.api.models.ProductPojo;
+import org.trebol.api.adapters.legacy.ProductLookupService;
 import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.Image;
 import org.trebol.jpa.entities.Product;
@@ -54,6 +55,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -65,6 +67,7 @@ class ProductsCrudServiceImplTest {
     @Mock ProductImagesRepository productImagesRepositoryMock;
     @Mock ImagesCrudService imagesCrudServiceMock;
     @Mock ImagesConverterService imagesConverterMock;
+    @Mock ProductLookupService productLookupServiceMock;
     final ProductsTestHelper productsHelper = new ProductsTestHelper();
     final ProductCategoriesTestHelper categoriesHelper = new ProductCategoriesTestHelper();
     final ImagesTestHelper imagesHelper = new ImagesTestHelper();
@@ -74,6 +77,9 @@ class ProductsCrudServiceImplTest {
         productsHelper.resetProducts();
         categoriesHelper.resetProductCategories();
         imagesHelper.resetImages();
+        lenient().when(productLookupServiceMock.findPojoByBarcode(anyString())).thenReturn(Optional.empty());
+        lenient().when(productLookupServiceMock.findPojoById(any())).thenReturn(Optional.empty());
+        lenient().when(productLookupServiceMock.findAsJpaById(any())).thenReturn(Optional.empty());
     }
 
     @Test
