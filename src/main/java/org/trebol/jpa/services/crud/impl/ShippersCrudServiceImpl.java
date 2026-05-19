@@ -20,20 +20,19 @@
 
 package org.trebol.jpa.services.crud.impl;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.trebol.api.models.ShipperPojo;
-import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.Shipper;
 import org.trebol.jpa.repositories.ShippersRepository;
 import org.trebol.jpa.services.conversion.ShippersConverterService;
 import org.trebol.jpa.services.crud.CrudGenericService;
 import org.trebol.jpa.services.crud.ShippersCrudService;
 import org.trebol.jpa.services.patch.ShippersPatchService;
-
-import java.util.Optional;
 
 @Transactional
 @Service
@@ -53,10 +52,10 @@ public class ShippersCrudServiceImpl
     }
 
     @Override
-    public Optional<Shipper> getExisting(ShipperPojo input) throws BadInputException {
+    public Optional<Shipper> getExisting(ShipperPojo input) {
         String name = input.getName();
         if (StringUtils.isBlank(name)) {
-            throw new BadInputException("Billing type has no name");
+            return Optional.empty();
         } else {
             return shippersRepository.findByName(name);
         }

@@ -20,16 +20,18 @@
 
 package org.trebol.jpa.services;
 
-import com.querydsl.core.types.Predicate;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.trebol.api.models.DataPagePojo;
 import org.trebol.common.exceptions.BadInputException;
 
+import com.querydsl.core.types.Predicate;
+
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.Map;
-import java.util.Optional;
 
 
 /**
@@ -86,7 +88,7 @@ public interface CrudService<M, E> {
      * @return A container possibly holding an entity.
      * @throws BadInputException When the model does not have a valid <i>identification property</i>.
      */
-    Optional<E> getExisting(M example) throws BadInputException;
+    Optional<E> getExisting(M example);
 
     /**
      * Updates an existing registry, first fetching it from its <i>identifying property</i> and
@@ -97,10 +99,6 @@ public interface CrudService<M, E> {
      * @param input Model with data to update
      * @return A model-copy of the saved registry, with its properties updated accordingly.
      * @throws EntityNotFoundException When no registry matches the given input.
-     * @throws BadInputException       When the data in the input object is not valid.<br/>
-     *                                 It is expected that some portions data may be null, because it may not have
-     *                                 been included during serialization. Such cases are <i>not</i> meant to cause
-     *                                 a BadInputException.<br/>
      * @deprecated
      */
     @Deprecated(since = "0.2.0-SNAPSHOT", forRemoval = true)

@@ -20,20 +20,19 @@
 
 package org.trebol.jpa.services.crud.impl;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.trebol.api.models.BillingCompanyPojo;
-import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.BillingCompany;
 import org.trebol.jpa.repositories.BillingCompaniesRepository;
 import org.trebol.jpa.services.conversion.BillingCompaniesConverterService;
 import org.trebol.jpa.services.crud.BillingCompaniesCrudService;
 import org.trebol.jpa.services.crud.CrudGenericService;
 import org.trebol.jpa.services.patch.BillingCompaniesPatchService;
-
-import java.util.Optional;
 
 @Transactional
 @Service
@@ -53,10 +52,10 @@ public class BillingCompaniesCrudServiceImpl
     }
 
     @Override
-    public Optional<BillingCompany> getExisting(BillingCompanyPojo input) throws BadInputException {
+    public Optional<BillingCompany> getExisting(BillingCompanyPojo input) {
         String idNumber = input.getIdNumber();
         if (StringUtils.isBlank(idNumber)) {
-            throw new BadInputException("Billing company has no id number");
+            return Optional.empty();
         } else {
             return companiesRepository.findByIdNumber(idNumber);
         }

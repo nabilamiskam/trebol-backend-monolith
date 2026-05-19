@@ -20,32 +20,28 @@
 
 package org.trebol.jpa.services.crud.impl;
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Predicate;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.trebol.testing.TestConstants.*;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.trebol.api.models.ProductListPojo;
-import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.ProductList;
 import org.trebol.jpa.repositories.ProductListItemsRepository;
 import org.trebol.jpa.repositories.ProductListsRepository;
 
-import jakarta.persistence.EntityNotFoundException;
-import java.util.List;
-import java.util.Optional;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.trebol.testing.TestConstants.ANY;
+import jakarta.persistence.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class ProductListCrudServiceImplTest {
@@ -54,7 +50,7 @@ class ProductListCrudServiceImplTest {
     @Mock ProductListItemsRepository productListItemRepositoryMock;
 
     @Test
-    void matches_productlist_from_name() throws BadInputException {
+    void matches_productlist_from_name() {
         ProductListPojo input = ProductListPojo.builder()
             .name(ANY)
             .build();
@@ -67,11 +63,14 @@ class ProductListCrudServiceImplTest {
     }
 
     @Test
-    void cannot_match_any_productlist_from_null_data() {
-        ProductListPojo input = ProductListPojo.builder().build();
-        BadInputException result = assertThrows(BadInputException.class, () -> instance.getExisting(input));
-        assertEquals("The specified list has no name", result.getMessage());
-    }
+void cannot_match_any_productlist_from_null_data() {
+    ProductListPojo input = ProductListPojo.builder().build();
+
+    Optional<ProductList> result = instance.getExisting(input);
+
+    assertTrue(result.isEmpty());
+    verify(productListRepositoryMock, never()).findByName(anyString());
+}
 
     @Test
     void deletes_lists() {

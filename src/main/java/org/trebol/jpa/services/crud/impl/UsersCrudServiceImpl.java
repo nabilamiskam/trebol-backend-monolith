@@ -20,13 +20,13 @@
 
 package org.trebol.jpa.services.crud.impl;
 
-import com.querydsl.core.types.Predicate;
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.trebol.api.models.UserPojo;
-import org.trebol.common.exceptions.BadInputException;
 import org.trebol.config.SecurityProperties;
 import org.trebol.jpa.entities.User;
 import org.trebol.jpa.repositories.UsersRepository;
@@ -36,8 +36,9 @@ import org.trebol.jpa.services.crud.UsersCrudService;
 import org.trebol.jpa.services.patch.UsersPatchService;
 import org.trebol.security.exceptions.AccountProtectionViolationException;
 
+import com.querydsl.core.types.Predicate;
+
 import jakarta.persistence.EntityNotFoundException;
-import java.util.Optional;
 
 @Transactional
 @Service
@@ -60,10 +61,10 @@ public class UsersCrudServiceImpl
     }
 
     @Override
-    public Optional<User> getExisting(UserPojo input) throws BadInputException {
+    public Optional<User> getExisting(UserPojo input) {
         String name = input.getName();
         if (StringUtils.isBlank(name)) {
-            throw new BadInputException("Invalid user name");
+            return Optional.empty();
         } else {
             return usersRepository.findByName(name);
         }

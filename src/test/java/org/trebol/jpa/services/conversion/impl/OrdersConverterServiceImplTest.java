@@ -20,6 +20,17 @@
 
 package org.trebol.jpa.services.conversion.impl;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.trebol.config.Constants.*;
+import static org.trebol.jpa.services.conversion.impl.OrdersConverterServiceImpl.*;
+import static org.trebol.testing.TestConstants.*;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -46,9 +57,9 @@ import org.trebol.jpa.entities.Salesperson;
 import org.trebol.jpa.entities.Shipper;
 import org.trebol.jpa.repositories.AddressesRepository;
 import org.trebol.jpa.repositories.BillingTypesRepository;
+import org.trebol.jpa.repositories.OrderStatusesRepository;
 import org.trebol.jpa.repositories.PaymentTypesRepository;
 import org.trebol.jpa.repositories.ProductsRepository;
-import org.trebol.jpa.repositories.OrderStatusesRepository;
 import org.trebol.jpa.repositories.ShippersRepository;
 import org.trebol.jpa.services.conversion.AddressesConverterService;
 import org.trebol.jpa.services.conversion.BillingCompaniesConverterService;
@@ -57,28 +68,6 @@ import org.trebol.jpa.services.conversion.ProductsConverterService;
 import org.trebol.jpa.services.conversion.SalespeopleConverterService;
 import org.trebol.jpa.services.crud.BillingCompaniesCrudService;
 import org.trebol.jpa.services.crud.CustomersCrudService;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-import static org.trebol.config.Constants.BILLING_TYPE_ENTERPRISE;
-import static org.trebol.jpa.services.conversion.impl.OrdersConverterServiceImpl.TAX_PERCENT;
-import static org.trebol.jpa.services.conversion.impl.OrdersConverterServiceImpl.UNEXISTING_BILLING_TYPE;
-import static org.trebol.testing.TestConstants.ANY;
-import static org.trebol.testing.TestConstants.NOT_ANY;
 
 @ExtendWith(MockitoExtension.class)
 class OrdersConverterServiceImplTest {
@@ -443,19 +432,24 @@ class OrdersConverterServiceImplTest {
             verifyNoInteractions(customersConverterServiceMock);
         }
 
+
         @Test
-        void no_customer_information() throws BadInputException {
-            OrderPojo input = OrderPojo.builder()
-                .date(SOME_INSTANT)
-                .paymentType(ANY)
-                .customer(null)
-                .build();
-            when(paymentTypesRepository.findByName(anyString())).thenReturn(Optional.of(SOME_PAYMENT_TYPE_ENTITY));
-            when(customersCrudServiceMock.getExisting(isNull())).thenThrow(new BadInputException(NO_CUSTOMER_PROVIDED));
-            BadInputException result = assertThrows(BadInputException.class, () -> instance.convertToNewEntity(input));
-            assertEquals(NO_CUSTOMER_PROVIDED, result.getMessage());
-            verifyNoInteractions(customersConverterServiceMock);
-        }
+        void no_customer_information() {
+        OrderPojo input = OrderPojo.builder()
+        .date(SOME_INSTANT)
+        .paymentType(ANY)
+        .customer(null)
+        .build();
+
+    when(paymentTypesRepository.findByName(anyString()))
+        .thenReturn(Optional.of(SOME_PAYMENT_TYPE_ENTITY));
+
+    BadInputException result =
+        assertThrows(BadInputException.class, () -> instance.convertToNewEntity(input));
+    assertEquals(NO_CUSTOMER_PROVIDED, result.getMessage());
+
+    verifyNoInteractions(customersConverterServiceMock);
+}
 
         @Test
         void no_billing_information() {
@@ -487,21 +481,23 @@ class OrdersConverterServiceImplTest {
         }
 
         @Test
-        void billing_type_for_enterprise_without_billing_company() throws BadInputException {
-            OrderPojo input = OrderPojo.builder()
-                .date(SOME_INSTANT)
-                .paymentType(ANY)
-                .customer(SOME_CUSTOMER)
-                .billingType(BILLING_TYPE_ENTERPRISE)
-                .billingAddress(SOME_ADDRESS)
-                .billingCompany(null)
-                .build();
-            when(paymentTypesRepository.findByName(anyString())).thenReturn(Optional.of(SOME_PAYMENT_TYPE_ENTITY));
-            when(billingTypesRepositoryMock.findByName(anyString())).thenReturn(Optional.of(SOME_BILLING_TYPE_ENTITY));
-            when(billingCompaniesCrudServiceMock.getExisting(isNull())).thenThrow(new BadInputException(NO_BILLING_COMPANY_PROVIDED));
-            BadInputException result = assertThrows(BadInputException.class, () -> instance.convertToNewEntity(input));
-            assertEquals(NO_BILLING_COMPANY_PROVIDED, result.getMessage());
-        }
+        void billing_type_for_enterprise_without_billing_company() {
+        OrderPojo input = OrderPojo.builder()
+        .date(SOME_INSTANT)
+        .paymentType(ANY)
+        .customer(SOME_CUSTOMER)
+        .billingType(BILLING_TYPE_ENTERPRISE)
+        .billingAddress(SOME_ADDRESS)
+        .billingCompany(null)
+        .build();
+
+    when(paymentTypesRepository.findByName(anyString()))
+        .thenReturn(Optional.of(SOME_PAYMENT_TYPE_ENTITY));
+
+    BadInputException result =
+        assertThrows(BadInputException.class, () -> instance.convertToNewEntity(input));
+    assertEquals(NO_BILLING_COMPANY_PROVIDED, result.getMessage());
+}
 
         @Test
         void no_details() {

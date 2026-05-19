@@ -20,20 +20,19 @@
 
 package org.trebol.jpa.services.crud.impl;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.trebol.api.models.PersonPojo;
-import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.Customer;
 import org.trebol.jpa.repositories.CustomersRepository;
 import org.trebol.jpa.services.conversion.CustomersConverterService;
 import org.trebol.jpa.services.crud.CrudGenericService;
 import org.trebol.jpa.services.crud.CustomersCrudService;
 import org.trebol.jpa.services.patch.CustomersPatchService;
-
-import java.util.Optional;
 
 @Transactional
 @Service
@@ -53,10 +52,10 @@ public class CustomersCrudServiceImpl
     }
 
     @Override
-    public Optional<Customer> getExisting(PersonPojo input) throws BadInputException {
+    public Optional<Customer> getExisting(PersonPojo input)  {
         String idNumber = input.getIdNumber();
         if (StringUtils.isBlank(idNumber)) {
-            throw new BadInputException("Customer does not have an ID card");
+            return Optional.empty();
         } else {
             return customersRepository.findByPersonIdNumber(idNumber);
         }

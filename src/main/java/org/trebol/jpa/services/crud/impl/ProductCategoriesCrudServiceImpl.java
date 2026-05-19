@@ -20,6 +20,9 @@
 
 package org.trebol.jpa.services.crud.impl;
 
+import java.util.Map;
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,9 +35,6 @@ import org.trebol.jpa.services.conversion.ProductCategoriesConverterService;
 import org.trebol.jpa.services.crud.CrudGenericService;
 import org.trebol.jpa.services.crud.ProductCategoriesCrudService;
 import org.trebol.jpa.services.patch.ProductCategoriesPatchService;
-
-import java.util.Map;
-import java.util.Optional;
 
 @Transactional
 @Service
@@ -56,10 +56,10 @@ public class ProductCategoriesCrudServiceImpl
     }
 
     @Override
-    public Optional<ProductCategory> getExisting(ProductCategoryPojo input) throws BadInputException {
+    public Optional<ProductCategory> getExisting(ProductCategoryPojo input) {
         String code = input.getCode();
         if (StringUtils.isBlank(code)) {
-            throw new BadInputException("Invalid category code");
+            return Optional.empty();
         } else {
             return this.categoriesRepository.findByCode(code);
         }

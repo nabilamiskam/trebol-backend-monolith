@@ -20,20 +20,19 @@
 
 package org.trebol.jpa.services.crud.impl;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.trebol.api.models.BillingTypePojo;
-import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.BillingType;
 import org.trebol.jpa.repositories.BillingTypesRepository;
 import org.trebol.jpa.services.conversion.BillingTypesConverterService;
 import org.trebol.jpa.services.crud.BillingTypesCrudService;
 import org.trebol.jpa.services.crud.CrudGenericService;
 import org.trebol.jpa.services.patch.BillingTypesPatchService;
-
-import java.util.Optional;
 
 @Transactional
 @Service
@@ -53,10 +52,10 @@ public class BillingTypesCrudServiceImpl
     }
 
     @Override
-    public Optional<BillingType> getExisting(BillingTypePojo input) throws BadInputException {
+    public Optional<BillingType> getExisting(BillingTypePojo input) {
         String name = input.getName();
         if (StringUtils.isBlank(name)) {
-            throw new BadInputException("Billing type has no name");
+            return Optional.empty();
         } else {
             return typesRepository.findByName(name);
         }

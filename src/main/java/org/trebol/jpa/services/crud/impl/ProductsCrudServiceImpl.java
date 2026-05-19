@@ -20,7 +20,11 @@
 
 package org.trebol.jpa.services.crud.impl;
 
-import com.querydsl.core.types.Predicate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,12 +45,10 @@ import org.trebol.jpa.services.crud.ImagesCrudService;
 import org.trebol.jpa.services.crud.ProductsCrudService;
 import org.trebol.jpa.services.patch.ProductsPatchService;
 
+import com.querydsl.core.types.Predicate;
+
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 
 @Transactional
 @Service
@@ -125,11 +127,10 @@ public class ProductsCrudServiceImpl
     }
 
     @Override
-    public Optional<Product> getExisting(ProductPojo input)
-        throws BadInputException {
+    public Optional<Product> getExisting(ProductPojo input) {
         String barcode = input.getBarcode();
         if (StringUtils.isBlank(barcode)) {
-            throw new BadInputException("Invalid product barcode");
+            return Optional.empty();
         } else {
             return productsRepository.findByBarcode(barcode);
         }
@@ -143,24 +144,23 @@ public class ProductsCrudServiceImpl
      * @return The list of ImagePojos with normalized metadata.
      */
     private List<ProductImage> makeProductImageRelationships(Product existingProduct, Collection<ImagePojo> inputImages) {
-        List<ProductImage> allRelationships = new ArrayList<>();
-        for (ImagePojo img : inputImages) {
-            try {
-                Optional<Image> match = imagesCrudService.getExisting(img);
-                Image image = match.orElseGet(() -> Image.builder()
-                    .code(img.getCode())
-                    .filename(img.getFilename())
-                    .url(img.getUrl())
-                    .build());
-                ProductImage relationship = ProductImage.builder()
-                    .product(existingProduct)
-                    .image(image)
-                    .build();
-                allRelationships.add(relationship);
-            } catch (BadInputException ex) {
-                logger.debug("An image was not linked to product with barcode '{}'", existingProduct.getBarcode());
-            }
-        }
-        return allRelationships;
+    List<ProductImage> allRelationships = new ArrayList<>();
+    for (ImagePojo img : inputImages) {
+        Optional<Image> match = imagesCrudService.getExisting(img);
+
+        Image image = match.orElseGet(() -> Image.builder()
+            .code(img.getCode())
+            .filename(img.getFilename())
+            .url(img.getUrl())
+            .build());
+
+        ProductImage relationship = ProductImage.builder()
+            .product(existingProduct)
+            .image(image)
+            .build();
+
+        allRelationships.add(relationship);
+    }
+    return allRelationships;
     }
 }

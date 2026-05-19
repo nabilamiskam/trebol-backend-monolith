@@ -20,20 +20,19 @@
 
 package org.trebol.jpa.services.crud.impl;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.trebol.api.models.UserRolePojo;
-import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.UserRole;
 import org.trebol.jpa.repositories.UserRolesRepository;
 import org.trebol.jpa.services.conversion.UserRolesConverterService;
 import org.trebol.jpa.services.crud.CrudGenericService;
 import org.trebol.jpa.services.crud.UserRolesCrudService;
 import org.trebol.jpa.services.patch.UserRolesPatchService;
-
-import java.util.Optional;
 
 @Transactional
 @Service
@@ -53,10 +52,10 @@ public class UserRolesCrudServiceImpl
     }
 
     @Override
-    public Optional<UserRole> getExisting(UserRolePojo input) throws BadInputException {
+    public Optional<UserRole> getExisting(UserRolePojo input) {
         String name = input.getName();
         if (StringUtils.isBlank(name)) {
-            throw new BadInputException("Invalid user role name");
+            return Optional.empty();
         } else {
             return rolesRepository.findByName(name);
         }

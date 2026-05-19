@@ -20,6 +20,12 @@
 
 package org.trebol.jpa.services.conversion.impl;
 
+import static org.trebol.config.Constants.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,26 +47,20 @@ import org.trebol.jpa.entities.Product;
 import org.trebol.jpa.entities.Shipper;
 import org.trebol.jpa.repositories.AddressesRepository;
 import org.trebol.jpa.repositories.BillingTypesRepository;
+import org.trebol.jpa.repositories.OrderStatusesRepository;
 import org.trebol.jpa.repositories.PaymentTypesRepository;
 import org.trebol.jpa.repositories.ProductsRepository;
-import org.trebol.jpa.repositories.OrderStatusesRepository;
 import org.trebol.jpa.repositories.ShippersRepository;
 import org.trebol.jpa.services.conversion.AddressesConverterService;
 import org.trebol.jpa.services.conversion.BillingCompaniesConverterService;
 import org.trebol.jpa.services.conversion.CustomersConverterService;
-import org.trebol.jpa.services.conversion.ProductsConverterService;
 import org.trebol.jpa.services.conversion.OrdersConverterService;
+import org.trebol.jpa.services.conversion.ProductsConverterService;
 import org.trebol.jpa.services.conversion.SalespeopleConverterService;
 import org.trebol.jpa.services.crud.BillingCompaniesCrudService;
 import org.trebol.jpa.services.crud.CustomersCrudService;
 
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.trebol.config.Constants.BILLING_TYPE_ENTERPRISE;
-import static org.trebol.config.Constants.ORDER_STATUS_PENDING;
 
 @Transactional
 @Service
@@ -156,22 +156,34 @@ public class OrdersConverterServiceImpl
      * For that, it makes several database queries in the process.
      */
     @Override
-    public Order convertToNewEntity(OrderPojo model) throws BadInputException {
-        Order target = Order.builder().build();
-        // databases usually can take care of null dates. besides, the field is annotated with @CreationTimeStamp
-        if (model.getDate()!=null) {
-            target.setDate(model.getDate());
-        }
-        orderStatusesRepository.findByName(ORDER_STATUS_PENDING)
-            .ifPresent(target::setStatus);
-        this.convertPaymentTypeInformationForEntity(model, target);
-        this.convertCustomerInformationForEntity(model, target);
-        this.convertBillingInformationForEntity(model, target);
-        this.convertShippingInformationForEntity(model, target);
-        this.convertDetailsForEntity(model, target);
-        this.updateTotals(target);
-        return target;
+public Order convertToNewEntity(OrderPojo model) throws BadInputException {
+    Order target = Order.builder().build();
+
+    if (model.getDate() != null) {
+        target.setDate(model.getDate());
     }
+
+    orderStatusesRepository.findByName(ORDER_STATUS_PENDING)
+        .ifPresent(target::setStatus);
+
+    this.convertPaymentTypeInformationForEntity(model, target);
+
+    // NEW: required-field validation (do not rely on CrudService#getExisting throwing)
+    if (model.getCustomer() == null) {
+        throw new BadInputException("No customer provided");
+    }
+    if (BILLING_TYPE_ENTERPRISE.equals(model.getBillingType()) && model.getBillingCompany() == null) {
+        throw new BadInputException("No billing company provided");
+    }
+
+    this.convertCustomerInformationForEntity(model, target);
+    this.convertBillingInformationForEntity(model, target);
+    this.convertShippingInformationForEntity(model, target);
+    this.convertDetailsForEntity(model, target);
+    this.updateTotals(target);
+
+    return target;
+}
 
     @Override
     public OrderDetailPojo convertDetailToPojo(OrderDetail source) {

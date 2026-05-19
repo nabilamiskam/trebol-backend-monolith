@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.trebol.api.models.ImagePojo;
-import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.Image;
 import org.trebol.jpa.repositories.ImagesRepository;
 import org.trebol.jpa.services.conversion.ImagesConverterService;
@@ -53,10 +52,10 @@ public class ImagesCrudServiceImpl
     }
 
     @Override
-    public Optional<Image> getExisting(ImagePojo input) throws BadInputException {
+    public Optional<Image> getExisting(ImagePojo input) {
         String name = input.getFilename();
         if (StringUtils.isBlank(name)) {
-            throw new BadInputException("Invalid filename");
+            return Optional.empty();
         } else {
             return imagesRepository.findByFilename(name);
         }

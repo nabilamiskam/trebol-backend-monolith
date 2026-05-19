@@ -21,6 +21,14 @@
 package org.trebol.jpa.services.crud.impl;
 
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.trebol.testing.TestConstants.*;
+
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,20 +42,6 @@ import org.trebol.jpa.entities.ProductCategory;
 import org.trebol.jpa.repositories.ProductsCategoriesRepository;
 import org.trebol.jpa.services.patch.ProductCategoriesPatchService;
 import org.trebol.testing.ProductCategoriesTestHelper;
-
-import java.util.Map;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.trebol.testing.TestConstants.ANY;
 
 @ExtendWith(MockitoExtension.class)
 class ProductCategoriesCrudServiceImplTest {
@@ -75,7 +69,7 @@ class ProductCategoriesCrudServiceImplTest {
     }
 
     @Test
-    void finds_by_code() throws BadInputException {
+    void finds_by_code() {
         ProductCategoryPojo input = ProductCategoryPojo.builder()
             .code(ANY)
             .build();
@@ -90,12 +84,14 @@ class ProductCategoriesCrudServiceImplTest {
     }
 
     @Test
-    void does_not_perform_queries_with_empty_codes() throws BadInputException {
-        ProductCategoryPojo input = ProductCategoryPojo.builder().build();
+void does_not_perform_queries_with_empty_codes() {
+    ProductCategoryPojo input = ProductCategoryPojo.builder().build();
 
-        BadInputException result = assertThrows(BadInputException.class, () -> instance.getExisting(input));
-        assertEquals("Invalid category code", result.getMessage());
-    }
+    Optional<ProductCategory> match = instance.getExisting(input);
+
+    assertTrue(match.isEmpty());
+    verify(categoriesRepositoryMock, never()).findByCode(anyString());
+}
 
     @Test
     void partially_updates_using_patch_service() throws BadInputException {
