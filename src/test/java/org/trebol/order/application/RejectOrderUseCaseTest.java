@@ -4,90 +4,58 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.trebol.api.models.OrderPojo;
 import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.Order;
-import org.trebol.jpa.entities.OrderStatus;
-import org.trebol.jpa.repositories.OrderStatusesRepository;
-import org.trebol.jpa.repositories.OrdersRepository;
-import org.trebol.jpa.services.crud.OrdersCrudService;
+import org.trebol.order.domain.InvalidOrderTransitionException;
 
 import jakarta.persistence.EntityNotFoundException;
 
 class RejectOrderUseCaseTest {
 
-    private OrdersCrudService crudService;
-    private OrdersRepository ordersRepository;
-    private OrderStatusesRepository orderStatusesRepository;
-
+    private OrderTransitionService transitionService;
     private RejectOrderUseCase useCase;
 
     @BeforeEach
     void setUp() {
-        crudService = mock(OrdersCrudService.class);
-        ordersRepository = mock(OrdersRepository.class);
-        orderStatusesRepository = mock(OrderStatusesRepository.class);
-        useCase = new RejectOrderUseCase(crudService, ordersRepository, orderStatusesRepository);
+        transitionService = mock(OrderTransitionService.class);
+        useCase = new RejectOrderUseCase(transitionService);
     }
 
     @Test
-    void reject_whenPaidUnconfirmed_updatesStatusToRejected() throws Exception {
+    void reject_delegatesToTransitionServiceWithRejectCommand() throws Exception {
         OrderPojo input = new OrderPojo();
+        Order expected = Order.builder().id(10L).build();
 
-        OrderStatus currentStatus = OrderStatus.builder()
-            .code(3) // PAID_UNCONFIRMED
-            .name("Paid, Unconfirmed")
-            .build();
-
-        Order existing = Order.builder()
-            .id(10L)
-            .status(currentStatus)
-            .build();
-
-        OrderStatus rejectedStatusEntity = OrderStatus.builder()
-            .code(-3) // REJECTED
-            .name("Rejected")
-            .build();
-
-        when(crudService.getExisting(input)).thenReturn(Optional.of(existing));
-        when(orderStatusesRepository.findByCode(-3)).thenReturn(Optional.of(rejectedStatusEntity));
+        when(transitionService.transition(same(input), eq(OrderTransitionCommand.REJECT)))
+            .thenReturn(expected);
 
         Order result = useCase.reject(input);
 
-        assertSame(existing, result);
-        verify(ordersRepository).setStatus(10L, rejectedStatusEntity);
+        assertSame(expected, result);
+        verify(transitionService).transition(same(input), eq(OrderTransitionCommand.REJECT));
     }
 
     @Test
-    void reject_whenInvalidTransition_throwsBadInputException() throws Exception {
+    void reject_whenInvalidTransition_throwsBadInputException() {
         OrderPojo input = new OrderPojo();
 
-        OrderStatus currentStatus = OrderStatus.builder()
-            .code(1) // PENDING (reject should not be allowed from here)
-            .name("Pending")
-            .build();
-
-        Order existing = Order.builder()
-            .id(10L)
-            .status(currentStatus)
-            .build();
-
-        when(crudService.getExisting(input)).thenReturn(Optional.of(existing));
+        when(transitionService.transition(same(input), eq(OrderTransitionCommand.REJECT)))
+            .thenThrow(mock(InvalidOrderTransitionException.class));
 
         BadInputException ex = assertThrows(BadInputException.class, () -> useCase.reject(input));
         assertEquals("The transaction is not in a valid state for this api", ex.getMessage());
-
-        verify(ordersRepository, never()).setStatus(anyLong(), any());
+        verify(transitionService).transition(same(input), eq(OrderTransitionCommand.REJECT));
     }
 
     @Test
-    void reject_whenOrderNotFound_throwsEntityNotFoundException() throws Exception {
+    void reject_whenOrderNotFound_bubblesUpEntityNotFoundException() {
         OrderPojo input = new OrderPojo();
-        when(crudService.getExisting(input)).thenReturn(Optional.empty());
+
+        when(transitionService.transition(same(input), eq(OrderTransitionCommand.REJECT)))
+            .thenThrow(new EntityNotFoundException("No transaction matches given input"));
 
         assertThrows(EntityNotFoundException.class, () -> useCase.reject(input));
     }

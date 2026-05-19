@@ -4,91 +4,66 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.trebol.api.models.OrderPojo;
 import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.Order;
-import org.trebol.jpa.entities.OrderStatus;
-import org.trebol.jpa.repositories.OrderStatusesRepository;
-import org.trebol.jpa.repositories.OrdersRepository;
-import org.trebol.jpa.services.crud.OrdersCrudService;
+import org.trebol.order.domain.InvalidOrderTransitionException;
 
 import jakarta.persistence.EntityNotFoundException;
 
 class AbortPaymentUseCaseTest {
 
-    private OrdersCrudService crudService;
-    private OrdersRepository ordersRepository;
-    private OrderStatusesRepository orderStatusesRepository;
-
+    private OrderTransitionService transitionService;
     private AbortPaymentUseCase useCase;
 
     @BeforeEach
     void setUp() {
-        crudService = mock(OrdersCrudService.class);
-        ordersRepository = mock(OrdersRepository.class);
-        orderStatusesRepository = mock(OrderStatusesRepository.class);
-        useCase = new AbortPaymentUseCase(crudService, ordersRepository, orderStatusesRepository);
+        transitionService = mock(OrderTransitionService.class);
+        useCase = new AbortPaymentUseCase(transitionService);
     }
 
     @Test
-    void abortPayment_whenPaymentStarted_updatesStatusToPaymentCancelled() throws Exception {
+    void abortPayment_delegatesToTransitionServiceWithAbortPaymentCommand() throws Exception {
+        // Arrange
         OrderPojo input = new OrderPojo();
+        Order expected = Order.builder().id(10L).build();
 
-        OrderStatus currentStatus = OrderStatus.builder()
-            .code(2) // PAYMENT_STARTED
-            .name("Payment Started")
-            .build();
+        when(transitionService.transition(same(input), eq(OrderTransitionCommand.ABORT_PAYMENT)))
+            .thenReturn(expected);
 
-        Order existing = Order.builder()
-            .id(10L)
-            .status(currentStatus)
-            .build();
-
-        OrderStatus cancelledStatusEntity = OrderStatus.builder()
-            .code(-1) // PAYMENT_CANCELLED
-            .name("Payment Cancelled")
-            .build();
-
-        when(crudService.getExisting(input)).thenReturn(Optional.of(existing));
-        when(orderStatusesRepository.findByCode(-1)).thenReturn(Optional.of(cancelledStatusEntity));
-
+        // Act
         Order result = useCase.abortPayment(input);
 
-        assertSame(existing, result);
-        verify(ordersRepository).setStatus(10L, cancelledStatusEntity);
+        // Assert
+        assertSame(expected, result);
+        verify(transitionService).transition(same(input), eq(OrderTransitionCommand.ABORT_PAYMENT));
     }
 
     @Test
-    void abortPayment_whenInvalidTransition_throwsBadInputException() throws Exception {
+    void abortPayment_whenInvalidTransition_throwsBadInputException() {
+        // Arrange
         OrderPojo input = new OrderPojo();
 
-        OrderStatus currentStatus = OrderStatus.builder()
-            .code(1) // PENDING (abort should not be allowed from here)
-            .name("Pending")
-            .build();
+        when(transitionService.transition(same(input), eq(OrderTransitionCommand.ABORT_PAYMENT)))
+            .thenThrow(mock(InvalidOrderTransitionException.class));
 
-        Order existing = Order.builder()
-            .id(10L)
-            .status(currentStatus)
-            .build();
-
-        when(crudService.getExisting(input)).thenReturn(Optional.of(existing));
-
+        // Act + Assert
         BadInputException ex = assertThrows(BadInputException.class, () -> useCase.abortPayment(input));
         assertEquals("The transaction is not in a valid state for this api", ex.getMessage());
-
-        verify(ordersRepository, never()).setStatus(anyLong(), any());
+        verify(transitionService).transition(same(input), eq(OrderTransitionCommand.ABORT_PAYMENT));
     }
 
     @Test
-    void abortPayment_whenOrderNotFound_throwsEntityNotFoundException() throws Exception {
+    void abortPayment_whenOrderNotFound_bubblesUpEntityNotFoundException() {
+        // Arrange
         OrderPojo input = new OrderPojo();
-        when(crudService.getExisting(input)).thenReturn(Optional.empty());
 
+        when(transitionService.transition(same(input), eq(OrderTransitionCommand.ABORT_PAYMENT)))
+            .thenThrow(new EntityNotFoundException("No transaction matches given input"));
+
+        // Act + Assert
         assertThrows(EntityNotFoundException.class, () -> useCase.abortPayment(input));
     }
 }
