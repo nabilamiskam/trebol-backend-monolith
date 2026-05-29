@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.trebol.api.DataCrudGenericController;
 import org.trebol.api.models.DataPagePojo;
 import org.trebol.api.models.OrderPojo;
+import org.trebol.api.models.StartPaymentResponsePojo;
 import org.trebol.api.services.OrdersProcessService;
 import org.trebol.api.services.PaginationService;
 import org.trebol.common.exceptions.BadInputException;
@@ -202,8 +203,15 @@ public class DataOrdersController
     @PostMapping("/payment/start")
 @Operation(summary = "Start payment for an order (generates transaction token).")
 @PreAuthorize("hasAuthority('orders:update')")
-public OrderPojo startPayment(@RequestBody OrderPojo sell) throws BadInputException {
-    return processService.markAsStarted(sell);
+public StartPaymentResponsePojo startPayment(@RequestBody OrderPojo sell) throws BadInputException {
+
+    OrderPojo updated = processService.markAsStarted(sell);
+
+    return new StartPaymentResponsePojo(
+        updated.getBuyOrder(),
+        updated.getStatus(),
+        updated.getToken()
+    );
 }
 
     @Override
