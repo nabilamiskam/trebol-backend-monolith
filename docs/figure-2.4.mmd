@@ -1,0 +1,37 @@
+flowchart TB
+    subgraph PL[Controller Layer]
+        C[Data* Controllers]
+    end
+
+    subgraph BL[Service Cluster]
+        S[Crud + Conversion + Patch + Predicates]
+    end
+
+    subgraph DL[Data & Infra]
+        R[Repositories\n(Spring Data JPA)]
+        T[Technical Providers\n(JPA/Hibernate + QueryDSL)]
+        DB[(H2 local / MariaDB prod)]
+    end
+
+    C --> S
+    S --> R
+    S --> T
+    R --> T
+    T --> DB
+
+    %% Pain points overlay
+    P1([Framework coupling]):::pain
+    P2([Persistence leakage]):::pain
+    P3([Boundary blur]):::pain
+    P4([Change amplification]):::pain
+
+    P1 -. "Business logic tied to Spring/JPA/QueryDSL" .-> S
+    P1 -. "Framework-centric repository APIs" .-> R
+    P2 -. "SQL/QueryDSL details influence services" .-> S
+    P2 -. "Predicate/Sort/Repository details shape logic" .-> T
+    P3 -. "No explicit use‑case/application layer" .-> C
+    P3 -. "Controller delegates directly to technical service cluster" .-> S
+    P4 -. "Small DB/API changes ripple across layers" .-> C
+    P4 -. "Converter/Repository/schema changes cascade across layers" .-> R
+
+    classDef pain fill:#ffdede,stroke:#c73a3a,color:#000;

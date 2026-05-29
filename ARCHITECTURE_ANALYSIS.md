@@ -194,37 +194,46 @@ flowchart TB
 ```
 
 ### Figure 2.4: Pain-Point Overlay (Coupling, Leakage, Boundary Blur, Change Amplification)
+A concise explanation: Figure 2.4 highlights how the legacy dependency direction causes four main problems: framework coupling (business logic depends on Spring/JPA/QueryDSL), persistence leakage (database/query details influence service behaviour), boundary blur (absence of an explicit use-case layer), and change amplification (small data/API changes ripple across layers).
 
 ```mermaid
 flowchart TB
-    C[Controller Layer\nData*Controllers]
-    S[Service Cluster\nCrud + Conversion + Patch + Predicates]
-    R[Repositories\nSpring Data JPA]
-    T[Technical Providers\nJPA/Hibernate + QueryDSL]
-    D[(MariaDB)]
+    subgraph PL[Controller Layer]
+        C[Data* Controllers]
+    end
+
+    subgraph BL[Service Cluster]
+        S[Crud + Conversion + Patch + Predicates]
+    end
+
+    subgraph DL[Data & Infra]
+        R[Repositories\n(Spring Data JPA)]
+        T[Technical Providers\n(JPA/Hibernate + QueryDSL)]
+        DB[(H2 local / MariaDB prod)]
+    end
 
     C --> S
     S --> R
     S --> T
     R --> T
-    T --> D
+    T --> DB
 
-    P1{{P1\nFramework\nCoupling}}
-    P2{{P2\nPersistence\nLeakage}}
-    P3{{P3\nBoundary\nBlur}}
-    P4{{P4\nChange\nAmplification}}
+    %% Pain points overlay
+    P1([Framework coupling]):::pain
+    P2([Persistence leakage]):::pain
+    P3([Boundary blur]):::pain
+    P4([Change amplification]):::pain
 
-    P1 -. Spring/JPA types in core flow .-> S
-    P1 -. Framework-centric repository APIs .-> R
+    P1 -. "Business logic tied to Spring/JPA/QueryDSL" .-> S
+    P1 -. "Framework-centric repository APIs" .-> R
+    P2 -. "SQL/QueryDSL details influence services" .-> S
+    P2 -. "Predicate/Sort/Repository details shape logic" .-> T
+    P3 -. "No explicit use‑case/application layer" .-> C
+    P3 -. "Controller delegates directly to technical service cluster" .-> S
+    P4 -. "Small DB/API changes ripple across layers" .-> C
+    P4 -. "Converter/Repository/schema changes cascade across layers" .-> R
 
-    P2 -. Query and DB semantics in business services .-> S
-    P2 -. Predicate/Sort/Repository details shape logic .-> T
-
-    P3 -. No explicit use-case boundary .-> C
-    P3 -. Controller delegates directly to technical service cluster .-> S
-
-    P4 -. Small API/DB changes ripple upward .-> C
-    P4 -. Converter/Repository/schema changes cascade across layers .-> R
+    classDef pain fill:#ffdede,stroke:#c73a3a,color:#000;
 ```
 
 ---

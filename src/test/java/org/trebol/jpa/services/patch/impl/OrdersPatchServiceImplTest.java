@@ -71,7 +71,7 @@ class OrdersPatchServiceImplTest {
             .configure(WRITE_DATES_AS_TIMESTAMPS, false);
         existingOrder = Order.builder()
             .id(1L)
-            .date(Instant.now())
+            .date(Instant.parse("2020-01-01T00:00:00Z"))
             .totalItems(1)
             .netValue(9700)
             .transportValue(0)
