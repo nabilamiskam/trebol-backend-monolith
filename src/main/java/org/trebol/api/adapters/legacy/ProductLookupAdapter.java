@@ -9,7 +9,7 @@ import org.trebol.product.application.service.ProductApplicationService;
 import org.trebol.api.models.ProductPojo;
 import org.trebol.jpa.entities.Product;
 
-import java.util.Map;
+import  java.util.Map;
 import java.util.Optional;
 
 @Service
