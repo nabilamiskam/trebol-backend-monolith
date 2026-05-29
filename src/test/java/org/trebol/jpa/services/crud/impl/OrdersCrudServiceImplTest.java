@@ -94,6 +94,26 @@ void finds_by_example_using_buy_order() {
     }
 
     @Test
+    void reads_using_predicate_without_null_address_npe() throws EntityNotFoundException {
+        OrderPojo expectedResult = OrderPojo.builder()
+            .buyOrder(1L)
+            .details(List.of())
+            .build();
+        Order orderWithoutAddresses = ordersHelper.orderEntityAfterCreation();
+        orderWithoutAddresses.setBillingAddress(null);
+        orderWithoutAddresses.setShippingAddress(null);
+
+        when(ordersRepositoryMock.findOne(any(Predicate.class))).thenReturn(Optional.of(orderWithoutAddresses));
+        when(ordersConverterMock.convertToPojo(any(Order.class))).thenReturn(expectedResult);
+
+        OrderPojo result = instance.readOne(new BooleanBuilder());
+
+        assertNotNull(result);
+        assertEquals(expectedResult, result);
+        verify(addressesConverterServiceMock, never()).convertToPojo(any());
+    }
+
+    @Test
     void throws_exception_when_not_found_using_predicates() {
         BooleanBuilder anyPredicate = new BooleanBuilder();
         when(ordersRepositoryMock.findOne(any(Predicate.class))).thenReturn(Optional.empty());
