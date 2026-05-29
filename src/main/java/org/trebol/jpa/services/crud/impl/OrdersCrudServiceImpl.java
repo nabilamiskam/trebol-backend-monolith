@@ -91,8 +91,10 @@ public class OrdersCrudServiceImpl
             Order found = matchingSell.get();
             OrderPojo target = ordersConverterService.convertToPojo(found);
 
-            AddressPojo billingAddress = addressesConverterService.convertToPojo(found.getBillingAddress());
-            target.setBillingAddress(billingAddress);
+            if (found.getBillingAddress()!=null) {
+                AddressPojo billingAddress = addressesConverterService.convertToPojo(found.getBillingAddress());
+                target.setBillingAddress(billingAddress);
+            }
 
             if (found.getShippingAddress()!=null) {
                 AddressPojo shippingAddress = addressesConverterService.convertToPojo(found.getShippingAddress());
