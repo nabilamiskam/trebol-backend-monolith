@@ -22,10 +22,10 @@ class DataOrdersControllerIT {
     @Autowired
     private MockMvc mockMvc;
 
-    @Test
-    @WithMockUser(authorities = {"orders:create", "orders:read", "orders:update"})
-    void startPayment_success_returnsToken() throws Exception {
-        long buyOrder = createOrderAndGetBuyOrder();
+@Test
+@WithMockUser(authorities = {"orders:create", "orders:read", "orders:update"})
+void startPayment_success_returnsToken() throws Exception {
+    long buyOrder = createOrderAndGetBuyOrder();
 
         mockMvc.perform(post("/data/orders/payment/start")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -38,19 +38,19 @@ class DataOrdersControllerIT {
             .andExpect(jsonPath("$.token", not(isEmptyOrNullString())));
     }
 
-    @Test
-    @WithMockUser(authorities = {"orders:create", "orders:read", "orders:update"})
-    void confirm_success_afterPaidUnconfirmed_returns204() throws Exception {
-        long buyOrder = createOrderAndGetBuyOrder();
+@Test
+@WithMockUser(authorities = {"orders:create", "orders:read", "orders:update"})
+void confirm_success_afterPaidUnconfirmed_returns204() throws Exception {
+    long buyOrder = createOrderAndGetBuyOrder();
 
         // start payment -> Payment Started
         mockMvc.perform(post("/data/orders/payment/start")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    { "buyOrder": %d }
-                    """.formatted(buyOrder)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.token", not(isEmptyOrNullString())));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                { "buyOrder": %d }
+                """.formatted(buyOrder)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.token", not(isEmptyOrNullString())));
 
         // mark as paid (bypass gateway) -> Paid, Unconfirmed
         mockMvc.perform(post("/data/orders/payment")
@@ -69,10 +69,10 @@ class DataOrdersControllerIT {
             .andExpect(status().isNoContent());
     }
 
-    @Test
-    @WithMockUser(authorities = {"orders:create", "orders:read", "orders:update"})
-    void confirm_invalidTransition_returns400() throws Exception {
-        long buyOrder = createOrderAndGetBuyOrder();
+@Test
+@WithMockUser(authorities = {"orders:create", "orders:read", "orders:update"})
+void confirm_invalidTransition_returns400() throws Exception {
+    long buyOrder = createOrderAndGetBuyOrder();
 
         // invalid because order is NOT Paid, Unconfirmed yet
         mockMvc.perform(post("/data/orders/confirmation")
@@ -89,8 +89,55 @@ void startPayment_nonExistingOrder_returns404() throws Exception {
     mockMvc.perform(post("/data/orders/payment/start")
             .contentType(MediaType.APPLICATION_JSON)
             .content("{ \"buyOrder\": 999999999 }"))
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.code", is("NOTFOUND_01")));
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.code", is("NOTFOUND_01")));
+}
+
+@Test
+@WithMockUser(authorities = {"orders:create", "orders:read", "orders:update"})
+void reject_success_afterPaidUnconfirmed_returns204() throws Exception {
+    long buyOrder = createOrderAndGetBuyOrder();
+
+    mockMvc.perform(post("/data/orders/payment/start")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{ \"buyOrder\": %d }".formatted(buyOrder)))
+        .andExpect(status().isOk());
+
+    mockMvc.perform(post("/data/orders/payment")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{ \"buyOrder\": %d }".formatted(buyOrder)))
+        .andExpect(status().isNoContent());
+
+    mockMvc.perform(post("/data/orders/rejection")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{ \"buyOrder\": %d }".formatted(buyOrder)))
+        .andExpect(status().isNoContent());
+}
+
+@Test
+@WithMockUser(authorities = {"orders:create", "orders:read", "orders:update"})
+void completion_success_afterConfirmed_returns204() throws Exception {
+    long buyOrder = createOrderAndGetBuyOrder();
+
+    mockMvc.perform(post("/data/orders/payment/start")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{ \"buyOrder\": %d }".formatted(buyOrder)))
+        .andExpect(status().isOk());
+
+    mockMvc.perform(post("/data/orders/payment")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{ \"buyOrder\": %d }".formatted(buyOrder)))
+        .andExpect(status().isNoContent());
+
+    mockMvc.perform(post("/data/orders/confirmation")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{ \"buyOrder\": %d }".formatted(buyOrder)))
+        .andExpect(status().isNoContent());
+
+    mockMvc.perform(post("/data/orders/completion")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{ \"buyOrder\": %d }".formatted(buyOrder)))
+        .andExpect(status().isNoContent());
 }
 
     // ----- helpers -----

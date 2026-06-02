@@ -168,6 +168,7 @@ public class DataOrdersController
 
     @PostMapping("/rejection")
     @Operation(summary = "Reject a pending order.")
+    @ResponseStatus(NO_CONTENT)
     @PreAuthorize("hasAuthority('orders:update')")
     public void rejectSell(@RequestBody OrderPojo sell)
         throws BadInputException, MailingServiceException {
@@ -179,6 +180,7 @@ public class DataOrdersController
 
     @PostMapping("/completion")
     @Operation(summary = "Mark an order as completed.")
+    @ResponseStatus(NO_CONTENT)
     @PreAuthorize("hasAuthority('orders:update')")
     public void completeSell(@RequestBody OrderPojo sell)
         throws BadInputException, MailingServiceException {
