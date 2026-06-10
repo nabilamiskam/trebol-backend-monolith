@@ -1,0 +1,43 @@
+flowchart TB
+    subgraph Inbound[Inbound Adapter Layer]
+        Controller[ProductController\nHTTP + security + status codes]
+        WebMapper[ProductWebMapper\nDTO ↔ Command/Result]
+    end
+
+    subgraph Application[Application Layer]
+        AppService[ProductApplicationService\nUse-case orchestration]
+        PrimaryPorts[Primary Ports\nCreate / Update / Delete / Get / List]
+        ACLPort[ProductLookupService\nRead-only ACL port]
+    end
+
+    subgraph Domain[Domain Layer]
+        Entities[Product model + invariants]
+        SecondaryPorts[Secondary Ports\nProductRepository contract]
+    end
+
+    subgraph Outbound[Outbound Adapters]
+        LookupAdapter[ProductLookupAdapter\nLegacy reads -> new product module]
+        LegacyCrud[ProductsCrudServiceImpl\nLegacy writes remain here]
+        RepoAdapter[Persistence adapter\nJPA / Spring Data]
+    end
+
+    Controller --> WebMapper
+    WebMapper --> AppService
+    AppService --> PrimaryPorts
+    AppService --> ACLPort
+    ACLPort --> LookupAdapter
+    PrimaryPorts --> LegacyCrud
+    SecondaryPorts --> RepoAdapter
+    LookupAdapter --> AppService
+    LegacyCrud --> SecondaryPorts
+    RepoAdapter --> Entities
+
+    classDef inbound fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    classDef app fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef domain fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef adapter fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+
+    class Controller,WebMapper inbound
+    class AppService,PrimaryPorts,ACLPort app
+    class Entities,SecondaryPorts domain
+    class LookupAdapter,LegacyCrud,RepoAdapter adapter

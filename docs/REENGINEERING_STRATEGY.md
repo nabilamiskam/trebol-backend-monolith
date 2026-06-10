@@ -58,18 +58,20 @@ src/main/java/org/trebol/
 │   │   │   ├── PagedProductResult.java
 │   │   │   └── ...
 │   │   │
-│   │   ├── use_case/                 ◄── Use Case Implementations
+│   │   │   ├── use_case/                 ◄── Use Case Interfaces
 │   │   │   ├── ListProductsUseCase.java (interface)
-│   │   │   ├── ListProductsUseCaseImpl.java (implementation)
-│   │   │   ├── GetProductUseCase.java
-│   │   │   ├── GetProductUseCaseImpl.java
-│   │   │   ├── CreateProductUseCase.java
-│   │   │   ├── CreateProductUseCaseImpl.java
-│   │   │   ├── UpdateProductUseCase.java
-│   │   │   ├── UpdateProductUseCaseImpl.java
-│   │   │   ├── DeleteProductUseCase.java
-│   │   │   ├── DeleteProductUseCaseImpl.java
+│   │   │   ├── GetProductUseCase.java (interface)
+│   │   │   ├── CreateProductUseCase.java (interface)
+│   │   │   ├── UpdateProductUseCase.java (interface)
+│   │   │   ├── DeleteProductUseCase.java (interface)
+│   │   │   ├── PatchProductsUseCase.java (interface)
 │   │   │   └── ...
+│   │   │   
+│   │   │   NOTE: Implementations are currently consolidated in
+│   │   │   `product.application.service.ProductApplicationService` (single application
+│   │   │   service implementing multiple use-case interfaces). This reduces class
+│   │   │   count and simplifies DI; if desired, each interface can be split into
+│   │   │   dedicated `*UseCaseImpl` classes later.
 │   │   │
 │   │   ├── service/                  ◄── Application Services (Orchestration)
 │   │   │   ├── ProductApplicationService.java
@@ -160,7 +162,7 @@ src/main/java/org/trebol/
 | **Interface to Rules** | `product/domain/port` | Repository interface (contract only) | `ProductRepository` (interface) | NONE | Domain only |
 | **Application Rules** | `product/application/query` | Input models (what to fetch) | `ListProductsQuery`, `GetProductQuery` | NONE | Domain only |
 | **Application Rules** | `product/application/result` | Output models (what to return) | `ProductResult`, `PagedProductResult` | NONE | Domain only |
-| **Application Rules** | `product/application/use_case` | Orchestration of business flow | `ListProductsUseCaseImpl` | Spring DI | Domain + port |
+| **Application Rules** | `product/application/use_case` | Orchestration of business flow | Use-case interfaces (e.g. `ListProductsUseCase`, `GetProductUseCase`) — implementations consolidated in `product.application.service.ProductApplicationService` | Spring DI | Domain + port |
 | **Application Rules** | `product/application/service` | Use case aggregation | `ProductApplicationService` | Spring | Use cases + mappers |
 | **Interface Adapters** | `product/adapter/inbound/web` | HTTP handling | `ProductController` | Spring MVC | Use cases |
 | **Interface Adapters** | `product/adapter/inbound/web` | Request/Response mapping | `ProductWebMapper` | Spring/Jackson | DTOs |
@@ -1516,3 +1518,37 @@ Prevention:
 ✓ **Backward compat tests** ensure old code still works
 
 This multi-layer approach ensures quality throughout the refactoring process.
+
+---
+
+## STATUS UPDATE (2026-05-30)
+
+Summary of progress and current repo alignment with this reengineering strategy.
+
+- Implemented (core):
+  - `ProductLookupService` and `ProductLookupAdapter` added and wired.
+  - `ProductsCrudServiceImpl` updated to prefer ACL reads and fall back to legacy JPA for reads; create/update/delete remain on legacy write path.
+  - Unit and integration tests added for adapter, ACL behavior, controller web-slice, and transactional rollback: `ProductLookupAdapterTest`, `ProductsCrudServiceImplAclTest`, `DataProductsControllerAclTest`, `ProductCreateImageRollbackTest`.
+  - Documentation updated: `ARCHITECTURE_ANALYSIS.md`, `docs/figure-2.4.mmd`, `docs/CLEAN_ARCHITECTURE_TESTING_REPORT.md`.
+  - Local full test-suite verification performed (green after iterative fixes).
+
+- Pending / Deferred (recommended before final sign-off):
+  - Controller security-negative tests and DTO validation matrix for `ProductRequest` (high priority).
+  - Concurrency and reconciliation tests (read-after-write, duplicate-create races).
+  - Exception→HTTP mapping and pagination/bulk edge-case tests.
+  - Repository-adapter complex-field roundtrip tests (images, binary blobs, nested collections).
+  - Export diagram assets (`docs/figure-2.4.mmd` → SVG/PNG) — local export blocked by missing `npx` in environment; recommend adding image assets to docs/ in PR.
+  - Add a feature toggle (config flag) to switch ACL on/off for safe staged rollout and to exercise the toggle in tests.
+  - CI updates: ensure focused integration tests (TestContainers) and contract tests run on PR; full suite runs on merge/nightly.
+
+- Doc / process adjustments required in this file:
+  - The document currently lists removal/deletion steps (e.g., deleting `ProductsCrudServiceImpl`) as future cleanup. That removal should be explicitly marked "deferred" until the ACL has been fully validated in staging and a toggle-based rollback path exists.
+  - Add a short PR reviewer checklist and rollout/monitoring guidance (error rates, fallback rate, latency regression) in the rollout section.
+
+- Recommended immediate next actions:
+  1. Add controller security-negative and DTO validation tests (short, high value).
+  2. Add a simple boolean feature toggle (property + conditional bean) and tests that exercise both paths.
+  3. Export and commit `figure-2.4.svg`/`png` from a machine with Node installed, or include a rendered SVG in the PR via mermaid.live image export.
+  4. Update CI to run the new integration group and report results in PR comments.
+
+This status update is intended to be concise and actionable; adjust wording or placement if you prefer the update near the top of the document or merged into the executive summary.

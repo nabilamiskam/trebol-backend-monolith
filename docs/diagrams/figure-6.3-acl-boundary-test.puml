@@ -1,0 +1,23 @@
+@startuml
+title ACL Boundary Test - Legacy Read Bridge
+
+actor "Legacy Monolith Consumer" as Consumer
+participant "ProductLookupService" as LookupService
+participant "ProductLookupAdapter" as LookupAdapter
+participant "ProductApplicationService" as ApplicationService
+
+Consumer -> LookupService : requestBarcodeLookup(barcode)
+LookupService -> LookupAdapter : findPojoByBarcode(barcode)
+LookupAdapter -> ApplicationService : execute(ListProductsQuery)
+ApplicationService --> LookupAdapter : PagedProductResult
+LookupAdapter -> LookupAdapter : map first item to ProductPojo
+LookupAdapter --> LookupService : Optional<ProductPojo>
+LookupService --> Consumer : ProductPojo
+
+note right of LookupAdapter
+The adapter translates the new Product
+module's result objects into legacy
+read models for backward compatibility.
+end note
+
+@enduml

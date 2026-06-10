@@ -1,0 +1,54 @@
+flowchart LR
+  %% Product Domain Layer Map
+  subgraph Domain [Domain (core)]
+    direction TB
+    DA[ProductAggregate\norg.trebol.product.domain.aggregate]
+    VOs[Value Objects (ProductId, ProductCode,\nProductName, ProductPrice)\norg.trebol.product.domain.vo]
+    PORTS[Repository Port: ProductRepository\norg.trebol.product.domain.port]
+  end
+
+  subgraph Application [Application (use-cases)]
+    direction TB
+    APP[ProductApplicationService\norg.trebol.product.application.service]
+    CMDS[Commands / Queries / Results\norg.trebol.product.application.command\norg.trebol.product.application.query\norg.trebol.product.application.result]
+  end
+
+  subgraph Inbound [Inbound Adapters (delivery)]
+    direction TB
+    CONT[ProductController\norg.trebol.product.adapter.inbound.web]
+    WEBMAP[ProductWebMapper\norg.trebol.product.adapter.inbound.web]
+  end
+
+  subgraph Outbound [Outbound Adapters (infrastructure)]
+    direction TB
+    REPOAD[ProductRepositoryAdapter\norg.trebol.product.adapter.outbound.persistence]
+    PERSIST[ProductJpaRepository / Entities\nsrc/main/java/org/trebol/jpa/...]
+  end
+
+  subgraph Legacy [Legacy / ACL bridge]
+    direction TB
+    ACLPORT[ProductLookupService (legacy port)\norg.trebol.api.adapters.legacy]
+    ACLAD[ProductLookupAdapter -> ProductApplicationService\norg.trebol.api.adapters.legacy]
+  end
+
+  %% Dependency directions (point to core)
+  CONT --> APP
+  WEBMAP --> APP
+  APP --> DA
+  APP --> VOs
+  APP --> PORTS
+  REPOAD --> PORTS
+  REPOAD --> PERSIST
+  ACLAD --> APP
+  ACLPORT --> ACLAD
+
+  %% Notes
+  classDef core fill:#f9f,stroke:#333,stroke-width:1px;
+  class DA,VOs,PORTS core;
+
+  %% Guidance
+  note right of Domain
+    - Domain must not import Spring/JPA
+    - Ports defined here; adapters implement them
+    - Keep framework at the edges
+  end

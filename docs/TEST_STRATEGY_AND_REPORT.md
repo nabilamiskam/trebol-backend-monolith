@@ -398,12 +398,76 @@ when(productApplicationService.execute(any(GetProductQuery.class))).thenReturn(r
 - ✅ Service dependency is replaceable
 
 #### Layer 3: Boundary Mappers
+
+---
+
+**ACL Migration Checklist**
+ - **Goal**: Make `org.trebol.product` authoritative for reads while keeping legacy writes safe.
+ - **Priority actions:**
+ - **Files to migrate (in order):**
+   - `OrdersConverterServiceImpl` : migrate consumers that still expect `org.trebol.jpa.entities.Product` to use the new product POJO instead of JPA entity.
+   - `DataProductListContentsController` : switch list responses to use product module DTOs (stop relying on legacy Product entity).
+   - `ReceiptServiceImpl` : convert receipt building to accept product DTOs from the ACL rather than JPA entities.
+   - `ProductsCrudServiceImpl` : after other consumers are migrated, remove fallback path and rely solely on `ProductLookupService` for reads.
+   - Any remaining code paths that call `ProductsRepository.findByBarcode(...)` or access `org.trebol.jpa.entities.Product` directly.
+
+ - **Verification steps:**
+   - Add adapter integration tests (Testcontainers) for `ProductRepositoryAdapter` to validate persistence mapping end-to-end.
+   - Add use-case tests with mocked ports to assert reads come from the product module.
+   - Run full `mvn clean test` and confirm no regressions.
+   - Monitor fallback metrics until they reach 0 before disabling fallback in staging.
+
+**Minimal ACL Flow Diagram (Mermaid)**
+
+```mermaid
+flowchart LR
+  A[ProductsCrudServiceImpl (legacy)] -->|read| B[ProductLookupService (ACL)]
+  B --> C[ProductLookupAdapter]
+  C --> D[ProductApplicationService]
+  D --> E[ProductRepositoryAdapter]
+  E --> F[(DB)]
+  B -->|maps to legacy DTO| A
+  A -->|fallback read| G[ProductsRepository (legacy)]
+  G --> F
+```
+
+---
+
+**Next step:** Mark migration checklist items done as you migrate each consumer and then open a PR that disables the fallback in staging for verification.
 ```java
 when(productWebMapper.toResponse(result)).thenReturn(response);
 ```
 - ✅ Mapper is isolated and testable
 - ✅ Conversion logic doesn't leak into controller
 - ✅ Can be tested independently
+
+---
+
+**ACL Bridge Status Report**
+
+- **Summary:** The Anti‑Corruption Layer (ACL) is in place for reads: legacy read calls in the monolith are routed to the new `org.trebol.product` module via a port (`ProductLookupService`) and adapter (`ProductLookupAdapter`). Writes still use the legacy `ProductsRepository`. This configuration is reversible (fallback remains) and covered by unit and controller tests.
+
+- **Current flow:** [src/main/java/org/trebol/jpa/services/crud/impl/ProductsCrudServiceImpl.java](src/main/java/org/trebol/jpa/services/crud/impl/ProductsCrudServiceImpl.java) → `ProductLookupService` ([src/main/java/org/trebol/api/adapters/legacy/ProductLookupService.java](src/main/java/org/trebol/api/adapters/legacy/ProductLookupService.java)) → `ProductLookupAdapter` ([src/main/java/org/trebol/api/adapters/legacy/ProductLookupAdapter.java](src/main/java/org/trebol/api/adapters/legacy/ProductLookupAdapter.java)) → `ProductApplicationService` → `ProductRepositoryAdapter` ([src/main/java/org/trebol/product/adapter/outbound/persistence/ProductRepositoryAdapter.java](src/main/java/org/trebol/product/adapter/outbound/persistence/ProductRepositoryAdapter.java)) → DB.
+
+- **Who still depends on legacy `Product` entity:** `OrdersConverterServiceImpl` (order details), `DataProductListContentsController`, `ReceiptServiceImpl`, and any code calling `ProductsRepository.findByBarcode(...)`. See references in codebase when searching for `org.trebol.jpa.entities.Product`.
+
+- **Tests & safety:** Controller and unit tests for the ACL paths are present and passing. Integration-level adapter tests are still pending — add Testcontainers tests for `ProductRepositoryAdapter` before cutting writes.
+
+- **Known risk areas:**
+  - **Price mapping:** canonical money representation is unresolved; current mappings were kept to preserve test expectations.
+  - **Write safety:** switching writes to the new module without replication/outbox will create data divergence with legacy consumers.
+
+- **Recommendations (short):**
+  1. Finalize price mapping and add adapter integration tests (Testcontainers).  
+  2. Migrate the first consumer (`OrdersConverterServiceImpl`) to accept product DTOs; verify end-to-end in staging.  
+  3. Implement a transactional outbox or reconciler before enabling product writes in the new module.  
+  4. Once fallback metrics are stable at 0, remove legacy read fallback and then remove bridge code guarded by CI + ArchUnit rules.
+
+- **Next actions for you (practical):**
+  - Add a focused integration test for `ProductRepositoryAdapter` (I can scaffold this).  
+  - Coordinate with Orders team to test Orders → Product read compatibility.  
+  - Add a short migration PR template that lists the consumer files to update and verification steps.
+
 
 ### Clean Architecture Stack Visualized
 
