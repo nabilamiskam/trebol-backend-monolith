@@ -76,7 +76,7 @@ import static org.trebol.config.Constants.JWT_PREFIX;
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest({JwtVerifiterFilterTest.SimpleController.class})
 @ContextConfiguration(classes = {
-    SecurityTestingConfig.class,
+    org.trebol.security.SecurityTestingConfig.class,
     JwtVerifiterFilterTest.MockSecurityConfig.class,
     JwtVerifiterFilterTest.SimpleController.class})
 class JwtVerifiterFilterTest {

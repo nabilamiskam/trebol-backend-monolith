@@ -68,7 +68,7 @@ import static org.trebol.config.Constants.AUTHORITY_CHECKOUT;
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest({JwtLoginAuthenticationFilterTest.NoOpController.class})
 @ContextConfiguration(classes = {
-    SecurityTestingConfig.class,
+    org.trebol.security.SecurityTestingConfig.class,
     JwtLoginAuthenticationFilterTest.MockSecurityConfig.class})
 class JwtLoginAuthenticationFilterTest {
     static final String LOGIN_URL = "/login";

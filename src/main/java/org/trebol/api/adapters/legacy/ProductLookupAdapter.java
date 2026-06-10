@@ -11,6 +11,8 @@ import org.trebol.jpa.entities.Product;
 
 import  java.util.Map;
 import java.util.Optional;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Service
 public class ProductLookupAdapter implements ProductLookupService {

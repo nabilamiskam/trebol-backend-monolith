@@ -7,6 +7,7 @@ import org.trebol.product.domain.vo.ProductName;
 import org.trebol.product.domain.vo.ProductPrice;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class ProductPersistenceMapper {
     public ProductJpaEntity toEntity(ProductAggregate aggregate) {
