@@ -57,7 +57,7 @@ class ProductApplicationServiceTest {
 
         ProductResult result = service.execute(new GetProductQuery(1L));
 
-        assertEquals(new ProductResult(1L, "LAP001", "Laptop", 999.99, true), result);
+        assertEquals(new ProductResult(1L, "LAP001", "Laptop", 999.99, true, 0, 0), result);
         verify(productRepository).findById(new ProductId(1L));
     }
 
@@ -84,15 +84,15 @@ class ProductApplicationServiceTest {
 
         assertEquals(2L, result.totalCount());
         assertEquals(2, result.items().size());
-        assertEquals(new ProductResult(1L, "LAP001", "Laptop", 999.99, true), result.items().get(0));
-        assertEquals(new ProductResult(2L, "LAP002", "Desktop", 1499.50, false), result.items().get(1));
+        assertEquals(new ProductResult(1L, "LAP001", "Laptop", 999.99, true, 0, 0), result.items().get(0));
+        assertEquals(new ProductResult(2L, "LAP002", "Desktop", 1499.50, false, 0, 0), result.items().get(1));
         verify(productRepository).findAll(0, 10, filters);
         verify(productRepository).countAll(filters);
     }
 
     @Test
     void shouldCreateProduct() {
-        CreateProductCommand command = new CreateProductCommand("LAP003", "Gaming Laptop", new BigDecimal("2499.99"), true);
+        CreateProductCommand command = new CreateProductCommand("LAP003", "Gaming Laptop", new BigDecimal("2499.99"), true, 0, 0);
         ProductAggregate saved = createProductAggregate(3L, "LAP003", "Gaming Laptop", "2499.99", ProductStatus.ACTIVE);
 
         when(productRepository.findByCode(new ProductCode("LAP003"))).thenReturn(Optional.empty());
@@ -100,14 +100,14 @@ class ProductApplicationServiceTest {
 
         ProductResult result = service.execute(command);
 
-        assertEquals(new ProductResult(3L, "LAP003", "Gaming Laptop", 2499.99, true), result);
+        assertEquals(new ProductResult(3L, "LAP003", "Gaming Laptop", 2499.99, true, 0, 0), result);
         verify(productRepository).findByCode(new ProductCode("LAP003"));
         verify(productRepository).save(any(ProductAggregate.class));
     }
 
     @Test
     void shouldThrowWhenCodeAlreadyExistsDuringCreate() {
-        CreateProductCommand command = new CreateProductCommand("LAP001", "Laptop", new BigDecimal("999.99"), true);
+        CreateProductCommand command = new CreateProductCommand("LAP001", "Laptop", new BigDecimal("999.99"), true, 0, 0);
         when(productRepository.findByCode(new ProductCode("LAP001"))).thenReturn(Optional.of(createProductAggregate(1L, "LAP001", "Laptop", "999.99", ProductStatus.ACTIVE)));
 
         assertThrows(ProductCodeAlreadyExistsException.class, () -> service.execute(command));
@@ -117,21 +117,21 @@ class ProductApplicationServiceTest {
 
     @Test
     void shouldUpdateProduct() {
-        UpdateProductCommand command = new UpdateProductCommand(1L, "Updated Laptop", new BigDecimal("1199.99"), false);
+        UpdateProductCommand command = new UpdateProductCommand(1L, "Updated Laptop", new BigDecimal("1199.99"), false, null, null);
         ProductAggregate existing = createProductAggregate(1L, "LAP001", "Laptop", "999.99", ProductStatus.ACTIVE);
         when(productRepository.findById(new ProductId(1L))).thenReturn(Optional.of(existing));
         when(productRepository.save(any(ProductAggregate.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         ProductResult result = service.execute(command);
 
-        assertEquals(new ProductResult(1L, "LAP001", "Updated Laptop", 1199.99, false), result);
+        assertEquals(new ProductResult(1L, "LAP001", "Updated Laptop", 1199.99, false, 0, 0), result);
         verify(productRepository).findById(new ProductId(1L));
         verify(productRepository).save(any(ProductAggregate.class));
     }
 
     @Test
     void shouldThrowWhenProductNotFoundDuringUpdate() {
-        UpdateProductCommand command = new UpdateProductCommand(404L, "Updated Laptop", new BigDecimal("1199.99"), true);
+        UpdateProductCommand command = new UpdateProductCommand(404L, "Updated Laptop", new BigDecimal("1199.99"), true, null, null);
         when(productRepository.findById(new ProductId(404L))).thenReturn(Optional.empty());
 
         assertThrows(ProductNotFoundException.class, () -> service.execute(command));
@@ -164,7 +164,9 @@ class ProductApplicationServiceTest {
             id == null ? null : new ProductId(id),
             new ProductCode(code),
             new ProductName(name),
-            new ProductPrice(new BigDecimal(price))
+            new ProductPrice(new BigDecimal(price)),
+            0,
+            0
         );
         aggregate.updateStatus(status);
         return aggregate;

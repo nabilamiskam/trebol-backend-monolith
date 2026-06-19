@@ -14,13 +14,20 @@ public class ProductAggregate {
     private ProductName name;
     private ProductPrice price;
     private ProductStatus status;
+    private int currentStock;
+    private int criticalStock;
 
-    public ProductAggregate(ProductId id, ProductCode code, ProductName name, ProductPrice price) {
+    public ProductAggregate(ProductId id, ProductCode code, ProductName name, ProductPrice price,
+                            int currentStock, int criticalStock) {
         this.id = id;
         this.code = Objects.requireNonNull(code);
         this.name = Objects.requireNonNull(name);
         this.price = Objects.requireNonNull(price);
         this.status = ProductStatus.ACTIVE;
+        if (currentStock < 0) throw new IllegalArgumentException("currentStock cannot be negative");
+        if (criticalStock < 0) throw new IllegalArgumentException("criticalStock cannot be negative");
+        this.currentStock = currentStock;
+        this.criticalStock = criticalStock;
     }
 
     public ProductId getId() {
@@ -43,6 +50,14 @@ public class ProductAggregate {
         return status;
     }
 
+    public int getCurrentStock() {
+        return currentStock;
+    }
+
+    public int getCriticalStock() {
+        return criticalStock;
+    }
+
     public void updateName(ProductName name) {
         this.name = Objects.requireNonNull(name);
     }
@@ -53,5 +68,15 @@ public class ProductAggregate {
 
     public void updateStatus(ProductStatus status) {
         this.status = Objects.requireNonNull(status);
+    }
+
+    public void updateCurrentStock(int currentStock) {
+        if (currentStock < 0) throw new IllegalArgumentException("currentStock cannot be negative");
+        this.currentStock = currentStock;
+    }
+
+    public void updateCriticalStock(int criticalStock) {
+        if (criticalStock < 0) throw new IllegalArgumentException("criticalStock cannot be negative");
+        this.criticalStock = criticalStock;
     }
 }

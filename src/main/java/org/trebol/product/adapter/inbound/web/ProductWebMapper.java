@@ -17,12 +17,14 @@ import java.util.List;
 public class ProductWebMapper {
     public CreateProductCommand toCreateCommand(ProductRequest request) {
         BigDecimal price = request.price != null ? BigDecimal.valueOf(request.price) : BigDecimal.ZERO;
-        return new CreateProductCommand(request.code, request.name, price, request.isActive != null && request.isActive);
+        int currentStock = request.currentStock != null ? request.currentStock : 0;
+        int criticalStock = request.criticalStock != null ? request.criticalStock : 0;
+        return new CreateProductCommand(request.code, request.name, price, request.isActive != null && request.isActive, currentStock, criticalStock);
     }
 
     public UpdateProductCommand toUpdateCommand(Long id, ProductRequest request) {
         BigDecimal price = request.price != null ? BigDecimal.valueOf(request.price) : null;
-        return new UpdateProductCommand(id, request.name, price, request.isActive != null && request.isActive);
+        return new UpdateProductCommand(id, request.name, price, request.isActive != null && request.isActive, request.currentStock, request.criticalStock);
     }
 
     public DeleteProductCommand toDeleteCommand(Long id) {
@@ -36,6 +38,8 @@ public class ProductWebMapper {
         response.name = result.name();
         response.price = result.price();
         response.isActive = result.isActive();
+        response.currentStock = result.currentStock();
+        response.criticalStock = result.criticalStock();
         return response;
     }
 

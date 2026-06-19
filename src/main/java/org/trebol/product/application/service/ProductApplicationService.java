@@ -64,7 +64,9 @@ public class ProductApplicationService implements
             null, // ID assigned by DB
             new ProductCode(command.code()),
             new ProductName(command.name()),
-            new ProductPrice(command.price())
+            new ProductPrice(command.price()),
+            command.currentStock(),
+            command.criticalStock()
         );
 
         // 3. Save via port
@@ -86,6 +88,12 @@ public class ProductApplicationService implements
         }
         if (command.price() != null) {
             product.updatePrice(new ProductPrice(command.price()));
+        }
+        if (command.currentStock() != null) {
+            product.updateCurrentStock(command.currentStock());
+        }
+        if (command.criticalStock() != null) {
+            product.updateCriticalStock(command.criticalStock());
         }
         product.updateStatus(ProductStatus.fromBoolean(command.isActive()));
 
@@ -157,6 +165,12 @@ public class ProductApplicationService implements
         if (changes.containsKey("isActive")) {
             product.updateStatus(ProductStatus.fromBoolean(requireBoolean(changes.get("isActive"), "isActive")));
         }
+        if (changes.containsKey("currentStock")) {
+            product.updateCurrentStock(requireInt(changes.get("currentStock"), "currentStock"));
+        }
+        if (changes.containsKey("criticalStock")) {
+            product.updateCriticalStock(requireInt(changes.get("criticalStock"), "criticalStock"));
+        }
     }
 
     private String requireString(Object value, String fieldName) {
@@ -202,5 +216,22 @@ public class ProductApplicationService implements
             }
         }
         throw new IllegalArgumentException("Field '" + fieldName + "' must be true or false");
+    }
+
+    private Integer requireInt(Object value, String fieldName) {
+        if (value == null) {
+            throw new IllegalArgumentException("Field '" + fieldName + "' cannot be null");
+        }
+        if (value instanceof Number number) {
+            return number.intValue();
+        }
+        if (value instanceof String stringValue) {
+            try {
+                return Integer.valueOf(stringValue);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Field '" + fieldName + "' must be an integer");
+            }
+        }
+        throw new IllegalArgumentException("Field '" + fieldName + "' must be an integer");
     }
 }

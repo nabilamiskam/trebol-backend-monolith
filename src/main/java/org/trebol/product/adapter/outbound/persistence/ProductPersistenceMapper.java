@@ -7,7 +7,7 @@ import org.trebol.product.domain.vo.ProductName;
 import org.trebol.product.domain.vo.ProductPrice;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+
 
 public class ProductPersistenceMapper {
     public ProductJpaEntity toEntity(ProductAggregate aggregate) {
@@ -19,8 +19,8 @@ public class ProductPersistenceMapper {
         entity.setName(aggregate.getName().value());
         entity.setPrice(aggregate.getPrice().value().intValue());
         entity.setDescription("");
-        entity.setCurrentStock(0);
-        entity.setCriticalStock(0);
+        entity.setCurrentStock(aggregate.getCurrentStock());
+        entity.setCriticalStock(aggregate.getCriticalStock());
         return entity;
     }
 
@@ -29,7 +29,9 @@ public class ProductPersistenceMapper {
             new ProductId(entity.getId()),
             new ProductCode(entity.getCode()),
             new ProductName(entity.getName()),
-            new ProductPrice(BigDecimal.valueOf(entity.getPrice()))
+            new ProductPrice(BigDecimal.valueOf(entity.getPrice())),
+            entity.getCurrentStock() == null ? 0 : entity.getCurrentStock(),
+            entity.getCriticalStock() == null ? 0 : entity.getCriticalStock()
         );
         return aggregate;
     }

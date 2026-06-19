@@ -5,6 +5,10 @@ public record ProductResult(
     String code,
     String name,
     Double price,
-    Boolean isActive
+    Boolean isActive,
+    Integer currentStock,
+    Integer criticalStock
 ) {
 }
+
+

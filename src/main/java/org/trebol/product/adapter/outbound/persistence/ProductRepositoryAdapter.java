@@ -11,7 +11,6 @@ import org.trebol.product.domain.vo.ProductId;
 
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

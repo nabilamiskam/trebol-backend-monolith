@@ -5,4 +5,6 @@ public class ProductRequest {
     public String name;
     public Double price;
     public Boolean isActive;
+    public Integer currentStock;
+    public Integer criticalStock;
 }

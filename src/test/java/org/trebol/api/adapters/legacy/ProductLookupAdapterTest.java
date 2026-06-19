@@ -40,7 +40,7 @@ class ProductLookupAdapterTest {
 
     @Test
     void mapsPojoFieldsFromProductResult() {
-        ProductResult r = new ProductResult(1L, "CODE-1", "Product One", 123.45, true);
+        ProductResult r = new ProductResult(1L, "CODE-1", "Product One", 123.45, true, 0, 0);
         when(productApplicationService.execute(any(GetProductQuery.class))).thenReturn(r);
 
         Optional<ProductPojo> found = adapter.findPojoById(1L);
@@ -54,7 +54,7 @@ class ProductLookupAdapterTest {
 
     @Test
     void findPojoByBarcodeReturnsFirstPagedItem() {
-        ProductResult first = new ProductResult(1L, "C1", "First", 10.0, true);
+        ProductResult first = new ProductResult(1L, "C1", "First", 10.0, true, 0, 0);
         PagedProductResult pr = new PagedProductResult(List.of(first), 1L);
         when(productApplicationService.execute(any(ListProductsQuery.class))).thenReturn(pr);
 
@@ -66,7 +66,7 @@ class ProductLookupAdapterTest {
 
     @Test
     void findAsJpaByIdReturnsTransientEntity() {
-        ProductResult r = new ProductResult(5L, "C5", "Five", 50.0, true);
+        ProductResult r = new ProductResult(5L, "C5", "Five", 50.0, true, 0, 0);
         when(productApplicationService.execute(any(GetProductQuery.class))).thenReturn(r);
 
         Optional<Product> entity = adapter.findAsJpaById(5L);

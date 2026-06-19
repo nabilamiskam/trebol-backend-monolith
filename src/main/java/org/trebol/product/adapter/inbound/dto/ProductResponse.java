@@ -6,4 +6,6 @@ public class ProductResponse {
     public String name;
     public Double price;
     public Boolean isActive;
+    public Integer currentStock;
+    public Integer criticalStock;
 }

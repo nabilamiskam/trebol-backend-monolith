@@ -6,7 +6,9 @@ public record CreateProductCommand(
     String code,
     String name,
     BigDecimal price,
-    boolean isActive
+    boolean isActive,
+    int currentStock,
+    int criticalStock
 ) {
     public CreateProductCommand {
         if (code == null || code.isBlank()) {
@@ -17,6 +19,12 @@ public record CreateProductCommand(
         }
         if (price == null || price.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("Price must be non-negative");
+        }
+        if (currentStock < 0) {
+            throw new IllegalArgumentException("currentStock must be non-negative");
+        }
+        if (criticalStock < 0) {
+            throw new IllegalArgumentException("criticalStock must be non-negative");
         }
     }
 }

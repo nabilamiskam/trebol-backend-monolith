@@ -15,7 +15,9 @@ class ProductAggregateTest {
             new ProductId(1L),
             new ProductCode("LAP001"),
             new ProductName("Laptop"),
-            new ProductPrice(new BigDecimal("999.99"))
+            new ProductPrice(new BigDecimal("999.99")),
+            0,
+            0
         );
         
         assertEquals(1L, product.getId().value());
@@ -124,7 +126,9 @@ class ProductAggregateTest {
             new ProductId(1L),
             new ProductCode("LAP001"),
             new ProductName("Laptop"),
-            new ProductPrice(new BigDecimal("999.99"))
+            new ProductPrice(new BigDecimal("999.99")),
+            0,
+            0
         );
     }
 }

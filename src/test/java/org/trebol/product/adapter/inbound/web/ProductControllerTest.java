@@ -60,13 +60,15 @@ class ProductControllerTest {
     @Test
     @WithMockUser(username = "testuser", roles = "ADMIN")
     void shouldReturnProductWhenFound() throws Exception {
-        ProductResult result = new ProductResult(1L, "PROD-1", "Product 1", 99.99, true);
+        ProductResult result = new ProductResult(1L, "PROD-1", "Product 1", 99.99, true, 0, 0);
         ProductResponse response = new ProductResponse();
         response.id = 1L;
         response.code = "PROD-1";
         response.name = "Product 1";
         response.price = 99.99;
         response.isActive = true;
+        response.currentStock = 0;
+        response.criticalStock = 0;
 
         when(productApplicationService.execute(any(GetProductQuery.class))).thenReturn(result);
         when(productWebMapper.toResponse(result)).thenReturn(response);
@@ -92,8 +94,8 @@ class ProductControllerTest {
     @Test
     @WithMockUser(username = "testuser", roles = "ADMIN")
     void shouldReturnPagedProducts() throws Exception {
-        ProductResult first = new ProductResult(1L, "PROD-1", "Product 1", 99.99, true);
-        ProductResult second = new ProductResult(2L, "PROD-2", "Product 2", 49.99, false);
+        ProductResult first = new ProductResult(1L, "PROD-1", "Product 1", 99.99, true, 0, 0);
+        ProductResult second = new ProductResult(2L, "PROD-2", "Product 2", 49.99, false, 0, 0);
         PagedProductResult result = new PagedProductResult(List.of(first, second), 2L);
 
         ProductResponse firstResponse = new ProductResponse();
@@ -102,6 +104,8 @@ class ProductControllerTest {
         firstResponse.name = "Product 1";
         firstResponse.price = 99.99;
         firstResponse.isActive = true;
+        firstResponse.currentStock = 0;
+        firstResponse.criticalStock = 0;
 
         ProductResponse secondResponse = new ProductResponse();
         secondResponse.id = 2L;
@@ -109,6 +113,8 @@ class ProductControllerTest {
         secondResponse.name = "Product 2";
         secondResponse.price = 49.99;
         secondResponse.isActive = false;
+        secondResponse.currentStock = 0;
+        secondResponse.criticalStock = 0;
 
         PagedProductResponse pagedResponse = new PagedProductResponse();
         pagedResponse.items = List.of(firstResponse, secondResponse);
@@ -138,15 +144,19 @@ class ProductControllerTest {
             "NEW-PROD",
             "New Product",
             BigDecimal.valueOf(199.99),
-            true
+            true,
+            0,
+            0
         );
-        ProductResult result = new ProductResult(3L, "NEW-PROD", "New Product", 199.99, true);
+        ProductResult result = new ProductResult(3L, "NEW-PROD", "New Product", 199.99, true, 0, 0);
         ProductResponse response = new ProductResponse();
         response.id = 3L;
         response.code = "NEW-PROD";
         response.name = "New Product";
         response.price = 199.99;
         response.isActive = true;
+        response.currentStock = 0;
+        response.criticalStock = 0;
 
         when(productWebMapper.toCreateCommand(any(ProductRequest.class))).thenReturn(command);
         when(productApplicationService.execute(any(CreateProductCommand.class))).thenReturn(result);
@@ -196,7 +206,9 @@ class ProductControllerTest {
                 "EXISTING-CODE",
                 "New Product",
                 BigDecimal.valueOf(199.99),
-                true
+                true,
+                0,
+                0
             ));
         when(productApplicationService.execute(any(CreateProductCommand.class)))
             .thenThrow(new ProductCodeAlreadyExistsException("Product code already exists: EXISTING-CODE"));
@@ -220,15 +232,19 @@ class ProductControllerTest {
             1L,
             "Updated Product",
             BigDecimal.valueOf(249.99),
-            false
+            false,
+            null,
+            null
         );
-        ProductResult result = new ProductResult(1L, "PROD-1", "Updated Product", 249.99, false);
+        ProductResult result = new ProductResult(1L, "PROD-1", "Updated Product", 249.99, false, 0, 0);
         ProductResponse response = new ProductResponse();
         response.id = 1L;
         response.code = "PROD-1";
         response.name = "Updated Product";
         response.price = 249.99;
         response.isActive = false;
+        response.currentStock = 0;
+        response.criticalStock = 0;
 
         when(productWebMapper.toUpdateCommand(any(Long.class), any(ProductRequest.class))).thenReturn(command);
         when(productApplicationService.execute(any(UpdateProductCommand.class))).thenReturn(result);
@@ -257,7 +273,9 @@ class ProductControllerTest {
             999L,
             "Updated Product",
             BigDecimal.valueOf(249.99),
-            false
+            false,
+            null,
+            null
         ));
         doThrow(new ProductNotFoundException("Product not found with id: 999"))
             .when(productApplicationService).execute(any(UpdateProductCommand.class));
@@ -298,7 +316,7 @@ class ProductControllerTest {
             "isActive", true
         );
 
-        ProductResult patchedItem = new ProductResult(1L, "PROD-1", "Patched Product", 99.99, true);
+        ProductResult patchedItem = new ProductResult(1L, "PROD-1", "Patched Product", 99.99, true, 0, 0);
         BulkPatchProductResult result = new BulkPatchProductResult(List.of(patchedItem), 1L);
 
         ProductResponse patchedResponse = new ProductResponse();
@@ -307,6 +325,8 @@ class ProductControllerTest {
         patchedResponse.name = "Patched Product";
         patchedResponse.price = 99.99;
         patchedResponse.isActive = true;
+        patchedResponse.currentStock = 0;
+        patchedResponse.criticalStock = 0;
 
         BulkPatchProductResponse response = new BulkPatchProductResponse();
         response.items = List.of(patchedResponse);

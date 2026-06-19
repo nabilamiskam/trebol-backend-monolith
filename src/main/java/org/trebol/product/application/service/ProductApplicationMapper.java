@@ -11,6 +11,7 @@ public class ProductApplicationMapper {
             aggregate.getName().value(),
             aggregate.getPrice().value().doubleValue(),
             aggregate.getStatus().asBoolean()
+            , aggregate.getCurrentStock(), aggregate.getCriticalStock()
         );
     }
 }

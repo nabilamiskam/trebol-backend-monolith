@@ -46,6 +46,8 @@ public class ProductLookupAdapter implements ProductLookupService {
         p.setName(r.name());
         p.setBarcode(r.code());
         p.setPrice(r.price() == null ? 0 : r.price().intValue());
+        p.setCurrentStock(r.currentStock() == null ? 0 : r.currentStock());
+        p.setCriticalStock(r.criticalStock() == null ? 0 : r.criticalStock());
         return p;
     }
 
@@ -55,6 +57,8 @@ public class ProductLookupAdapter implements ProductLookupService {
             .name(r.name())
             .barcode(r.code())
             .price(r.price() == null ? 0 : r.price().intValue())
+            .stockCurrent(r.currentStock() == null ? 0 : r.currentStock())
+            .stockCritical(r.criticalStock() == null ? 0 : r.criticalStock())
             .build();
     }
 }

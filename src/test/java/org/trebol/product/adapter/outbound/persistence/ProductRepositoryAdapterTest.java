@@ -244,7 +244,9 @@ class ProductRepositoryAdapterTest {
             id == null ? null : new ProductId(id),
             new ProductCode(code),
             new ProductName(name),
-            new ProductPrice(new BigDecimal(price))
+            new ProductPrice(new BigDecimal(price)),
+            0,
+            0
         );
         aggregate.updateStatus(ProductStatus.ACTIVE);
         return aggregate;
