@@ -9,7 +9,8 @@ import org.trebol.product.application.query.GetProductQuery;
 import org.trebol.product.application.query.ListProductsQuery;
 import org.trebol.product.application.result.PagedProductResult;
 import org.trebol.product.application.result.ProductResult;
-import org.trebol.product.application.service.ProductApplicationService;
+import org.trebol.product.application.usecase.GetProductUseCase;
+import org.trebol.product.application.usecase.ListProductsUseCase;
 import org.trebol.api.models.ProductPojo;
 import org.trebol.jpa.entities.Product;
 
@@ -27,11 +28,14 @@ class ProductLookupAdapterTest {
     ProductLookupAdapter adapter;
 
     @Mock
-    ProductApplicationService productApplicationService;
+    GetProductUseCase getProductUseCase;
+
+    @Mock
+    ListProductsUseCase listProductsUseCase;
 
     @Test
     void returnsEmptyWhenServiceReturnsNull() {
-        when(productApplicationService.execute(any(GetProductQuery.class))).thenReturn(null);
+        when(getProductUseCase.execute(any(GetProductQuery.class))).thenReturn(null);
 
         Optional<ProductPojo> found = adapter.findPojoById(1L);
 
@@ -41,7 +45,7 @@ class ProductLookupAdapterTest {
     @Test
     void mapsPojoFieldsFromProductResult() {
         ProductResult r = new ProductResult(1L, "CODE-1", "Product One", 123.45, true, 0, 0);
-        when(productApplicationService.execute(any(GetProductQuery.class))).thenReturn(r);
+        when(getProductUseCase.execute(any(GetProductQuery.class))).thenReturn(r);
 
         Optional<ProductPojo> found = adapter.findPojoById(1L);
 
@@ -56,7 +60,7 @@ class ProductLookupAdapterTest {
     void findPojoByBarcodeReturnsFirstPagedItem() {
         ProductResult first = new ProductResult(1L, "C1", "First", 10.0, true, 0, 0);
         PagedProductResult pr = new PagedProductResult(List.of(first), 1L);
-        when(productApplicationService.execute(any(ListProductsQuery.class))).thenReturn(pr);
+        when(listProductsUseCase.execute(any(ListProductsQuery.class))).thenReturn(pr);
 
         Optional<ProductPojo> found = adapter.findPojoByBarcode("C1");
 
@@ -65,9 +69,19 @@ class ProductLookupAdapterTest {
     }
 
     @Test
+    void findPojoByBarcodeReturnsEmptyWhenNoProductsFound() {
+        PagedProductResult pr = new PagedProductResult(List.of(), 0L);
+        when(listProductsUseCase.execute(any(ListProductsQuery.class))).thenReturn(pr);
+
+        Optional<ProductPojo> found = adapter.findPojoByBarcode("UNKNOWN");
+
+        assertTrue(found.isEmpty());
+    }
+
+    @Test
     void findAsJpaByIdReturnsTransientEntity() {
         ProductResult r = new ProductResult(5L, "C5", "Five", 50.0, true, 0, 0);
-        when(productApplicationService.execute(any(GetProductQuery.class))).thenReturn(r);
+        when(getProductUseCase.execute(any(GetProductQuery.class))).thenReturn(r);
 
         Optional<Product> entity = adapter.findAsJpaById(5L);
 

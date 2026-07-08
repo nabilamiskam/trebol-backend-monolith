@@ -5,7 +5,8 @@ import org.trebol.product.application.query.GetProductQuery;
 import org.trebol.product.application.query.ListProductsQuery;
 import org.trebol.product.application.result.ProductResult;
 import org.trebol.product.application.result.PagedProductResult;
-import org.trebol.product.application.service.ProductApplicationService;
+import org.trebol.product.application.usecase.GetProductUseCase;
+import org.trebol.product.application.usecase.ListProductsUseCase;
 import org.trebol.api.models.ProductPojo;
 import org.trebol.jpa.entities.Product;
 
@@ -17,27 +18,34 @@ import java.math.RoundingMode;
 @Service
 public class ProductLookupAdapter implements ProductLookupService {
 
-    private final ProductApplicationService productApplicationService;
+    private final GetProductUseCase getProductUseCase;
+    private final ListProductsUseCase listProductsUseCase;
 
-    public ProductLookupAdapter(ProductApplicationService productApplicationService) {
-        this.productApplicationService = productApplicationService;
+    public ProductLookupAdapter(
+        GetProductUseCase getProductUseCase,
+        ListProductsUseCase listProductsUseCase
+    ) {
+        this.getProductUseCase = getProductUseCase;
+        this.listProductsUseCase = listProductsUseCase;
     }
 
     @Override
     public Optional<ProductPojo> findPojoById(Long id) {
-        ProductResult r = productApplicationService.execute(new GetProductQuery(id));
+        ProductResult r = getProductUseCase.execute(new GetProductQuery(id));
         return r == null ? Optional.empty() : Optional.of(toPojo(r));
     }
 
     @Override
     public Optional<ProductPojo> findPojoByBarcode(String barcode) {
-        PagedProductResult pr = productApplicationService.execute(new ListProductsQuery(0, 1, Map.of("barcode", barcode)));
+        PagedProductResult pr = listProductsUseCase.execute(
+            new ListProductsQuery(0, 1, Map.of("barcode", barcode))
+        );
         return pr.items().stream().findFirst().map(this::toPojo);
     }
 
     @Override
     public Optional<Product> findAsJpaById(Long id) {
-        ProductResult r = productApplicationService.execute(new GetProductQuery(id));
+        ProductResult r = getProductUseCase.execute(new GetProductQuery(id));
         return r == null ? Optional.empty() : Optional.of(toTransientJpa(r));
     }
 

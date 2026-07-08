@@ -121,16 +121,20 @@ public class ProductsCrudServiceImpl
         if (entity.isEmpty()) {
             throw new EntityNotFoundException(ITEM_NOT_FOUND);
         }
+        
         Product found = entity.get();
-        // Prefer ACL-backed data from new Product module; fall back to legacy conversion when missing
+        
+        // TRY ACL FIRST (new Product module)
         return productLookupService.findPojoById(found.getId())
-            .orElseGet(() -> {
+            .or(() -> {
+                // FALL BACK TO LEGACY (only if new module has no data)
                 ProductPojo target = productsConverterService.convertToPojo(found);
                 List<ProductImage> productImages = productImagesRepository.deepFindProductImagesByProductId(found.getId());
                 Collection<ImagePojo> imagePojos = productsConverterService.convertImagesToPojo(productImages);
                 target.setImages(imagePojos);
-                return target;
-            });
+                return Optional.of(target);
+            })
+            .orElseThrow(() -> new EntityNotFoundException(ITEM_NOT_FOUND));
     }
 
     @Override

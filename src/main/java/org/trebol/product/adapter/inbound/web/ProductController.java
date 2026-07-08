@@ -29,7 +29,12 @@ import org.trebol.product.application.query.ListProductsQuery;
 import org.trebol.product.application.result.BulkPatchProductResult;
 import org.trebol.product.application.result.PagedProductResult;
 import org.trebol.product.application.result.ProductResult;
-import org.trebol.product.application.service.ProductApplicationService;
+import org.trebol.product.application.usecase.CreateProductUseCase;
+import org.trebol.product.application.usecase.DeleteProductUseCase;
+import org.trebol.product.application.usecase.GetProductUseCase;
+import org.trebol.product.application.usecase.ListProductsUseCase;
+import org.trebol.product.application.usecase.PatchProductsUseCase;
+import org.trebol.product.application.usecase.UpdateProductUseCase;
 import org.trebol.product.domain.exception.ProductCodeAlreadyExistsException;
 import org.trebol.product.domain.exception.ProductNotFoundException;
 
@@ -40,17 +45,35 @@ import java.util.Map;
 @RequestMapping("/product-module")
 public class ProductController {
 
-	private final ProductApplicationService productApplicationService;
+	private final GetProductUseCase getProductUseCase;
+	private final ListProductsUseCase listProductsUseCase;
+	private final CreateProductUseCase createProductUseCase;
+	private final UpdateProductUseCase updateProductUseCase;
+	private final DeleteProductUseCase deleteProductUseCase;
+	private final PatchProductsUseCase patchProductsUseCase;
 	private final ProductWebMapper productWebMapper;
 
-	public ProductController(ProductApplicationService productApplicationService, ProductWebMapper productWebMapper) {
-		this.productApplicationService = productApplicationService;
+	public ProductController(
+		GetProductUseCase getProductUseCase,
+		ListProductsUseCase listProductsUseCase,
+		CreateProductUseCase createProductUseCase,
+		UpdateProductUseCase updateProductUseCase,
+		DeleteProductUseCase deleteProductUseCase,
+		PatchProductsUseCase patchProductsUseCase,
+		ProductWebMapper productWebMapper
+	) {
+		this.getProductUseCase = getProductUseCase;
+		this.listProductsUseCase = listProductsUseCase;
+		this.createProductUseCase = createProductUseCase;
+		this.updateProductUseCase = updateProductUseCase;
+		this.deleteProductUseCase = deleteProductUseCase;
+		this.patchProductsUseCase = patchProductsUseCase;
 		this.productWebMapper = productWebMapper;
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<ProductResponse> getProduct(@PathVariable Long id) {
-		ProductResult result = productApplicationService.execute(new GetProductQuery(id));
+		ProductResult result = getProductUseCase.execute(new GetProductQuery(id));
 		if (result == null) {
 			return ResponseEntity.notFound().build();
 		}
@@ -64,7 +87,7 @@ public class ProductController {
 		@RequestParam(defaultValue = "10") int pageSize,
 		@RequestParam Map<String, String> requestParams
 	) {
-		PagedProductResult result = productApplicationService.execute(
+		PagedProductResult result = listProductsUseCase.execute(
 			new ListProductsQuery(pageIndex, pageSize, requestParams)
 		);
 
@@ -75,7 +98,7 @@ public class ProductController {
 	@PreAuthorize("hasAuthority('products:create')")
 	public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest request) {
 		CreateProductCommand command = productWebMapper.toCreateCommand(request);
-		ProductResult result = productApplicationService.execute(command);
+		ProductResult result = createProductUseCase.execute(command);
 		ProductResponse response = productWebMapper.toResponse(result);
 
 		URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -93,7 +116,7 @@ public class ProductController {
 		@RequestBody Map<String, Object> changes
 	) {
 		BulkPatchProductCommand command = new BulkPatchProductCommand(requestParams, changes);
-		BulkPatchProductResult result = productApplicationService.execute(command);
+		BulkPatchProductResult result = patchProductsUseCase.execute(command);
 		return ResponseEntity.ok(productWebMapper.toBulkPatchResponse(result));
 	}
 
@@ -101,7 +124,7 @@ public class ProductController {
 	@PreAuthorize("hasAuthority('products:update')")
 	public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @RequestBody ProductRequest request) {
 		UpdateProductCommand command = productWebMapper.toUpdateCommand(id, request);
-		ProductResult result = productApplicationService.execute(command);
+		ProductResult result = updateProductUseCase.execute(command);
 		ProductResponse response = productWebMapper.toResponse(result);
 		return ResponseEntity.ok(response);
 	}
@@ -110,7 +133,7 @@ public class ProductController {
 	@PreAuthorize("hasAuthority('products:delete')")
 	public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
 		DeleteProductCommand command = productWebMapper.toDeleteCommand(id);
-		productApplicationService.execute(command);
+		deleteProductUseCase.execute(command);
 		return ResponseEntity.noContent().build();
 	}
 

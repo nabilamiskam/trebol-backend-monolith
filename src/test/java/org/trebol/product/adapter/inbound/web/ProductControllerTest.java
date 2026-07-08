@@ -24,7 +24,12 @@ import org.trebol.product.application.query.ListProductsQuery;
 import org.trebol.product.application.result.BulkPatchProductResult;
 import org.trebol.product.application.result.PagedProductResult;
 import org.trebol.product.application.result.ProductResult;
-import org.trebol.product.application.service.ProductApplicationService;
+import org.trebol.product.application.usecase.CreateProductUseCase;
+import org.trebol.product.application.usecase.DeleteProductUseCase;
+import org.trebol.product.application.usecase.GetProductUseCase;
+import org.trebol.product.application.usecase.ListProductsUseCase;
+import org.trebol.product.application.usecase.PatchProductsUseCase;
+import org.trebol.product.application.usecase.UpdateProductUseCase;
 import org.trebol.product.domain.exception.ProductCodeAlreadyExistsException;
 import org.trebol.product.domain.exception.ProductNotFoundException;
 
@@ -52,7 +57,22 @@ class ProductControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private ProductApplicationService productApplicationService;
+    private GetProductUseCase getProductUseCase;
+
+    @MockBean
+    private ListProductsUseCase listProductsUseCase;
+
+    @MockBean
+    private CreateProductUseCase createProductUseCase;
+
+    @MockBean
+    private UpdateProductUseCase updateProductUseCase;
+
+    @MockBean
+    private DeleteProductUseCase deleteProductUseCase;
+
+    @MockBean
+    private PatchProductsUseCase patchProductsUseCase;
 
     @MockBean
     private ProductWebMapper productWebMapper;
@@ -70,7 +90,7 @@ class ProductControllerTest {
         response.currentStock = 0;
         response.criticalStock = 0;
 
-        when(productApplicationService.execute(any(GetProductQuery.class))).thenReturn(result);
+        when(getProductUseCase.execute(any(GetProductQuery.class))).thenReturn(result);
         when(productWebMapper.toResponse(result)).thenReturn(response);
 
         mockMvc.perform(get("/product-module/1").contentType(MediaType.APPLICATION_JSON))
@@ -85,7 +105,7 @@ class ProductControllerTest {
     @Test
     @WithMockUser(username = "testuser", roles = "ADMIN")
     void shouldReturn404WhenProductNotFound() throws Exception {
-        when(productApplicationService.execute(any(GetProductQuery.class))).thenReturn(null);
+        when(getProductUseCase.execute(any(GetProductQuery.class))).thenReturn(null);
 
         mockMvc.perform(get("/product-module/999").contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound());
@@ -120,7 +140,7 @@ class ProductControllerTest {
         pagedResponse.items = List.of(firstResponse, secondResponse);
         pagedResponse.totalCount = 2L;
 
-        when(productApplicationService.execute(any(ListProductsQuery.class))).thenReturn(result);
+        when(listProductsUseCase.execute(any(ListProductsQuery.class))).thenReturn(result);
         when(productWebMapper.toPagedResponse(result)).thenReturn(pagedResponse);
 
         mockMvc.perform(get("/product-module?pageIndex=0&pageSize=10").contentType(MediaType.APPLICATION_JSON))
@@ -159,7 +179,7 @@ class ProductControllerTest {
         response.criticalStock = 0;
 
         when(productWebMapper.toCreateCommand(any(ProductRequest.class))).thenReturn(command);
-        when(productApplicationService.execute(any(CreateProductCommand.class))).thenReturn(result);
+        when(createProductUseCase.execute(any(CreateProductCommand.class))).thenReturn(result);
         when(productWebMapper.toResponse(result)).thenReturn(response);
 
         mockMvc.perform(post("/product-module")
@@ -210,7 +230,7 @@ class ProductControllerTest {
                 0,
                 0
             ));
-        when(productApplicationService.execute(any(CreateProductCommand.class)))
+        when(createProductUseCase.execute(any(CreateProductCommand.class)))
             .thenThrow(new ProductCodeAlreadyExistsException("Product code already exists: EXISTING-CODE"));
 
         mockMvc.perform(post("/product-module")
@@ -247,7 +267,7 @@ class ProductControllerTest {
         response.criticalStock = 0;
 
         when(productWebMapper.toUpdateCommand(any(Long.class), any(ProductRequest.class))).thenReturn(command);
-        when(productApplicationService.execute(any(UpdateProductCommand.class))).thenReturn(result);
+        when(updateProductUseCase.execute(any(UpdateProductCommand.class))).thenReturn(result);
         when(productWebMapper.toResponse(result)).thenReturn(response);
 
         mockMvc.perform(put("/product-module/1")
@@ -278,7 +298,7 @@ class ProductControllerTest {
             null
         ));
         doThrow(new ProductNotFoundException("Product not found with id: 999"))
-            .when(productApplicationService).execute(any(UpdateProductCommand.class));
+            .when(updateProductUseCase).execute(any(UpdateProductCommand.class));
 
         mockMvc.perform(put("/product-module/999")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -291,7 +311,7 @@ class ProductControllerTest {
     @WithMockUser
     void shouldDeleteProductSuccessfully() throws Exception {
         when(productWebMapper.toDeleteCommand(1L)).thenReturn(new DeleteProductCommand(1L));
-        doNothing().when(productApplicationService).execute(any(DeleteProductCommand.class));
+        doNothing().when(deleteProductUseCase).execute(any(DeleteProductCommand.class));
 
         mockMvc.perform(delete("/product-module/1").with(csrf()))
             .andExpect(status().isNoContent());
@@ -302,7 +322,7 @@ class ProductControllerTest {
     void shouldReturn404OnDeleteWhenProductNotFound() throws Exception {
         when(productWebMapper.toDeleteCommand(999L)).thenReturn(new DeleteProductCommand(999L));
         doThrow(new ProductNotFoundException("Product not found with id: 999"))
-            .when(productApplicationService).execute(any(DeleteProductCommand.class));
+            .when(deleteProductUseCase).execute(any(DeleteProductCommand.class));
 
         mockMvc.perform(delete("/product-module/999").with(csrf()))
             .andExpect(status().isNotFound());
@@ -332,7 +352,7 @@ class ProductControllerTest {
         response.items = List.of(patchedResponse);
         response.updatedCount = 1L;
 
-        when(productApplicationService.execute(any(BulkPatchProductCommand.class))).thenReturn(result);
+        when(patchProductsUseCase.execute(any(BulkPatchProductCommand.class))).thenReturn(result);
         when(productWebMapper.toBulkPatchResponse(result)).thenReturn(response);
 
         mockMvc.perform(patch("/product-module?code=PROD-1")
