@@ -18,7 +18,7 @@ public record BulkPatchProductCommand(
         "nameLike"
     );
 
-    private static final Set<String> PATCHABLE_FIELDS = Set.of("name", "price", "isActive");
+    private static final Set<String> PATCHABLE_FIELDS = Set.of("name", "price", "isActive", "currentStock", "criticalStock" );
 
     public BulkPatchProductCommand {
         requestParams = requestParams == null ? Map.of() : Map.copyOf(requestParams);
