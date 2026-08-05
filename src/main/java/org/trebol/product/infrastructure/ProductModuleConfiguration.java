@@ -6,6 +6,7 @@ import org.trebol.product.adapter.inbound.web.ProductWebMapper;
 import org.trebol.product.adapter.outbound.persistence.ProductJpaRepository;
 import org.trebol.product.adapter.outbound.persistence.ProductPersistenceMapper;
 import org.trebol.product.adapter.outbound.persistence.ProductRepositoryAdapter;
+import org.trebol.product.application.port.TransactionManagerPort;
 import org.trebol.product.application.service.ProductApplicationMapper;
 import org.trebol.product.application.service.ProductApplicationService;
 import org.trebol.product.domain.port.ProductRepository;
@@ -29,8 +30,12 @@ public class ProductModuleConfiguration {
     }
 
     @Bean
-    public ProductApplicationService productApplicationService(ProductRepository repository, ProductApplicationMapper mapper) {
-        return new ProductApplicationService(repository, mapper);
+    public ProductApplicationService productApplicationService(
+        ProductRepository repository,
+        ProductApplicationMapper mapper,
+        TransactionManagerPort transactionManagerPort
+    ) {
+        return new ProductApplicationService(repository, mapper, transactionManagerPort);
     }
 
     @Bean

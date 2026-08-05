@@ -5,9 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.ArgumentMatchers;
 import org.trebol.product.application.command.CreateProductCommand;
 import org.trebol.product.application.command.DeleteProductCommand;
 import org.trebol.product.application.command.UpdateProductCommand;
+import org.trebol.product.application.port.TransactionManagerPort;
 import org.trebol.product.application.query.GetProductQuery;
 import org.trebol.product.application.query.ListProductsQuery;
 import org.trebol.product.application.result.PagedProductResult;
@@ -26,10 +28,12 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,6 +44,9 @@ class ProductApplicationServiceTest {
     @Mock
     private ProductRepository productRepository;
 
+    @Mock
+    private TransactionManagerPort transactionManagerPort;
+
     private ProductApplicationMapper mapper;
 
     private ProductApplicationService service;
@@ -47,7 +54,11 @@ class ProductApplicationServiceTest {
     @BeforeEach
     void setUp() {
         mapper = new ProductApplicationMapper();
-        service = new ProductApplicationService(productRepository, mapper);
+        doAnswer(invocation -> {
+            Supplier<?> supplier = invocation.getArgument(0);
+            return supplier.get();
+        }).when(transactionManagerPort).runInTransaction(ArgumentMatchers.<Supplier<?>>any());
+        service = new ProductApplicationService(productRepository, mapper, transactionManagerPort);
     }
 
     @Test
@@ -103,6 +114,7 @@ class ProductApplicationServiceTest {
         assertEquals(new ProductResult(3L, "LAP003", "Gaming Laptop", 2499.99, true, 0, 0), result);
         verify(productRepository).findByCode(new ProductCode("LAP003"));
         verify(productRepository).save(any(ProductAggregate.class));
+        verify(transactionManagerPort).runInTransaction(ArgumentMatchers.<Supplier<?>>any());
     }
 
     @Test

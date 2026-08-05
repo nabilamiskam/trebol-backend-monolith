@@ -1,11 +1,10 @@
 package org.trebol.product.application.service;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.trebol.product.application.command.CreateProductCommand;
 import org.trebol.product.application.command.BulkPatchProductCommand;
 import org.trebol.product.application.command.DeleteProductCommand;
 import org.trebol.product.application.command.UpdateProductCommand;
+import org.trebol.product.application.port.TransactionManagerPort;
 import org.trebol.product.application.query.GetProductQuery;
 import org.trebol.product.application.query.ListProductsQuery;
 import org.trebol.product.application.result.BulkPatchProductResult;
@@ -33,7 +32,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Map;
 
-@Service
 public class ProductApplicationService implements
     CreateProductUseCase,
     UpdateProductUseCase,
@@ -44,115 +42,116 @@ public class ProductApplicationService implements
 
     private final ProductRepository productRepository;
     private final ProductApplicationMapper mapper;
+    private final TransactionManagerPort transactionManagerPort;
 
-    public ProductApplicationService(ProductRepository productRepository, ProductApplicationMapper mapper) {
+    public ProductApplicationService(ProductRepository productRepository, ProductApplicationMapper mapper, TransactionManagerPort transactionManagerPort) {
         this.productRepository = productRepository;
         this.mapper = mapper;
+        this.transactionManagerPort = transactionManagerPort;
     }
 
     @Override
     public ProductResult execute(CreateProductCommand command) {
-        // 1. Check if code already exists
-        Optional<ProductAggregate> existingByCode = 
-            productRepository.findByCode(new ProductCode(command.code()));
-        if (existingByCode.isPresent()) {
-            throw new ProductCodeAlreadyExistsException("Product code already exists: " + command.code());
-        }
+        return transactionManagerPort.runInTransaction(() -> {
+            Optional<ProductAggregate> existingByCode =
+                productRepository.findByCode(new ProductCode(command.code()));
+            if (existingByCode.isPresent()) {
+                throw new ProductCodeAlreadyExistsException("Product code already exists: " + command.code());
+            }
 
-        // 2. Create aggregate with value objects
-        ProductAggregate product = new ProductAggregate(
-            null, // ID assigned by DB
-            new ProductCode(command.code()),
-            new ProductName(command.name()),
-            new ProductPrice(command.price()),
-            command.currentStock(),
-            command.criticalStock()
-        );
+            ProductAggregate product = new ProductAggregate(
+                null,
+                new ProductCode(command.code()),
+                new ProductName(command.name()),
+                new ProductPrice(command.price()),
+                command.currentStock(),
+                command.criticalStock()
+            );
 
-        // 3. Save via port
-        ProductAggregate saved = productRepository.save(product);
-
-        // 4. Return result
-        return mapper.toResult(saved);
+            ProductAggregate saved = productRepository.save(product);
+            return mapper.toResult(saved);
+        });
     }
 
     @Override
     public ProductResult execute(UpdateProductCommand command) {
-        // 1. Load existing aggregate
-        ProductAggregate product = productRepository.findById(new ProductId(command.id()))
-            .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + command.id()));
+        return transactionManagerPort.runInTransaction(() -> {
+            ProductAggregate product = productRepository.findById(new ProductId(command.id()))
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + command.id()));
 
-        // 2. Apply mutations (if field provided)
-        if (command.name() != null) {
-            product.updateName(new ProductName(command.name()));
-        }
-        if (command.price() != null) {
-            product.updatePrice(new ProductPrice(command.price()));
-        }
-        if (command.currentStock() != null) {
-            product.updateCurrentStock(command.currentStock());
-        }
-        if (command.criticalStock() != null) {
-            product.updateCriticalStock(command.criticalStock());
-        }
-        product.updateStatus(ProductStatus.fromBoolean(command.isActive()));
+            if (command.name() != null) {
+                product.updateName(new ProductName(command.name()));
+            }
+            if (command.price() != null) {
+                product.updatePrice(new ProductPrice(command.price()));
+            }
+            if (command.currentStock() != null) {
+                product.updateCurrentStock(command.currentStock());
+            }
+            if (command.criticalStock() != null) {
+                product.updateCriticalStock(command.criticalStock());
+            }
+            product.updateStatus(ProductStatus.fromBoolean(command.isActive()));
 
-        // 3. Save via port
-        ProductAggregate updated = productRepository.save(product);
-
-        // 4. Return result
-        return mapper.toResult(updated);
+            ProductAggregate updated = productRepository.save(product);
+            return mapper.toResult(updated);
+        });
     }
 
-    @Transactional
     @Override
     public BulkPatchProductResult execute(BulkPatchProductCommand command) {
-        List<ProductAggregate> products = productRepository.findAll(command.requestParams());
-        if (products.isEmpty()) {
-            throw new ProductNotFoundException("No products found for the provided filters");
-        }
+        return transactionManagerPort.runInTransaction(() -> {
+            List<ProductAggregate> products = productRepository.findAll(command.requestParams());
+            if (products.isEmpty()) {
+                throw new ProductNotFoundException("No products found for the provided filters");
+            }
 
-        List<ProductResult> updatedResults = new ArrayList<>();
-        for (ProductAggregate product : products) {
-            applyPatch(product, command.changes());
-            ProductAggregate updated = productRepository.save(product);
-            updatedResults.add(mapper.toResult(updated));
-        }
+            List<ProductResult> updatedResults = new ArrayList<>();
+            for (ProductAggregate product : products) {
+                applyPatch(product, command.changes());
+                ProductAggregate updated = productRepository.save(product);
+                updatedResults.add(mapper.toResult(updated));
+            }
 
-        return new BulkPatchProductResult(updatedResults, updatedResults.size());
+            return new BulkPatchProductResult(updatedResults, updatedResults.size());
+        });
     }
 
     @Override
     public void execute(DeleteProductCommand command) {
-        // 1. Verify product exists
-        productRepository.findById(new ProductId(command.id()))
-            .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + command.id()));
-
-        // 2. Delete
-        productRepository.deleteById(new ProductId(command.id()));
+        transactionManagerPort.runInTransaction(() -> {
+            productRepository.findById(new ProductId(command.id()))
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + command.id()));
+            productRepository.deleteById(new ProductId(command.id()));
+            return null;
+        });
     }
 
     @Override
     public ProductResult execute(GetProductQuery query) {
-        ProductId id = new ProductId(query.id());
-        Optional<ProductAggregate> aggregate = productRepository.findById(id);
-        return aggregate.map(mapper::toResult).orElse(null);
+        return transactionManagerPort.runInTransaction(() -> {
+            ProductId id = new ProductId(query.id());
+            Optional<ProductAggregate> aggregate = productRepository.findById(id);
+            return aggregate.map(mapper::toResult).orElse(null);
+        });
     }
 
     @Override
     public PagedProductResult execute(ListProductsQuery query) {
-        List<ProductAggregate> aggregates = productRepository.findAll(
-            query.pageIndex(),
-            query.pageSize(),
-            query.requestParams()
-        );
-        long totalCount = productRepository.countAll(query.requestParams());
-        
-        List<ProductResult> results = aggregates.stream()
-            .map(mapper::toResult)
-            .toList();
-        
-        return new PagedProductResult(results, totalCount);
+        return transactionManagerPort.runInTransaction(() -> {
+            List<ProductAggregate> aggregates = productRepository.findAll(
+                query.pageIndex(),
+                query.pageSize(),
+                query.requestParams()
+            );
+            long totalCount = productRepository.countAll(query.requestParams());
+
+            List<ProductResult> results = aggregates.stream()
+                .map(mapper::toResult)
+                .toList();
+
+            return new PagedProductResult(results, totalCount);
+        });
     }
 
     private void applyPatch(ProductAggregate product, Map<String, Object> changes) {
