@@ -96,6 +96,23 @@ class ProductsCrudServiceImplTest {
     }
 
     @Test
+    void prefers_acl_lookup_and_persists_bridge_product_when_legacy_has_no_match() throws BadInputException {
+        ProductPojo input = productsHelper.productPojoForFetch();
+        ProductPojo aclProduct = productsHelper.productPojoAfterCreationWithoutCategory();
+        Product persistedProduct = productsHelper.productEntityAfterCreationWithoutCategory();
+        when(productLookupServiceMock.findPojoByBarcode(anyString())).thenReturn(Optional.of(aclProduct));
+        when(productsRepositoryMock.findByBarcode(anyString())).thenReturn(Optional.empty());
+        when(productsRepositoryMock.saveAndFlush(any(Product.class))).thenReturn(persistedProduct);
+
+        Optional<Product> match = instance.getExisting(input);
+
+        verify(productLookupServiceMock).findPojoByBarcode(input.getBarcode());
+        verify(productsRepositoryMock).saveAndFlush(any(Product.class));
+        assertTrue(match.isPresent());
+        assertEquals(persistedProduct, match.get());
+    }
+
+    @Test
     void creates_product() throws BadInputException, EntityExistsException {
         ProductPojo input = productsHelper.productPojoBeforeCreationWithoutCategory();
         ProductPojo expectedResult = productsHelper.productPojoAfterCreationWithoutCategory();

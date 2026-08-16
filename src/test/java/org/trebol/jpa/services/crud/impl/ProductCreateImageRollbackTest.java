@@ -13,6 +13,7 @@ import org.trebol.common.exceptions.BadInputException;
 import org.trebol.jpa.entities.Image;
 import org.trebol.jpa.entities.Product;
 import org.trebol.jpa.repositories.ProductImagesRepository;
+import org.trebol.jpa.repositories.ProductListItemsRepository;
 import org.trebol.jpa.repositories.ProductsRepository;
 import org.trebol.jpa.services.conversion.ProductsConverterService;
 import org.trebol.jpa.services.crud.ImagesCrudService;
@@ -40,6 +41,9 @@ class ProductCreateImageRollbackTest {
     @Autowired
     private ProductsRepository productsRepository;
 
+    @Autowired
+    private ProductListItemsRepository productListItemsRepository;
+
     @MockBean
     private ProductsConverterService productsConverterService;
     @MockBean
@@ -56,6 +60,7 @@ class ProductCreateImageRollbackTest {
     void setUp() {
         productsHelper.resetProducts();
         imagesHelper.resetImages();
+        productListItemsRepository.deleteAll();
         productsRepository.deleteAll();
     }
 

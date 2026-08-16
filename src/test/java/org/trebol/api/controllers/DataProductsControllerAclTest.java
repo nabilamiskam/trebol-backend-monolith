@@ -70,7 +70,11 @@ class DataProductsControllerAclTest {
     void create_returns400WhenAclReportsExisting() throws Exception {
         ProductPojo input = ProductPojo.builder().barcode("EXIST-1").name("Existing").price(100).build();
 
+        Product persistedProduct = Product.builder().id(1L).barcode("EXIST-1").name("Existing").price(100).build();
+
         when(productLookupService.findPojoByBarcode(anyString())).thenReturn(Optional.of(input));
+        when(productsRepository.findByBarcode(anyString())).thenReturn(Optional.empty());
+        when(productsRepository.saveAndFlush(any(Product.class))).thenReturn(persistedProduct);
 
         mockMvc.perform(post("/data/products")
             .contentType(MediaType.APPLICATION_JSON)

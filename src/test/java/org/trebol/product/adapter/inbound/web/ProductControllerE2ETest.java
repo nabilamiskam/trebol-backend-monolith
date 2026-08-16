@@ -12,6 +12,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.trebol.BackendApp;
+import org.trebol.jpa.repositories.ProductListItemsRepository;
 import org.trebol.product.adapter.outbound.persistence.ProductJpaRepository;
 
 import java.util.HashMap;
@@ -39,8 +40,12 @@ class ProductControllerE2ETest {
     @Autowired
     ProductJpaRepository jpaRepository;
 
+    @Autowired
+    ProductListItemsRepository productListItemsRepository;
+
     @BeforeEach
     void clean() {
+        productListItemsRepository.deleteAll();
         jpaRepository.deleteAll();
     }
 

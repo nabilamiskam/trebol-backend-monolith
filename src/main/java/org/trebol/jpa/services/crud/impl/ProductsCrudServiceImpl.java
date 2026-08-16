@@ -144,14 +144,23 @@ public class ProductsCrudServiceImpl
         if (StringUtils.isBlank(barcode)) {
             throw new BadInputException("Invalid product barcode");
         }
-        // Try ACL lookup first, then fallback to legacy repository
-        return productLookupService.findPojoByBarcode(barcode)
-            .map(pojo -> Product.builder()
-                .barcode(pojo.getBarcode())
-                .name(pojo.getName())
-                .price(pojo.getPrice() == null ? 0 : pojo.getPrice())
-                .build())
-            .or(() -> productsRepository.findByBarcode(barcode));
+
+        Optional<ProductPojo> aclMatch = productLookupService.findPojoByBarcode(barcode);
+        if (aclMatch.isPresent()) {
+            ProductPojo aclProduct = aclMatch.get();
+            Product bridgeProduct = Product.builder()
+                .barcode(aclProduct.getBarcode())
+                .name(aclProduct.getName())
+                .price(aclProduct.getPrice() == null ? 0 : aclProduct.getPrice())
+                .stockCurrent(aclProduct.getCurrentStock() == null ? 0 : aclProduct.getCurrentStock())
+                .stockCritical(aclProduct.getCriticalStock() == null ? 0 : aclProduct.getCriticalStock())
+                .build();
+
+            return productsRepository.findByBarcode(barcode)
+                .or(() -> Optional.of(productsRepository.saveAndFlush(bridgeProduct)));
+        }
+
+        return productsRepository.findByBarcode(barcode);
     }
 
     /**

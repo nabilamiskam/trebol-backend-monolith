@@ -66,15 +66,19 @@ class ProductsCrudServiceImplAclTest {
     }
 
     @Test
-    void getExisting_prefersAclBarcode() throws BadInputException {
+    void getExisting_prefersAclBarcodeAndPersistsBridgeProduct() throws BadInputException {
         ProductPojo input = productsHelper.productPojoForFetch();
         ProductPojo aclPojo = productsHelper.productPojoAfterCreationWithoutCategory();
+        Product persistedBridge = productsHelper.productEntityAfterCreationWithoutCategory();
 
         when(productLookupService.findPojoByBarcode(anyString())).thenReturn(Optional.of(aclPojo));
+        when(productsRepository.findByBarcode(anyString())).thenReturn(Optional.empty());
+        when(productsRepository.saveAndFlush(any(Product.class))).thenReturn(persistedBridge);
 
         Optional<Product> result = instance.getExisting(input);
 
         assertTrue(result.isPresent());
+        assertEquals(persistedBridge, result.get());
         assertEquals(aclPojo.getBarcode(), result.get().getBarcode());
     }
 

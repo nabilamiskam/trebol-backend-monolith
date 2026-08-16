@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.trebol.BackendApp;
+import org.trebol.jpa.repositories.ProductListItemsRepository;
 import org.trebol.product.domain.aggregate.ProductAggregate;
 import org.trebol.product.domain.vo.ProductCode;
 import org.trebol.product.domain.vo.ProductId;
@@ -31,8 +32,12 @@ class ProductRepositoryAdapterTest {
     @Autowired
     private ProductJpaRepository jpaRepository;
 
+    @Autowired
+    private ProductListItemsRepository productListItemsRepository;
+
     @BeforeEach
     void cleanup() {
+        productListItemsRepository.deleteAll();
         jpaRepository.deleteAll();
     }
 
